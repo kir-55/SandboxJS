@@ -6,7 +6,7 @@ var w = document.getElementById("width");
 var m = document.getElementById("mines_amount");
 
 var cell_size = 20;
-var normal_brush_size = 2;
+var normal_brush_size = 3;
 
 var current_grain = 1;
 
@@ -16,14 +16,32 @@ grainTypes = []
 
 //grains
 class Grain{
-    static gravity = true;
+    gravity = true;
+    normalInt;
     static surroundingFormat = 0;
     constructor(gravity, surroundingFormat) {
         this.gravity = gravity;
         this.surroundingFormat = surroundingFormat
     }
 
-    static getGrainInt(){
+
+    findNormalInt(type){
+        var realI = 0;
+        for(let i in grainTypes){
+            console.log("type i: " + typeof grainTypes[i].type);
+            console.log("type: " + typeof type);
+            if(grainTypes[i].type === type){
+                this.normalInt = realI+1
+                return;
+            }
+            realI += grainTypes[i].amount;
+        }
+        console.log("normal int: " + this.normalInt);
+
+    }
+    
+
+    getGrainInt(){
         var realI = 0;
         for(let i in grainTypes){
             if(grainTypes[i].type == this){
@@ -35,7 +53,7 @@ class Grain{
         return 0;
     }
 
-    static applyPhisics(surrounding){
+    applyPhisics(surrounding){
         if(this.gravity == true){
             var newSurrounding = surrounding;
             var self = surrounding[1][1];
@@ -67,44 +85,92 @@ class Grain{
     }
 }
 
-class WaterAffectable extends Grain{
-    maxAffectionLevel;
-    affectionLevel = 0;
-    constructor(maxAffectionLevel, graity, surroundingFormat){
-        super(graity, surroundingFormat);
-        this.maxAffectionLevel = maxAffectionLevel;
-    }
-    setToMaxLevel(){
-        this.affectionLevel = this.maxAffectionLevel;
-    }
-
-    static applyPhisics(surrounding){
-        return super.applyPhisics(surrounding);
-    }
-}
-
-const sand = class Sand extends Grain{
+class Liquid extends Grain{
     constructor(){
         super(true, 0);
     }
 
-    static applyPhisics(surrounding){
-        return super.applyPhisics(surrounding);
-    }
-
-    static getGrainInt(){
-        return 1;
+    applyPhisics(surrounding){
+        var result = super.applyPhisics(surrounding)
+        if(result == surrounding){
+            var self = result[1][1];
+            if(result[0][1] == 0 && result[2][1] == 0){
+                result[getRandom(0,2)*2][1] = self;
+                result[1][1] = 0;
+            }
+            else if(result[0][1] == 0){
+                result[0][1] = self;
+                result[1][1] = 0;
+            }
+            else if(result[2][1] == 0){
+                result[2][1] = self;
+                result[1][1] = 0;
+            }
+        }
+        return result;
     }
 }
 
-const water = class Water extends Grain{
-    constructor(){
-        super(false, 0);
+class LiquidAffectable extends Grain{
+
+    normalInt
+    maxAffectionLevel;
+    constructor(graity, surroundingFormat, normalInt, maxAffectionLevel){
+        super(graity, surroundingFormat);
+        this.maxAffectionLevel = maxAffectionLevel;
+        this.normalInt = normalInt;
     }
 
-    static applyPhisics(surrounding){
-        return super.applyPhisics(surrounding)
+    applyPhisics(surrounding){
+        var result = super.applyPhisics(surrounding);
+        if(result == surrounding){ 
+            if(result[1][1] != this.normalInt + this.maxAffectionLevel)
+            for(var x = 0; x < 3; x++){
+                for(var y = 0; y < 3; y++){
+                    if((x+y)%2 == 1){
+                        var side = result[x][y];
+                        if(side != 0 && side != unexistingGrain){
+                            var grain_type = grains[side-1].type;
+                            
+                            if(grain_type instanceof Liquid){
+                                result[1][1] = this.normalInt + this.maxAffectionLevel;
+                                return result;
+                            }
+                            if(grain_type instanceof LiquidAffectable){
+                                if(side - grain_type.normalInt > 0){
+                                    var rnd = getRandom(0, 500);
+                                    if(rnd == 3)
+                                        result[1][1] = this.normalInt + side - grain_type.normalInt;
+                                    else
+                                        result[1][1] = this.normalInt + side - grain_type.normalInt - 1; 
+                                    return result;
+                                }
+                                
+                            }
+                            
+                        }
+                        
+                    }
+                }
+            }
+            
+
+        }
+        return result;
     }
+}
+
+const sand = class Sand extends LiquidAffectable{
+    constructor(normalInt){
+        super(true, 0, normalInt, 2);
+    }
+
+    getGrainInt(){
+        return this.normalInt;
+    }
+}
+
+const water = class Water extends Liquid{
 
 }
 
@@ -136,12 +202,14 @@ class GrainType{
 
 }
 
+const normal_sand = new sand();
+const normal_water = new water();
 
 grains = [
-    new GrainType(1, "#eae1b0", sand),
-    new GrainType(2, "#e5d890", sand),
-    new GrainType(3, "#c3b87c", sand),
-    new GrainType(4, "#5d9798", water)
+    new GrainType(1, "#eae1b0", normal_sand),
+    new GrainType(2, "#e5d890", normal_sand),
+    new GrainType(3, "#c3b87c", normal_sand),
+    new GrainType(4, "#5d9798", normal_water)
 ]
 
 
@@ -169,6 +237,10 @@ function getGrainTypes(){
         }
         
     }
+
+    for(grainType of grainTypes){
+        grainType.type.findNormalInt(grainType.type);
+    }
 }
 
 
@@ -190,6 +262,7 @@ canvas.height = pixelWidth;
 var screen = new Array(height).fill(0).map(() => new Array(width).fill(0));
 
 getGrainTypes();
+
 start()
 
 //mouse handling
@@ -230,10 +303,18 @@ function start(){
 
 
 function nextGrain(){
-    if(current_grain < grainTypes.length){
+    if(current_grain < grainTypes.length)
         current_grain++;
-    }
+    else 
+        current_grain = 0;
 
+}
+
+function prevGrain(){
+    if(current_grain > 0)
+        current_grain--;
+    else
+        current_grain = grainTypes.length;
 }
 
 function gameLoop(){
@@ -304,7 +385,7 @@ function placeBrush(x, y, brush_size = normal_brush_size){
             var globalX = x+Math.round(x1);
             var globalY = y+Math.round(y1);
             if(globalX >= 0 && globalX < width && globalY >= 0 && globalY < height)
-                screen[x+Math.round(x1)][y+Math.round(y1)] = grainTypes[current_grain-1].type.getGrainInt();          
+                screen[x+Math.round(x1)][y+Math.round(y1)] = current_grain > 0? grainTypes[current_grain-1].type.getGrainInt() : 0;          
         }
     }
     
