@@ -6,7 +6,7 @@ var w = document.getElementById("width");
 var m = document.getElementById("mines_amount");
 
 var cell_size = 20;
-var normal_brush_size = 3;
+var normal_brush_size = 1;
 
 var current_grain = 1;
 
@@ -17,11 +17,13 @@ grainTypes = []
 //grains
 class Grain{
     gravity = true;
+    density = 1;
     normalInt;
     static surroundingFormat = 0;
-    constructor(gravity, surroundingFormat) {
+    constructor(gravity, surroundingFormat, density) {
         this.gravity = gravity;
-        this.surroundingFormat = surroundingFormat
+        this.surroundingFormat = surroundingFormat;
+        this.density = density;
     }
 
 
@@ -87,11 +89,23 @@ class Grain{
 
 class Liquid extends Grain{
     constructor(){
-        super(true, 0);
+        super(true, 0, 1);
     }
 
     applyPhisics(surrounding){
         var result = super.applyPhisics(surrounding)
+        if(result == surrounding){
+
+            var self = result[1][1]; 
+            if(result[1][0] != 0 && result[1][0] != unexistingGrain && grains[result[1][0]-1].type.density > this.density)
+            {
+                var tempGrain = result[1][0];
+                result[1][0] = self;
+                result[1][1] = tempGrain;
+                return result;
+            }
+            
+        }
         if(result == surrounding){
             var self = result[1][1];
             if(result[0][1] == 0 && result[2][1] == 0){
@@ -115,8 +129,8 @@ class LiquidAffectable extends Grain{
 
     normalInt
     maxAffectionLevel;
-    constructor(graity, surroundingFormat, normalInt, maxAffectionLevel){
-        super(graity, surroundingFormat);
+    constructor(graity, surroundingFormat, density, normalInt, maxAffectionLevel){
+        super(graity, surroundingFormat, density);
         this.maxAffectionLevel = maxAffectionLevel;
         this.normalInt = normalInt;
     }
@@ -162,7 +176,7 @@ class LiquidAffectable extends Grain{
 
 const sand = class Sand extends LiquidAffectable{
     constructor(normalInt){
-        super(true, 0, normalInt, 2);
+        super(true, 0, 3, normalInt, 2);
     }
 
     getGrainInt(){
@@ -174,6 +188,11 @@ const water = class Water extends Liquid{
 
 }
 
+const iron = class Iron extends Grain{
+    constructor(){
+        super(false, 0, 50);
+    }
+}
 
 //sourrounding formats:
 // format 0
@@ -204,12 +223,21 @@ class GrainType{
 
 const normal_sand = new sand();
 const normal_water = new water();
+const normal_iron = new iron();
 
 grains = [
     new GrainType(1, "#eae1b0", normal_sand),
     new GrainType(2, "#e5d890", normal_sand),
     new GrainType(3, "#c3b87c", normal_sand),
-    new GrainType(4, "#5d9798", normal_water)
+    new GrainType(4, "#0f5e9c", normal_water),
+    new GrainType(5, "#2389da", normal_water),
+    new GrainType(6, "#1ca3ec", normal_water),
+    new GrainType(7, "#0f5e9c", normal_water),
+    new GrainType(8, "#848482", normal_iron),
+    new GrainType(9, "#cbcdcd", normal_iron),
+    new GrainType(10, "#999e98", normal_iron),
+    new GrainType(11, "#343432", normal_iron),
+    new GrainType(12, "#696b5e", normal_iron),
 ]
 
 
