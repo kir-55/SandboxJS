@@ -6,11 +6,10 @@ var w = document.getElementById("width");
 var m = document.getElementById("mines_amount");
 
 var cell_size = 20;
-var normal_brush_size = 1;
+var normal_brush_size = 3;
 
 var current_grain = 1;
 
-//add type here!
 
 grainTypes = []
 
@@ -30,16 +29,12 @@ class Grain{
     findNormalInt(type){
         var realI = 0;
         for(let i in grainTypes){
-            console.log("type i: " + typeof grainTypes[i].type);
-            console.log("type: " + typeof type);
             if(grainTypes[i].type === type){
                 this.normalInt = realI+1
                 return;
             }
             realI += grainTypes[i].amount;
         }
-        console.log("normal int: " + this.normalInt);
-
     }
     
 
@@ -57,7 +52,7 @@ class Grain{
 
     applyPhisics(surrounding){
         if(this.gravity == true){
-            var newSurrounding = surrounding;
+            var newSurrounding = JSON.parse(JSON.stringify(surrounding)); ;
             var self = surrounding[1][1];
             if(surrounding[1][2] == 0){
                 newSurrounding[1][2] = self;
@@ -66,12 +61,11 @@ class Grain{
             else if(surrounding[0][2] == 0 && surrounding[2][2] == 0){
                 if (getRandom(0,2) == 0){
                     newSurrounding[0][2] = self;
-                    newSurrounding[1][1] = 0;
                 }
                 else{
                     newSurrounding[2][2] = self;
-                    newSurrounding[1][1] = 0;
                 }
+                newSurrounding[1][1] = 0;
             } 
             else if(surrounding[0][2] == 0){
                 newSurrounding[0][2] = self;
@@ -81,6 +75,8 @@ class Grain{
                 newSurrounding[2][2] = self;
                 newSurrounding[1][1] = 0;
             }
+            if(!arraysEqual(surrounding, newSurrounding))
+                console.log("gravitacja działa!!");
             return newSurrounding;
         }
         return surrounding;
@@ -88,38 +84,66 @@ class Grain{
 }
 
 class Liquid extends Grain{
-    constructor(){
-        super(true, 0, 1);
+    constructor(density = 1){
+        super(true, 0, density);
     }
 
     applyPhisics(surrounding){
         var result = super.applyPhisics(surrounding)
-        if(result == surrounding){
-
+        if(arraysEqual(surrounding, result)){
+            
             var self = result[1][1]; 
-            if(result[1][0] != 0 && result[1][0] != unexistingGrain && grains[result[1][0]-1].type.density > this.density)
-            {
-                var tempGrain = result[1][0];
-                result[1][0] = self;
-                result[1][1] = tempGrain;
-                return result;
+            //drowning grains with higher density
+            for(var i = 0; i < 3; i++){
+                var higherGrain = result[i][0];
+                if(higherGrain != 0 && higherGrain != unexistingGrain){
+                    var grainType = grains[higherGrain-1].type
+                    if(grainType.gravity && grainType.density > this.density){
+                        result[i][0] = self;
+                        result[1][1] = higherGrain;
+                        return result;
+                    }
+                }
             }
             
-        }
-        if(result == surrounding){
-            var self = result[1][1];
-            if(result[0][1] == 0 && result[2][1] == 0){
+            var left = result[0][1];
+            var right = result[2][1];
+
+            
+
+            if(left == 0 && right == 0){
                 result[getRandom(0,2)*2][1] = self;
                 result[1][1] = 0;
+                return result;
             }
-            else if(result[0][1] == 0){
+            else if(left == 0){
                 result[0][1] = self;
                 result[1][1] = 0;
+                return result;
             }
-            else if(result[2][1] == 0){
+            else if(right == 0){
                 result[2][1] = self;
                 result[1][1] = 0;
+                return result;
             }
+
+            var leftIsLiquid = left != unexistingGrain && left != 0 && !(grains[left-1].type === grains[this.normalInt].type) && grains[left-1].type instanceof Liquid; 
+            var rightIsLiquid = right != unexistingGrain && right != 0 && !(grains[right-1].type === grains[this.normalInt].type) && grains[right-1].type instanceof Liquid; 
+
+            if(leftIsLiquid && rightIsLiquid){
+                var rnd = getRandom(0,2)*2;
+                result[1][1] = result[rnd][1];
+                result[rnd][1] = self;
+            }
+            else if(leftIsLiquid){
+                result[0][1] = self;
+                result[1][1] = left;
+            }
+            else if(rightIsLiquid){
+                result[0][1] = self;
+                result[1][1] = right;
+            }
+
         }
         return result;
     }
@@ -137,38 +161,35 @@ class LiquidAffectable extends Grain{
 
     applyPhisics(surrounding){
         var result = super.applyPhisics(surrounding);
-        if(result == surrounding){ 
-            if(result[1][1] != this.normalInt + this.maxAffectionLevel)
-            for(var x = 0; x < 3; x++){
-                for(var y = 0; y < 3; y++){
-                    if((x+y)%2 == 1){
-                        var side = result[x][y];
-                        if(side != 0 && side != unexistingGrain){
-                            var grain_type = grains[side-1].type;
-                            
-                            if(grain_type instanceof Liquid){
-                                result[1][1] = this.normalInt + this.maxAffectionLevel;
-                                return result;
-                            }
-                            if(grain_type instanceof LiquidAffectable){
-                                if(side - grain_type.normalInt > 0){
-                                    var rnd = getRandom(0, 500);
-                                    if(rnd == 3)
-                                        result[1][1] = this.normalInt + side - grain_type.normalInt;
-                                    else
-                                        result[1][1] = this.normalInt + side - grain_type.normalInt - 1; 
-                                    return result;
-                                }
+        if(arraysEqual(result,surrounding)){ 
+            console.log("zawsze działa");
+            if(result[1][1] != this.normalInt + this.maxAffectionLevel){
+                for(var x = 0; x < 3; x++){
+                    for(var y = 0; y < 3; y++){
+                        if((x+y)%2 == 1){
+                            var side = result[x][y];
+                            if(side != 0 && side != unexistingGrain){
+                                var grain_type = grains[side-1].type;
                                 
+                                if(grain_type instanceof Liquid){
+                                    result[1][1] = this.normalInt + this.maxAffectionLevel;
+                                }
+                                else if(grain_type instanceof LiquidAffectable){
+                                    if(side - grain_type.normalInt > 0){
+                                        var rnd = getRandom(0, 500);
+                                        if(rnd == 3)
+                                            result[1][1] = this.normalInt + side - grain_type.normalInt;
+                                        else
+                                            result[1][1] = this.normalInt + side - grain_type.normalInt - 1; 
+                                    }
+                                }
                             }
-                            
                         }
-                        
                     }
                 }
             }
-            
-
+        }else{
+            console.log("niezgodność");
         }
         return result;
     }
@@ -186,6 +207,21 @@ const sand = class Sand extends LiquidAffectable{
 
 const water = class Water extends Liquid{
 
+}
+
+const acid = class Acid extends Liquid{
+    constructor(){
+        super(2);
+    }
+
+    applyPhisics(surrounding){
+        var result = super.applyPhisics(surrounding);
+        if(arraysEqual(result, surrounding)){ 
+            result = destroyNear(result, [iron], 40, true);
+        }
+        return result;
+    }
+    
 }
 
 const iron = class Iron extends Grain{
@@ -208,11 +244,9 @@ const iron = class Iron extends Grain{
 // 20|21|22|23|24
 
 class GrainType{
-    int = 0;
     color = "";
     type = new Grain(true, 0);
-    constructor(int, color, type){
-        this.int = int;
+    constructor(color, type){
         this.color = color;
         this.type = type;
         
@@ -224,20 +258,26 @@ class GrainType{
 const normal_sand = new sand();
 const normal_water = new water();
 const normal_iron = new iron();
+const normal_acid = new acid();
 
 grains = [
-    new GrainType(1, "#eae1b0", normal_sand),
-    new GrainType(2, "#e5d890", normal_sand),
-    new GrainType(3, "#c3b87c", normal_sand),
-    new GrainType(4, "#0f5e9c", normal_water),
-    new GrainType(5, "#2389da", normal_water),
-    new GrainType(6, "#1ca3ec", normal_water),
-    new GrainType(7, "#0f5e9c", normal_water),
-    new GrainType(8, "#848482", normal_iron),
-    new GrainType(9, "#cbcdcd", normal_iron),
-    new GrainType(10, "#999e98", normal_iron),
-    new GrainType(11, "#343432", normal_iron),
-    new GrainType(12, "#696b5e", normal_iron),
+    new GrainType("#eae1b0", normal_sand),
+    new GrainType("#e5d890", normal_sand),
+    new GrainType("#c3b87c", normal_sand),
+    new GrainType("#0f5e9c", normal_water),
+    new GrainType("#2389da", normal_water),
+    new GrainType("#1ca3ec", normal_water),
+    new GrainType("#0f5e9c", normal_water),
+    new GrainType("#848482", normal_iron),
+    new GrainType("#cbcdcd", normal_iron),
+    new GrainType("#999e98", normal_iron),
+    new GrainType("#343432", normal_iron),
+    new GrainType("#696b5e", normal_iron),
+    new GrainType("#f4ffd1", normal_acid),
+    new GrainType("#f4ff9f", normal_acid),
+    new GrainType("#f5ff62", normal_acid),
+    new GrainType("#e7ff2c", normal_acid),
+    new GrainType("#d2ff46", normal_acid),
 ]
 
 
@@ -250,6 +290,7 @@ class GrainVariety {
         this.type = type;
     }
 }
+
 
 function getGrainTypes(){
     var lastGrain
@@ -329,6 +370,11 @@ function start(){
     intervalID = window.setInterval(gameLoop, 1);
 }
 
+function arraysEqual(arr1, arr2) {
+    if (arr1[1][1] != arr2[1][1]) 
+        return false;
+    return true;
+}
 
 function nextGrain(){
     if(current_grain < grainTypes.length)
@@ -352,11 +398,35 @@ function gameLoop(){
 
 function findGrain(int){
     if(int == 0)
-        return
-    for(let grain of grains)
-        if(grain.int == int)
-            return grain;
+        return;
+    for(let grainIndex in grains)
+        if(grainIndex == int-1)
+            return grains[grainIndex];
     
+}
+//this function is only of surrounding type 0
+function destroyNear(surrounding, grainsToDestroy, chanceToSelfDestroy = 100, onlySides = true){
+    for(var x = 0; x < 3; x++){
+        for(var y = 0; y < 3; y++){
+            if(!onlySides || (onlySides && (x+y)%2 == 1)){
+                for(let grainToDestroy of grainsToDestroy){
+                    var side = surrounding[x][y];
+                    if (side != 0 && side != unexistingGrain){
+                        if(grains[surrounding[x][y]-1].type instanceof grainToDestroy){
+                            surrounding[x][y] = 0;
+                            var chance = getRandom(0, 100);
+                            if (chance < chanceToSelfDestroy){
+                                surrounding[1][1] = 0;
+                                return surrounding;
+                            }
+                            break;
+                        }
+                    }
+                } 
+            }
+        }
+    }
+    return surrounding;
 }
 
 function getSurrounding(surroundingFormat, x, y, screen){
@@ -381,11 +451,12 @@ function getSurrounding(surroundingFormat, x, y, screen){
 
 function runPhysics(){
     var newScreen = JSON.parse(JSON.stringify(screen)); 
-    for(y = 0; y < height; y++){
-        for(x = 0; x < width; x++){
+    for(x = 0; x < width; x++){
+        for(y = 0; y < height; y++){
             var currentGrainInt = screen[x][y];
-            if(currentGrainInt != 0 && currentGrainInt != 9999){
-                var currentGrainType = findGrain(currentGrainInt);
+            if(currentGrainInt != 0 && currentGrainInt != unexistingGrain && currentGrainInt == newScreen[x][y]){
+                
+                var currentGrainType = grains[currentGrainInt-1];
                 var currentGrain = currentGrainType.type;
                 var newSurrounding = currentGrain.applyPhisics(getSurrounding(currentGrain.surroundingFormat, x, y, newScreen))
                 var sideLength = currentGrain.surroundingFormat * 2 + 3
