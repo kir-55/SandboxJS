@@ -25,7 +25,7 @@ label{
   cursor: pointer;
   display: inline-block;
   font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 70px;
+  font-size: 32px;
   font-weight: 700;
   letter-spacing: .8px;
   line-height: 20px;
@@ -42,8 +42,7 @@ label{
   -webkit-user-select: none;
   vertical-align: middle;
   white-space: nowrap;
-  width: 25%;
-  height: 10%;
+
 }
 
 .button-19:after {

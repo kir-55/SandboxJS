@@ -5,7 +5,7 @@ var h = document.getElementById("height");
 var w = document.getElementById("width");
 var m = document.getElementById("mines_amount");
 
-var cell_size = 20;
+var cell_size = 8;
 var normal_brush_size = 3;
 
 var current_grain = 1;
