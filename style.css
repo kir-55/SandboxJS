@@ -14,6 +14,15 @@ label{
   text-align: left;
 }
 
+/* 
+#materialPreview{
+  width: 48px;
+  height: 48px;
+  margin-top: 10px;
+}
+   */
+
+
 .button-19 {
   appearance: button;
   background-color: gold;
@@ -33,14 +42,13 @@ label{
   outline: none;
   overflow: visible;
   padding: 13px 16px;
-  margin-top: 10px;
   text-align: center;
   touch-action: manipulation;
   transform: translateZ(0);
   transition: filter .2s;
   user-select: none;
   -webkit-user-select: none;
-  vertical-align: middle;
+  vertical-align: top;
   white-space: nowrap;
 
 }
@@ -82,12 +90,111 @@ label{
 
 
 
-
-
 .center{
     margin-bottom: auto;
     margin-left: auto;
     margin-right: auto;
     align-items: center;
     text-align: center;
+}
+
+#brushSize {
+  -webkit-appearance: none;
+  width: 180px;
+  height: 18px;
+  background: #222;
+  border-radius: 9px;
+  outline: none;
+  margin-left: 20px;
+  margin-right: 20px;
+  vertical-align: top;
+  box-shadow: 0 0 8px gold;
+  transition: box-shadow 0.2s;
+}
+
+
+#brushSize::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: gold;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 0 8px #000;
+  transition: background 0.2s;
+}
+
+#brushSize:active::-webkit-slider-thumb {
+  background: #ffd700;
+}
+
+#brushSize::-moz-range-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: gold;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 0 8px #000;
+  transition: background 0.2s;
+}
+
+#brushSize:active::-moz-range-thumb {
+  background: #ffd700;
+}
+
+#brushSize::-ms-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: gold;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 0 8px #000;
+  transition: background 0.2s;
+}
+
+#brushSize:focus {
+  outline: none;
+}
+
+#brushSize::-ms-fill-lower {
+  background: #222;
+  border-radius: 9px;
+}
+
+#brushSize::-ms-fill-upper {
+  background: #222;
+  border-radius: 9px;
+}
+
+#brushSize::-webkit-slider-runnable-track {
+  height: 18px;
+  background: #222;
+  border-radius: 9px;
+}
+
+#brushSize::-moz-range-track {
+  height: 18px;
+  background: #222;
+  border-radius: 9px;
+}
+
+#brushSize::-ms-fill-lower,
+#brushSize::-ms-fill-upper {
+  background: #222;
+}
+
+#brushSize:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 6px gold;
+}
+
+#brushSize:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 6px gold;
+}
+
+#brushSize:focus::-ms-thumb {
+  box-shadow: 0 0 0 6px gold;
 }
