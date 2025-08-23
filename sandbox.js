@@ -1618,7 +1618,37 @@ var mousePos = {
     'x' : 0,
     'y' : 0
 }
+function getTouchPos(canvas, touchEvent) {
+    var rect = canvas.getBoundingClientRect();
+    var touch = touchEvent.touches[0];
+    return {
+        x: Math.floor((touch.clientX - rect.left)/cell_size),
+        y: Math.floor((touch.clientY - rect.top)/cell_size)
+    };
+}
 
+canvas.addEventListener("touchstart", function(event) {
+    event.preventDefault();
+    var pos = getTouchPos(canvas, event);
+    mousePos.x = pos.x;
+    mousePos.y = pos.y;
+    if (mouseInterval) clearInterval(mouseInterval);
+    mouseInterval = setInterval(handleMouse, 20);
+});
+
+canvas.addEventListener("touchmove", function(event) {
+    event.preventDefault();
+    var pos = getTouchPos(canvas, event);
+    mousePos.x = pos.x;
+    mousePos.y = pos.y;
+});
+
+canvas.addEventListener("touchend", function(event) {
+    clearInterval(mouseInterval);
+    mouseInterval = null;
+    mousePos.x = -1;
+    mousePos.y = -1;
+});
 const unexistingGrain = 9999;
 
 const height = 100;
@@ -1638,16 +1668,7 @@ start()
 //mouse handling
 var mouseInterval;
 
-document.addEventListener("mousemove", function(event){
-    var rect = canvas.getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
-        mousePos.x = -1; // Set to -1 to indicate outside canvas
-        mousePos.y = -1; // Set to -1 to indicate outside canvas
-        return; // Exit if mouse is outside the canvas
-    }
-    mousePos.x = Math.floor((event.clientX - rect.left)/cell_size);
-    mousePos.y = Math.floor((event.clientY - rect.top)/cell_size);
-});
+
 
 document.addEventListener("mousedown", function(event) {
     // Clear any existing interval before setting a new one
