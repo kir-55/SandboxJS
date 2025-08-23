@@ -1637,7 +1637,56 @@ start()
 
 //mouse handling
 var mouseInterval;
+// Helper for both mouse and touch
+function setPointerPos(x, y) {
+    mousePos.x = x;
+    mousePos.y = y;
+}
 
+// For canvas
+canvas.addEventListener("touchstart", function(event) {
+    event.preventDefault();
+    var pos = getTouchPos(canvas, event);
+    setPointerPos(pos.x, pos.y);
+    if (mouseInterval) clearInterval(mouseInterval);
+    mouseInterval = setInterval(handleMouse, 20);
+});
+canvas.addEventListener("touchmove", function(event) {
+    event.preventDefault();
+    var pos = getTouchPos(canvas, event);
+    setPointerPos(pos.x, pos.y);
+});
+canvas.addEventListener("touchend", function(event) {
+    clearInterval(mouseInterval);
+    mouseInterval = null;
+    setPointerPos(-1, -1);
+});
+canvas.addEventListener("touchcancel", function(event) {
+    clearInterval(mouseInterval);
+    mouseInterval = null;
+    setPointerPos(-1, -1);
+});
+
+// For grain menu
+document.getElementById("grainMenu").addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    const rect = this.getBoundingClientRect();
+    const touch = e.touches[0];
+    const y = touch.clientY - rect.top;
+    const x = touch.clientX - rect.left;
+    const cellSize = 9 * 5;
+    const idx = Math.floor((Math.floor(y / cellSize) * rect.width/cellSize) + Math.floor(x / cellSize));
+    if (idx >= 0 && idx < grainTypes.length) {
+        current_grain = idx + 1;
+        drawGrainMenu();
+        drawMaterialPreview();
+    }
+    else{
+        current_grain = 0;
+        drawGrainMenu();
+        drawMaterialPreview();
+    }
+});
 
 document.addEventListener("mousemove", function(event){
     var rect = canvas.getBoundingClientRect();
