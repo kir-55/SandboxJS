@@ -1,4 +1,4 @@
-var canvas = document.getElementById("canvas")
+ var canvas = document.getElementById("canvas")
 var ctx = canvas.getContext("2d");
 
 var h = document.getElementById("height");
@@ -1644,30 +1644,53 @@ function setPointerPos(x, y) {
 }
 
 // For canvas
+// Existing mousemove handler
+document.addEventListener("mousemove", function(event){
+    var rect = canvas.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+        mousePos.x = -1;
+        mousePos.y = -1;
+        return;
+    }
+    mousePos.x = Math.floor((event.clientX - rect.left)/cell_size);
+    mousePos.y = Math.floor((event.clientY - rect.top)/cell_size);
+});
+
+// Add touch handlers with matching calculation logic
+
 canvas.addEventListener("touchstart", function(event) {
     event.preventDefault();
-    var pos = getTouchPos(canvas, event);
-    setPointerPos(pos.x, pos.y);
+    var rect = canvas.getBoundingClientRect();
+    var touch = event.touches[0];
+    mousePos.x = Math.floor((touch.clientX - rect.left)/cell_size);
+    mousePos.y = Math.floor((touch.clientY - rect.top)/cell_size);
     if (mouseInterval) clearInterval(mouseInterval);
     mouseInterval = setInterval(handleMouse, 20);
 });
+
 canvas.addEventListener("touchmove", function(event) {
     event.preventDefault();
-    var pos = getTouchPos(canvas, event);
-    setPointerPos(pos.x, pos.y);
+    var rect = canvas.getBoundingClientRect();
+    var touch = event.touches[0];
+    mousePos.x = Math.floor((touch.clientX - rect.left)/cell_size);
+    mousePos.y = Math.floor((touch.clientY - rect.top)/cell_size);
 });
+
 canvas.addEventListener("touchend", function(event) {
     clearInterval(mouseInterval);
     mouseInterval = null;
-    setPointerPos(-1, -1);
+    mousePos.x = -1;
+    mousePos.y = -1;
 });
+
 canvas.addEventListener("touchcancel", function(event) {
     clearInterval(mouseInterval);
     mouseInterval = null;
-    setPointerPos(-1, -1);
+    mousePos.x = -1;
+    mousePos.y = -1;
 });
 
-// For grain menu
+// For grainMenu (selection menu)
 document.getElementById("grainMenu").addEventListener("touchstart", function(e) {
     e.preventDefault();
     const rect = this.getBoundingClientRect();
