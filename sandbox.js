@@ -1827,7 +1827,43 @@ document.getElementById("grainMenu").addEventListener("click", function(e) {
         drawMaterialPreview();
     }
 });
+window.addEventListener('DOMContentLoaded', function() {
+    var canvas = document.getElementById("canvas");
+    if (!canvas) return;
 
+    // Add touch handlers for canvas
+    canvas.addEventListener("touchstart", function(event) {
+        event.preventDefault();
+        var rect = canvas.getBoundingClientRect();
+        var touch = event.touches[0];
+        mousePos.x = Math.floor((touch.clientX - rect.left)/cell_size);
+        mousePos.y = Math.floor((touch.clientY - rect.top)/cell_size);
+        if (mouseInterval) clearInterval(mouseInterval);
+        mouseInterval = setInterval(handleMouse, 20);
+    });
+
+    canvas.addEventListener("touchmove", function(event) {
+        event.preventDefault();
+        var rect = canvas.getBoundingClientRect();
+        var touch = event.touches[0];
+        mousePos.x = Math.floor((touch.clientX - rect.left)/cell_size);
+        mousePos.y = Math.floor((touch.clientY - rect.top)/cell_size);
+    });
+
+    canvas.addEventListener("touchend", function(event) {
+        clearInterval(mouseInterval);
+        mouseInterval = null;
+        mousePos.x = -1;
+        mousePos.y = -1;
+    });
+
+    canvas.addEventListener("touchcancel", function(event) {
+        clearInterval(mouseInterval);
+        mouseInterval = null;
+        mousePos.x = -1;
+        mousePos.y = -1;
+    });
+});
 // Redraw menu when grain changes
 function nextGrain(){
     if(current_grain < grainTypes.length)
