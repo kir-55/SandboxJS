@@ -14,23 +14,23 @@
         <input type="number" name="stepDelay" id="stepDelay" onchange="setStepDelay()">
     </div> -->
 
-    <div class="center">
-        
-        <br>
-        <label for="log" id="log">Click</label>
-        <br>
-        <canvas id="canvas" ></canvas>
-
-        <canvas id="grainMenu"  style="float:left; margin-right:20px; border:2px solid gold;"></canvas>
-        <br>
-        <div class="button-container" style="margin-top: 10px;">
-            <button onclick="prevGrain()" class="button-19">Previous</button>
-            <canvas id="materialPreview" width="48" height="48" style="border:2px solid gold;"></canvas>
-            <button onclick="nextGrain()" class="button-19">Next</button>
-            <input type="range" id="brushSize" min="1" max="20" value="3"  onchange="setBrushSize(this.value)">
+    <div class="main-layout">
+        <canvas id="grainMenu" style="border:2px solid gold;"></canvas>
+        <div class="center">
+            <br>
+            <label for="log" id="log">Click</label>
+            <br>
+            <canvas id="canvas" style="margin-bottom: 30px;"></canvas>
+            <br>
+            <div class="button-container" style="margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-direction: column; justify-content: center;">
+                <div>
+                    <button onclick="prevGrain()" class="button-19"><</button>
+                    <canvas id="materialPreview" width="48" height="48" style="border:2px solid gold;"></canvas>
+                    <button onclick="nextGrain()" class="button-19">></button>
+                </div>
+                <input type="range" id="brushSize" min="1" max="20" value="3"  onchange="setBrushSize(this.value)">
+            </div>
         </div>
-       
-       
     </div>
 </body>
 </html>

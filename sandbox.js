@@ -1902,8 +1902,9 @@ canvas.addEventListener("touchstart", function(event) {
     event.preventDefault();
     var rect = canvas.getBoundingClientRect();
     var touch = event.touches[0];
-    mousePos.x = Math.floor((touch.clientX - rect.left)/cell_size);
-    mousePos.y = Math.floor((touch.clientY - rect.top)/cell_size);
+    const pos = getCanvasCoords(event, canvas);
+    mousePos.x = Math.floor(pos.x / cell_size);
+    mousePos.y = Math.floor(pos.y / cell_size);
     if (mouseInterval) clearInterval(mouseInterval);
     mouseInterval = setInterval(handleMouse, 20);
 });
@@ -1912,8 +1913,9 @@ canvas.addEventListener("touchmove", function(event) {
     event.preventDefault();
     var rect = canvas.getBoundingClientRect();
     var touch = event.touches[0];
-    mousePos.x = Math.floor((touch.clientX - rect.left)/cell_size);
-    mousePos.y = Math.floor((touch.clientY - rect.top)/cell_size);
+    const pos = getCanvasCoords(event, canvas);
+    mousePos.x = Math.floor(pos.x / cell_size);
+    mousePos.y = Math.floor(pos.y / cell_size);
 });
 
 canvas.addEventListener("touchend", function(event) {
@@ -2084,26 +2086,41 @@ function drawGrainMenu() {
     
 }
 
+function getCanvasCoords(event, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    let clientX, clientY;
+    if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else {
+        clientX = event.clientX;
+        clientY = event.clientY;
+    }
+    // Scale to canvas coordinates
+    const x = Math.floor((clientX - rect.left) * (canvas.width / rect.width));
+    const y = Math.floor((clientY - rect.top) * (canvas.height / rect.height));
+    return { x, y };
+}
 
 
 // Handle clicks on the grain menu
-document.getElementById("grainMenu").addEventListener("click", function(e) {
-    const rect = this.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const x = e.clientX - rect.left;
+document.getElementById("grainMenu").addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    const pos = getCanvasCoords(e, this);
     const cellSize = 9 * 5;
-    const idx = Math.floor((Math.floor(y / cellSize) * rect.width/cellSize) + Math.floor(x / cellSize));
+    const grainBoxWidth = this.width / cellSize;
+    const idx = Math.floor((Math.floor(pos.y / cellSize) * grainBoxWidth) + Math.floor(pos.x / cellSize));
     if (idx >= 0 && idx < grainTypes.length) {
         current_grain = idx + 1;
         drawGrainMenu();
         drawMaterialPreview();
-    }
-    else{
+    } else {
         current_grain = 0;
         drawGrainMenu();
         drawMaterialPreview();
     }
 });
+
 window.addEventListener('DOMContentLoaded', function() {
     var canvas = document.getElementById("canvas");
     if (!canvas) return;
@@ -2113,8 +2130,9 @@ window.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         var rect = canvas.getBoundingClientRect();
         var touch = event.touches[0];
-        mousePos.x = Math.floor((touch.clientX - rect.left)/cell_size);
-        mousePos.y = Math.floor((touch.clientY - rect.top)/cell_size);
+        const pos = getCanvasCoords(event, canvas);
+        mousePos.x = Math.floor(pos.x / cell_size);
+        mousePos.y = Math.floor(pos.y / cell_size);
         if (mouseInterval) clearInterval(mouseInterval);
         mouseInterval = setInterval(handleMouse, 20);
     });
@@ -2123,8 +2141,9 @@ window.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         var rect = canvas.getBoundingClientRect();
         var touch = event.touches[0];
-        mousePos.x = Math.floor((touch.clientX - rect.left)/cell_size);
-        mousePos.y = Math.floor((touch.clientY - rect.top)/cell_size);
+        const pos = getCanvasCoords(event, canvas);
+        mousePos.x = Math.floor(pos.x / cell_size);
+        mousePos.y = Math.floor(pos.y / cell_size);
     });
 
     canvas.addEventListener("touchend", function(event) {
