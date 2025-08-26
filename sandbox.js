@@ -1980,6 +1980,41 @@ document.addEventListener("mouseleave", function(event) {
     if (mouseInterval) clearInterval(mouseInterval);
 });
 
+
+function resizeCanvasForMobile() {
+    // Get available width/height (minus menu if needed)
+    const menuWidth = 64; // or whatever you want for the menu
+    const margin = 20;
+    let w = window.innerWidth - menuWidth - margin;
+    let h = window.innerHeight - 180; // leave space for controls
+
+    // Make it square and not too small
+    let size = Math.min(w, h);
+    size = Math.max(size, 200);
+
+    // Calculate cell size based on grid size
+    cell_size = Math.floor(size / width);
+
+    // Set canvas size
+    const canvas = document.getElementById("canvas");
+    canvas.width = width * cell_size;
+    canvas.height = height * cell_size;
+
+    // Optionally, resize grainMenu and materialPreview as well
+    const menu = document.getElementById("grainMenu");
+    if (menu) {
+        menu.height = canvas.height;
+        menu.width = menuWidth;
+    }
+    const preview = document.getElementById("materialPreview");
+    if (preview) {
+        preview.width = 48;
+        preview.height = 48;
+    }
+}
+window.addEventListener('resize', resizeCanvasForMobile);
+window.addEventListener('DOMContentLoaded', resizeCanvasForMobile);
+
 // Draws the grain menu on the side
 function drawGrainMenu() {
     const menu = document.getElementById("grainMenu");
