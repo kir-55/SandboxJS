@@ -8,6 +8,12 @@ label{
     font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
+p{
+    color: white;
+    font-size: 13;
+    font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
 .left{
   margin-bottom: auto;
   align-items: left;
@@ -24,13 +30,13 @@ label{
 
 
 .button-19 {
+  color: white;
+  background-color: rgba(0, 0, 0, 0);
   appearance: button;
-  background-color: gold;
   border: solid transparent;
   border-radius: 16px;
   border-width: 0 0 4px;
   box-sizing: border-box;
-  color: #000000;
   cursor: pointer;
   display: inline-block;
   font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -56,39 +62,8 @@ label{
 
 }
 
-.button-19:after {
-  background-clip: padding-box;
-  background-color: gold;
-  border: solid transparent;
-  border-radius: 16px;
-  border-width: 0 0 4px;
-  bottom: -4px;
-  content: "";
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: -1;
-}
 
-.button-19:main,
-.button-19:focus {
-  user-select: auto;
-}
 
-.button-19:hover:not(:disabled) {
-  filter: brightness(1.1);
-  -webkit-filter: brightness(1.1);
-}
-
-.button-19:disabled {
-  cursor: auto;
-}
-
-.button-19:active {
-  border-width: 4px 0 0;
-  background: none;
-}
 
 
 
@@ -111,9 +86,12 @@ label{
   margin-left: 20px;
   margin-right: 20px;
   vertical-align: top;
-  box-shadow: 0 0 8px gold;
   transition: box-shadow 0.2s;
+
+  border: 3px solid gold;
 }
+
+
 
 
 #brushSize::-webkit-slider-thumb {
@@ -124,7 +102,6 @@ label{
   border-radius: 50%;
   background: gold;
   cursor: pointer;
-  border: 3px solid #fff;
   box-shadow: 0 0 8px #000;
   transition: background 0.2s;
 }
@@ -139,22 +116,17 @@ label{
   border-radius: 50%;
   background: gold;
   cursor: pointer;
-  border: 3px solid #fff;
   box-shadow: 0 0 8px #000;
   transition: background 0.2s;
 }
 
-#brushSize:active::-moz-range-thumb {
-  background: #ffd700;
-}
+
 
 #brushSize::-ms-thumb {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: gold;
   cursor: pointer;
-  border: 3px solid #fff;
   box-shadow: 0 0 8px #000;
   transition: background 0.2s;
 }
@@ -190,16 +162,12 @@ label{
   background: #222;
 }
 
-#brushSize:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 6px gold;
-}
-
-#brushSize:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 6px gold;
-}
-
-#brushSize:focus::-ms-thumb {
-  box-shadow: 0 0 0 6px gold;
+#materialMenu{
+  display: flex; 
+  flex-direction: row; 
+  align-items: center; 
+  gap: 10px; 
+  justify-content: center;
 }
 
 
@@ -212,13 +180,10 @@ label{
     float: none;
     display: block;
     margin: 0 auto 10px auto;
-    width: 120px;
   }
   #canvas {
     width: 90vw !important;
     height: 90vw !important;
-    max-width: 100vw;
-    max-height: 60vh;
     display: block;
     margin: 0 auto;
   }
@@ -243,5 +208,10 @@ label{
   }
   .center {
     order: 1;
+  }
+
+  #materialMenu {
+    flex-direction: column;
+    gap: 5px;
   }
 }

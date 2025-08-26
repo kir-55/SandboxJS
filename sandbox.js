@@ -1,4 +1,4 @@
- var canvas = document.getElementById("canvas")
+var canvas = document.getElementById("canvas")
 var ctx = canvas.getContext("2d");
 
 var h = document.getElementById("height");
@@ -26,10 +26,13 @@ class Grain{
     density = 1;
     normalInt;
     surroundingFormat = 0;
-    constructor(gravity = 1, surroundingFormat = 0, density = 1) {
+    name = "Unknown";
+
+    constructor(gravity = 1, surroundingFormat = 0, density = 1, name = "Unknown") {
         this.gravity = gravity;
         this.surroundingFormat = surroundingFormat;
         this.density = density;
+        this.name = name;
     }
 
 
@@ -127,7 +130,7 @@ class Grain{
 class Fire extends Grain {
     chanceToDie = 5; // Percentage chance to die each step
     constructor() { 
-        super(3, 0, 0);
+        super(3, 0, 0, "Fire");
     }
     applyPhisics(surrounding) {
         var result = super.applyPhisics(surrounding);
@@ -170,8 +173,8 @@ class Fire extends Grain {
 class FlamableGrain extends Grain {
     flammability = 50; // Default flammability percentage
     surroundingFormat = 0; // Default surrounding format
-    constructor(gravity, surroundingFormat, density, flammability = 50) {
-        super(gravity, surroundingFormat, density);
+    constructor(gravity, surroundingFormat, density, flammability = 50, name = "Flamable Grain") {
+        super(gravity, surroundingFormat, density, name);
         this.flammability = flammability;
     }
 
@@ -208,8 +211,8 @@ class FlamableGrain extends Grain {
 class ExplosiveGrain extends Grain {
     explosionChance = 10; // Percentage chance to explode when burning
     chanceToDuplicate = 0.1; // Percentage chance to duplicate when burning
-    constructor(gravity, density, explosionChance = 100, power = 100, chanceToDuplicate = 0.3) {
-        super(gravity, 0, density);
+    constructor(gravity, density, explosionChance = 100, power = 100, chanceToDuplicate = 0.3, name = "Explosive Grain") {
+        super(gravity, 0, density, name);
         this.explosionChance = explosionChance;
         this.power = power;
         this.chanceToDuplicate = chanceToDuplicate;
@@ -281,8 +284,8 @@ class Liquid extends Grain {
     gasForm = null; // Gas form of this liquid, if any
 
 
-    constructor(density = 1, killsFire = true, gasForm = null, breaksWires = true) {
-        super(1, 0, density);
+    constructor(density = 1, killsFire = true, gasForm = null, breaksWires = true, name = "Liquid") {
+        super(1, 0, density, name);
         this.killsFire = killsFire;
         this.gasForm = gasForm;
         this.breaksWires = breaksWires;
@@ -416,8 +419,8 @@ class LiquidAffectable extends Grain{
     wetGrain;
     dryGrain;
     isWet = false; // Whether this grain is wet
-    constructor(graity, surroundingFormat, density, wetGrain, dryGrain, chanceToAffect = 100, chanceFroliquidAffectableToAffect = 0.01, absorbsLiquid = false, isWet = false, chanceToDry = 0.01) {
-        super(graity, surroundingFormat, density);
+    constructor(graity, surroundingFormat, density, wetGrain, dryGrain, chanceToAffect = 100, chanceFroliquidAffectableToAffect = 0.01, absorbsLiquid = false, isWet = false, chanceToDry = 0.01, name = "Liquid Affectable") {
+        super(graity, surroundingFormat, density, name);
         this.wetGrain = wetGrain;
         this.dryGrain = dryGrain;
         this.chanceToAffect = chanceToAffect;
@@ -505,8 +508,8 @@ class LiquidAffectable extends Grain{
 }
 
 class ElectricalProducer extends Grain {
-    constructor(gravity = 1, surroundingFormat = 0, density = 1, chanceToProduce = 10) {
-        super(gravity, surroundingFormat, density);
+    constructor(gravity = 1, surroundingFormat = 0, density = 1, chanceToProduce = 10, name = "Electrical Producer") {
+        super(gravity, surroundingFormat, density, name);
         this.chanceToProduce = chanceToProduce;
     }
 
@@ -539,8 +542,8 @@ class ElectricalProducer extends Grain {
 
 class WireGrain extends FlamableGrain{
     maxCharge = 5; // Maximum charge this wire can hold
-    constructor(maxCharge = 5){
-        super(0, 0, 5, 1);
+    constructor(maxCharge = 5, name = "Wire") {
+        super(0, 0, 5, 1, name);
         this.maxCharge = maxCharge;
     }
     // if collides with weaker charged grain, it will transfer charge to it
@@ -575,8 +578,8 @@ class WireGrain extends FlamableGrain{
 }
 
 class HeatingElement extends Grain {
-    constructor() {
-        super(0, 0, 1);
+    constructor(name = "Heating Element") {
+        super(0, 0, 1, name);
     }
 
     applyPhisics(surrounding) {
@@ -614,8 +617,8 @@ class HeatingElement extends Grain {
 }
 
 class ElectricalDispenser extends Grain {
-    constructor() {
-        super(0, 0, 1);
+    constructor(name = "Electrical Dispenser") {
+        super(0, 0, 1, name);
     }
     // only gives energy when wire is empty
     applyPhisics(surrounding) {
@@ -665,8 +668,8 @@ class ElectricalDispenser extends Grain {
 
 class DuplicateElement extends Grain {
 
-    constructor() {
-        super(0, 0, 1);
+    constructor(name = "Duplicate Element") {
+        super(0, 0, 1, name);
     }
 
     applyPhisics(surrounding) {
@@ -722,8 +725,8 @@ class DuplicateElement extends Grain {
 class Gas extends Grain {
     chanceToReturnToNonGasForm = 0.01; // Percentage chance to return to liquid state
     nonGasForm = null;
-    constructor(density = 1, chanceToReturnToNonGasForm = 0.01, nonGasForm = null) {
-        super(3, 0, density);
+    constructor(density = 1, chanceToReturnToNonGasForm = 0.01, nonGasForm = null, name = "Gas") {
+        super(3, 0, density, name);
         this.chanceToReturnToNonGasForm = chanceToReturnToNonGasForm;
         this.nonGasForm = nonGasForm;
     }
@@ -764,8 +767,8 @@ class Gas extends Grain {
 class Uran extends ElectricalProducer {
     chanceToFlame = 0.1;
     chanceToBlowup = 0.01;
-    constructor(chanceToFlame = 0.1) {
-        super(0, 0, 10, 55);
+    constructor(chanceToFlame = 0.1, name = "Uran") {
+        super(0, 0, 10, 55, name);
         this.chanceToFlame = chanceToFlame;
     }
 
@@ -820,14 +823,14 @@ class Uran extends ElectricalProducer {
 }
 
 class Sand extends LiquidAffectable{
-    constructor(wetGrain = null, dryGrain = null){
-        super(1, 0, 3, wetGrain, dryGrain, 3, 0.01, true, false, 0);
+    constructor(wetGrain = null, dryGrain = null, name = "Sand"){
+        super(1, 0, 3, wetGrain, dryGrain, 3, 0.01, true, false, 0, name);
     }
 }
 
 class WetSand extends LiquidAffectable{
-    constructor(wetGrain = null, dryGrain = null){
-        super(0, 0, 3, wetGrain, dryGrain, 0, 0, false, true, 0.01);
+    constructor(wetGrain = null, dryGrain = null, name = "Wet Sand"){
+        super(0, 0, 3, wetGrain, dryGrain, 0, 0, false, true, 0.01, name);
     }
 }
 
@@ -836,8 +839,8 @@ class Seed extends FlamableGrain {
     needsWater = true; // Whether this seed needs water to grow
     needsDirt = true; // Whether this seed needs dirt to grow
     turnInto; // The grain type this seed turns into when it grows
-    constructor(turnInto, chanceToGrow = 0.01, needsWater = true, needsDirt = true) {
-        super(1, 0, 3, 10);
+    constructor(turnInto, chanceToGrow = 0.01, needsWater = true, needsDirt = true, name = "Seed") {
+        super(1, 0, 5, 10, name);
         this.chanceToGrow = chanceToGrow;
         this.needsWater = needsWater;
         this.needsDirt = needsDirt;
@@ -898,8 +901,8 @@ class Plant extends FlamableGrain {
     chanceToStopGrowing = 0.001; // Percentage chance to stop growing
     chanceToGrowLeafs = 0.0001; // Percentage chance to grow leaves
     grownForm = null; // The grain type this plant grows into
-    constructor(grownForm, leaf, growthChance = 0.002, chanceToStopGrowing = 0.001, chanceToGrowLeafs = 0.0001) {
-        super(0, 0, 1, 25);
+    constructor(grownForm, leaf, growthChance = 0.002, chanceToStopGrowing = 0.001, chanceToGrowLeafs = 0.0001, name = "Plant") {
+        super(0, 0, 1, 25, name);
         this.growthChance = growthChance;
         this.chanceToStopGrowing = chanceToStopGrowing;
         this.grownForm = grownForm;
@@ -983,14 +986,14 @@ class Plant extends FlamableGrain {
 }
 
 class Wood extends FlamableGrain {
-    constructor() {
-        super(0, 0, 10, 55);
+    constructor(name = "Wood") {
+        super(0, 0, 10, 55, name);
     }
 }
 
 class Leaf extends FlamableGrain {
-    constructor() {
-        super(0, 0, 1, 25);
+    constructor(name = "Leaf") {
+        super(0, 0, 1, 25, name);
     }
 
     applyPhisics(surrounding) {
@@ -1027,14 +1030,14 @@ class Leaf extends FlamableGrain {
 
 
 const WaterVapor = class WaterVapor extends Gas{
-    constructor(normalForm) {
-        super(0, 0.01, normalForm);
+    constructor(normalForm, name = "Water Vapor") {
+        super(0, 0.01, normalForm, name);
     }
 }
 
 const Water = class Water extends Liquid{
-    constructor(gasForm){
-        super(1, true, gasForm, true);
+    constructor(gasForm, name = "Water"){
+        super(1, true, gasForm, true, name);
     }
 }
 
@@ -1042,14 +1045,14 @@ const Water = class Water extends Liquid{
 
 
 class AcidVapor extends Gas{
-    constructor(normalForm) {
-        super(0, 0.01, normalForm);
+    constructor(normalForm, name = "Acid Vapor") {
+        super(0, 0.01, normalForm, name);
     }
 }
 
 class Acid extends Liquid{
-    constructor(gasForm){
-        super(2, true, gasForm, true);
+    constructor(gasForm, name = "Acid"){
+        super(2, true, gasForm, true, name);
     }
 
     applyPhisics(surrounding){
@@ -1081,8 +1084,8 @@ class Acid extends Liquid{
 
 class Lava extends Liquid {
     stone = null; // The grain type this lava turns into when it cools down
-    constructor(chanceToPlaceFire = 0.01, stone = null) {
-        super(3, false, null, true);
+    constructor(chanceToPlaceFire = 0.01, stone = null, name = "Lava") {
+        super(3, false, null, true, name);
         this.chanceToPlaceFire = chanceToPlaceFire; // Chance to place fire around
         this.stone = stone; // The grain type this lava turns into when it cools down
     }
@@ -1101,7 +1104,7 @@ class Lava extends Liquid {
                         else if (result[x][y] !== unexistingGrain) {
                             var sideGrain = result[x][y];
                             var grainObj = grains[sideGrain - 1];
-                            if (grainObj.type instanceof Liquid && grainObj.type != this) {
+                            if (grainObj.type instanceof Liquid && grainObj.type != this && !(grainObj.type instanceof Oil)) {
                                 result[x][y] = this.stone.getGrainInt(); // Turn into stone
                                 return result; // Return the result after turning into stone
                                 // Check if the stone can turn into a different type
@@ -1128,8 +1131,8 @@ class Lava extends Liquid {
 
 class FlamableLiquid extends Liquid {
     chanceToBurn = 1;
-    constructor(chanceToBurn = 1) {
-        super(3, false, null, true);
+    constructor(chanceToBurn = 1, name = "Flamable Liquid") {
+        super(3, false, null, true, name);
         this.chanceToBurn = chanceToBurn; // Chance to place fire around
     }
     applyPhisics(surrounding) {
@@ -1138,19 +1141,19 @@ class FlamableLiquid extends Liquid {
         var hasAir = false;
         for (var x = 0; x < 3; x++) {
             for (var y = 0; y < 3; y++) {
-                if ((x + y) % 2 === 1) { // Only check sides
-                    if (result[x][y] !== 0 && result[x][y] !== unexistingGrain) {
-                        var sideGrain = result[x][y];
-                        var grainObj = grains[sideGrain - 1];
-                        if (grainObj.type instanceof Fire || grainObj.type instanceof Lava) {
-                            hasFire = true; // There is fire around
-                        }
-                        
+                
+                if (result[x][y] !== 0 && result[x][y] !== unexistingGrain) {
+                    var sideGrain = result[x][y];
+                    var grainObj = grains[sideGrain - 1];
+                    if (grainObj.type instanceof Fire || grainObj.type instanceof Lava) {
+                        hasFire = true; // There is fire around
                     }
-                    else if (result[x][y] === 0) {
-                        hasAir = true; // There is air around
-                    }
+                    
                 }
+                else if (result[x][y] === 0) {
+                    hasAir = true; // There is air around
+                }
+                
             }
         }
 
@@ -1169,14 +1172,14 @@ class FlamableLiquid extends Liquid {
 }
 
 class Oil extends FlamableLiquid {
-    constructor(chanceToBurn = 1) {
-        super(chanceToBurn);
+    constructor(chanceToBurn = 1, name = "Oil") {
+        super(chanceToBurn, name);
     }
 }
 
 class Stone extends Grain {
-    constructor(chanceToTurnIntoLava = 0.01, chanceToTurnIntoLavaFromFire = 0.0009) {
-        super(0, 0, 10);
+    constructor(chanceToTurnIntoLava = 0.01, chanceToTurnIntoLavaFromFire = 0.0009, name = "Lava Rock") {
+        super(0, 0, 10, name);
         this.chanceToTurnIntoLava = chanceToTurnIntoLava; // Chance to turn into lava
         this.chanceToTurnIntoLavaFromFire = chanceToTurnIntoLavaFromFire; // Chance to turn into lava from fire
     }
@@ -1240,41 +1243,41 @@ class Stone extends Grain {
 }
 
 class Iron extends LiquidAffectable{
-    constructor(wetGrain = null, dryGrain = null){
-        super(0, 0, 55, wetGrain, dryGrain, 0.01, 0, false, false, 0);
+    constructor(wetGrain = null, dryGrain = null, name = "Iron"){
+        super(0, 0, 55, wetGrain, dryGrain, 0.01, 0, false, false, 0, name);
     }
 }
 
-class RustIron extends Grain{
-    constructor(){
-        super(0, 0, 10);
+class RustIron extends LiquidAffectable{
+    constructor(wetGrain = null, dryGrain = null, name = "Rusty Iron"){
+        super(0, 0, 10, wetGrain, dryGrain, 0.005, 0.01, false, false, 0, name);
     }
 }
 
 class WeakRustIron extends Grain{
-    constructor(){
-        super(2, 0, 5);
+    constructor(name = "Weak Rusty Iron"){
+        super(2, 0, 5, name);
     }
 }
 
 
 
 class Gunpowder extends ExplosiveGrain {
-    constructor() {
-        super(1, 5, 100, 100, 0.36);
+    constructor(name = "Gunpowder") {
+        super(1, 5, 100, 100, 0.36, name);
     }
 }
 
 
 class TreeSeed extends Seed {
-    constructor(turnInto, needsWater = true, needsDirt = true) {
-        super(turnInto, 0.01, needsWater, needsDirt);
+    constructor(turnInto, needsWater = true, needsDirt = true, name = "Tree Seed") {
+        super(turnInto, 0.01, needsWater, needsDirt, name);
     }
 }
 
 class TreeSprout extends Plant {
-    constructor(grownForm, seed = null, leaf = null, chanceToDoble = 0.002, chanceToThrowSeed = 0.1, growthChance = 0.01, chanceToGrowLeafs = 0.0001) {
-        super(grownForm, leaf, growthChance, 0, chanceToGrowLeafs);
+    constructor(grownForm, seed = null, leaf = null, chanceToDoble = 0.002, chanceToThrowSeed = 0.1, growthChance = 0.01, chanceToGrowLeafs = 0.0001, name = "Tree Sprout") {
+        super(grownForm, leaf, growthChance, 0, chanceToGrowLeafs, name);
         this.chanceToDoble = chanceToDoble; // Chance to double the size
         this.chanceToTrowSeed = chanceToThrowSeed; // Chance to trow a seed
         this.seed = seed; // The seed this sprout can trow
@@ -1334,8 +1337,8 @@ class TreeSprout extends Plant {
 }
 
 class FireTreeSprout extends TreeSprout {
-    constructor(grownForm, seed = null, leaf = null, chanceToDoble = 0.02, chanceToThrowSeed = 0.1, chanceToBurn = 0.001) {
-        super(grownForm, seed, leaf, chanceToDoble, chanceToThrowSeed, 0.1, 0.001);
+    constructor(grownForm, seed = null, leaf = null, chanceToDoble = 0.02, chanceToThrowSeed = 0.1, chanceToBurn = 0.001, name = "Fire Tree Sprout") {
+        super(grownForm, seed, leaf, chanceToDoble, chanceToThrowSeed, 0.1, 0.001, name);
         this.chanceToBurn = chanceToBurn; // Chance to burn
     }
 
@@ -1359,8 +1362,8 @@ class FireTreeSprout extends TreeSprout {
 class Meat extends FlamableGrain {
     maxRotLevel = 5;
     chanceToRot = 0.001; // Percentage chance to rot
-    constructor(maxRotLevel = 5, chanceToRot = 0.001) {
-        super(1, 0, 4, 1);
+    constructor(maxRotLevel = 5, chanceToRot = 0.001, name = "Meat") {
+        super(1, 0, 4, 1, name);
         this.maxRotLevel = maxRotLevel; // Maximum rot level
         this.chanceToRot = chanceToRot; // Chance to rot
     }
@@ -1385,8 +1388,8 @@ class Meat extends FlamableGrain {
 }  
 
 class Fly extends Grain {
-    constructor(meat, chanceToEat = 0.1, eats = [], diesFrom = [], needsOxygen = true, chanceToDoble = 0.1) {
-        super(0, 0, 4);   
+    constructor(meat, chanceToEat = 0.1, eats = [], diesFrom = [], needsOxygen = true, chanceToDoble = 0.1, name = "Fly") {
+        super(0, 0, 4, name);   
         this.chanceToEat = chanceToEat; // Percentage chance to eat meat
         this.meat = meat; // The meat this fly can eat
         this.eats = eats; // The grains this fly can eat
@@ -1479,8 +1482,8 @@ class Fly extends Grain {
 
 
 class FruitFly extends Fly {
-    constructor(meat, radioactiveFly = null) {
-        super(meat, 0.1, [Leaf, TreeSeed, TreeSprout], [Water, WaterVapor, Acid, AcidVapor, Fire], true, 0.1);
+    constructor(meat, radioactiveFly = null, name = "Fruit Fly") {
+        super(meat, 0.1, [Leaf, TreeSeed, TreeSprout], [Water, WaterVapor, Acid, AcidVapor, Fire], true, 0.1, name);
         this.radioactiveFly = radioactiveFly; // The radioactive fly this fruit fly can turn into
     }
     applyPhisics(surrounding) {
@@ -1507,15 +1510,15 @@ class FruitFly extends Fly {
 }
 
 class RadioactiveFly extends Fly {
-    constructor(meat) {
-        super(meat, 0.1, [Wood, Sand, Acid, AcidVapor, FruitFly, RustIron, WeakRustIron, Uran, Fire], [Water, WaterVapor, Lava], false, 0.1);
+    constructor(meat, name = "Radioactive Fly") {
+        super(meat, 0.1, [Wood, Sand, Acid, AcidVapor, FruitFly, RustIron, WeakRustIron, Uran, Fire], [Water, WaterVapor, Lava], false, 0.1, name);
     }
 }
 
 
 class RadioactiveMeat extends Meat {
-    constructor(chanceToRevive = 0.01, radioactiveFly = null) {
-        super(5, 0.001); // Higher rot level and chance to rot
+    constructor(chanceToRevive = 0.01, radioactiveFly = null, name = "Radioactive Meat") {
+        super(5, 0.001, name); // Higher rot level and chance to rot
         this.chanceToRevive = chanceToRevive; // Chance to revive into a radioactive fly
         this.radioactiveFly = radioactiveFly; // The radioactive fly this meat can turn into
     }
@@ -1551,8 +1554,8 @@ class RadioactiveMeat extends Meat {
 
 class FrozenGrain extends Grain {
     normalForm = null; // The normal grain type this frozen grain can thaw into
-    constructor(gravity, normalForm) {
-        super(gravity, 0, 10);
+    constructor(gravity, normalForm, name = "Frozen Grain") {
+        super(gravity, 0, 10, name);
         this.normalForm = normalForm; // The normal grain type this frozen grain can thaw into
     }
     applyPhisics(surrounding) {
@@ -1579,8 +1582,8 @@ class FrozenGrain extends Grain {
 
 class Ice extends FrozenGrain {
 
-    constructor(water = null) {
-        super(0, water);
+    constructor(water = null, name = "Ice") {
+        super(0, water, name);
     }
 }
 
@@ -1620,9 +1623,14 @@ const normal_waterVapor = new WaterVapor(normal_water);
 normal_water.gasForm = normal_waterVapor;
 const normal_ice = new Ice(normal_water);
 
-const normal_rustIron = new RustIron();
 const normal_weakRustIron = new WeakRustIron();
-const normal_iron = new Iron([normal_rustIron, normal_weakRustIron], null);
+
+const normal_rustIron = new RustIron(null, null);
+normal_rustIron.dryGrain = normal_rustIron;
+normal_rustIron.wetGrain = normal_weakRustIron;
+
+
+const normal_iron = new Iron([normal_rustIron], null);
 
 
 const normal_acid = new Acid(null);
@@ -1679,10 +1687,14 @@ grains = [
     new GrainType("#eccca2", normal_sand),
     new GrainType("#e7c496", normal_wetSand),
     new GrainType("#e1bf92", normal_wetSand),
+
+
+    new GrainType("#0b4470ff", normal_water),
     new GrainType("#0f5e9c", normal_water),
     new GrainType("#2389da", normal_water),
     new GrainType("#1ca3ec", normal_water),
-    new GrainType("#0f5e9c", normal_water),
+
+
     new GrainType("#ade1bb", normal_waterVapor),
     new GrainType("#ade1cc", normal_waterVapor),
     new GrainType("#ade1dd", normal_waterVapor),
@@ -1718,11 +1730,13 @@ grains = [
 
 
 
-
-    new GrainType("#ffdb00", normal_lava), // Charged wire
-    new GrainType("#ffa904", normal_lava),
     new GrainType("#ff6600", normal_lava),
     new GrainType("#ee7b06", normal_lava),
+    new GrainType("#ffa904", normal_lava),
+    new GrainType("#ffdb00", normal_lava), 
+    
+    
+    
 
 
     new GrainType("#414a4c", normal_stone), // Charged wire
@@ -1883,6 +1897,42 @@ function setPointerPos(x, y) {
     mousePos.y = y;
 }
 
+
+function nextGrain(){
+    if(current_grain < grainTypes.length)
+        current_grain++;
+    else 
+        current_grain = 0;
+    drawMaterialPreview();
+    drawGrainMenu();
+}
+
+function prevGrain(){
+    if(current_grain > 0)
+        current_grain--;
+    else
+        current_grain = grainTypes.length;
+    drawMaterialPreview();
+    drawGrainMenu();
+}
+
+
+function getCanvasCoords(event, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    let clientX, clientY;
+    if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else {
+        clientX = event.clientX;
+        clientY = event.clientY;
+    }
+    // Scale to canvas coordinates
+    const x = Math.floor((clientX - rect.left) * (canvas.width / rect.width));
+    const y = Math.floor((clientY - rect.top) * (canvas.height / rect.height));
+    return { x, y };
+}
+
 // For canvas
 // Existing mousemove handler
 document.addEventListener("mousemove", function(event){
@@ -1984,31 +2034,24 @@ document.addEventListener("mouseleave", function(event) {
 
 
 function resizeCanvasForMobile() {
-    // Get available width/height (minus menu if needed)
-    const menuWidth = 64; // or whatever you want for the menu
-    const margin = 20;
-    let w = window.innerWidth - menuWidth - margin;
-    let h = window.innerHeight - 180; // leave space for controls
-
-    // Make it square and not too small
-    let size = Math.min(w, h);
-    size = Math.max(size, 200);
-
-    // Calculate cell size based on grid size
-    cell_size = Math.floor(size / width);
-
-    // Set canvas size
     const canvas = document.getElementById("canvas");
-    canvas.width = width * cell_size;
-    canvas.height = height * cell_size;
-
-    // Optionally, resize grainMenu and materialPreview as well
-    const menu = document.getElementById("grainMenu");
-    if (menu) {
-        menu.height = canvas.height;
-        menu.width = menuWidth;
-    }
     const preview = document.getElementById("materialPreview");
+
+    // Desktop: large canvas
+    if (window.innerWidth > 700) {
+        // Set your preferred desktop size here
+        canvas.width = 700;
+        canvas.height = 700;
+        cell_size = Math.floor(canvas.width / width);
+    } else {
+        // Mobile: responsive square
+        let size = Math.min(window.innerWidth, window.innerHeight);
+        size = Math.max(size, 200);
+        cell_size = Math.floor(size / width);
+        canvas.width = width * cell_size;
+        canvas.height = height * cell_size;
+    }
+
     if (preview) {
         preview.width = 48;
         preview.height = 48;
@@ -2022,165 +2065,113 @@ function drawGrainMenu() {
     const menu = document.getElementById("grainMenu");
     if (!menu) return;
     const ctx = menu.getContext("2d");
-    const cellSize = 9;
-    menu.width = 9 * 25;
 
-    // given in grains
-    const grainsAmuount = grainTypes.length+1;
-    const grainBoxWidth = menu.width / (cellSize * 5);
-    const grainBoxHeight = grainsAmuount % grainBoxWidth == 0? grainsAmuount / grainBoxWidth  : Math.floor(grainsAmuount / grainBoxWidth) + 1
+    const { grainsPerRow, cellSize, padding } = getMenuLayout();
 
-    menu.height = grainBoxHeight * cellSize * 5
+    const rows = Math.ceil(grainTypes.length / grainsPerRow);
+
+    menu.width = grainsPerRow * (cellSize + padding) + padding;
+    menu.height = rows * (cellSize + padding) + padding;
 
     ctx.clearRect(0, 0, menu.width, menu.height);
-    drawMaterialPreview();
-    
-    // currentGrainType
-    let cgt = 0
-    var g = current_grain - 1
 
-    console.log("grainsAmount: " + grainsAmuount);
-    console.log("grainWidth: " + grainBoxWidth);
-    console.log("GrainHeight: " + grainBoxHeight);
+    for (let i = 0; i < grainTypes.length; i++) {
+        const row = Math.floor(i / grainsPerRow);
+        const col = i % grainsPerRow;
 
-    for(let j = 0; j < grainBoxHeight; j++){
-        for(let i = 0; i < grainBoxWidth; i++){
-            if (grainTypes.length <= cgt){
-                ctx.strokeStyle = "red";
-                ctx.lineWidth = 4;
-                ctx.strokeRect((g % grainBoxWidth) * cellSize * 5, (Math.floor(g / grainBoxWidth)) * cellSize * 5, cellSize * 5, cellSize * 5);
-                return;
+        // Gather all colors for this grain type
+        let colors = [];
+        for (let g of grains) {
+            if (g.type === grainTypes[i].type) {
+                colors.push(g.color);
             }
-            for (let y = 0; y < 5; y++) {
-                for (let x = 0; x < 5; x++) {
-                    console.log("Drawing grain: " + grains[grainTypes[cgt].type.getGrainInt()-1]);
-                    
-                    ctx.fillStyle = grains[grainTypes[cgt].type.getGrainInt()-1].color;
-                    ctx.fillRect(i * cellSize * 5 + x * cellSize, j * cellSize * 5 + y * cellSize, cellSize, cellSize);
-                    //ctx.fillRect(i * cellSize * 5, j * cellSize * 5, cellSize, cellSize);
+        }
+        if (colors.length === 0) colors = ["#888"];
 
-                    
-                }
-            }
-           
-            cgt += 1;
+        const x = padding + col * (cellSize + padding);
+        const y = padding + row * (cellSize + padding);
+
+        // Draw concentric rectangles (rings) for each color
+        const ringWidth = Math.floor(cellSize / (2 * colors.length));
+        for (let r = 0; r < colors.length; r++) {
+            ctx.strokeStyle = colors[r];
+            ctx.lineWidth = ringWidth;
+            // The offset increases for each inner ring
+            const offset = r * ringWidth;
+            ctx.strokeRect(
+                x + offset + ringWidth / 2,
+                y + offset + ringWidth / 2,
+                cellSize - 2 * offset - ringWidth,
+                cellSize - 2 * offset - ringWidth
+            );
+        }
+
+        // Draw selection highlight
+        if (current_grain - 1 === i) {
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
         }
     }
-    
-
-    
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 4;
-    ctx.strokeRect((g % grainBoxWidth) * cellSize * 5, (g % grainBoxHeight) * cellSize * 5, cellSize * 5, cellSize * 5);
-    
-
-
-    // Draw border if selected
-    // if (current_grain - 1 === i) {
-    //     ctx.strokeStyle = "gold";
-    //     ctx.lineWidth = 4;
-    //     ctx.strokeRect(2, i * cellSize + 2, cellSize - 4, cellSize - 4);
-    // }
-    
-    // Resize canvas to fit all grains
-    
 }
 
-function getCanvasCoords(event, canvas) {
-    const rect = canvas.getBoundingClientRect();
-    let clientX, clientY;
-    if (event.touches && event.touches.length > 0) {
-        clientX = event.touches[0].clientX;
-        clientY = event.touches[0].clientY;
-    } else {
-        clientX = event.clientX;
-        clientY = event.clientY;
-    }
-    // Scale to canvas coordinates
-    const x = Math.floor((clientX - rect.left) * (canvas.width / rect.width));
-    const y = Math.floor((clientY - rect.top) * (canvas.height / rect.height));
-    return { x, y };
+// Helper to get menu cell size and grains per row
+function getMenuLayout() {
+    const isMobile = window.innerWidth <= 700;
+    const grainsPerRow = isMobile ? 10 : 20;
+    const cellSize = 32;
+    const padding = 4;
+    return { grainsPerRow, cellSize, padding };
 }
 
-
-// Handle clicks on the grain menu
-document.getElementById("grainMenu").addEventListener("touchstart", function(e) {
+// Handle clicks/touches on the grain menu
+function handleGrainMenuSelect(e) {
     e.preventDefault();
-    const pos = getCanvasCoords(e, this);
-    const cellSize = 9 * 5;
-    const grainBoxWidth = this.width / cellSize;
-    const idx = Math.floor((Math.floor(pos.y / cellSize) * grainBoxWidth) + Math.floor(pos.x / cellSize));
-    if (idx >= 0 && idx < grainTypes.length) {
-        current_grain = idx + 1;
-        drawGrainMenu();
-        drawMaterialPreview();
+    const menu = document.getElementById("grainMenu");
+    if (!menu) return;
+    const { grainsPerRow, cellSize, padding } = getMenuLayout();
+    const rect = menu.getBoundingClientRect();
+
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
     } else {
-        current_grain = 0;
-        drawGrainMenu();
-        drawMaterialPreview();
+        clientX = e.clientX;
+        clientY = e.clientY;
     }
-});
 
-window.addEventListener('DOMContentLoaded', function() {
-    var canvas = document.getElementById("canvas");
-    if (!canvas) return;
+    // Subtract menu's left/top and the padding
+    const x = clientX - rect.left - padding;
+    const y = clientY - rect.top - padding;
 
-    // Add touch handlers for canvas
-    canvas.addEventListener("touchstart", function(event) {
-        event.preventDefault();
-        var rect = canvas.getBoundingClientRect();
-        var touch = event.touches[0];
-        const pos = getCanvasCoords(event, canvas);
-        mousePos.x = Math.floor(pos.x / cell_size);
-        mousePos.y = Math.floor(pos.y / cell_size);
-        if (mouseInterval) clearInterval(mouseInterval);
-        mouseInterval = setInterval(handleMouse, 20);
-    });
+    if (x < 0 || y < 0) return;
 
-    canvas.addEventListener("touchmove", function(event) {
-        event.preventDefault();
-        var rect = canvas.getBoundingClientRect();
-        var touch = event.touches[0];
-        const pos = getCanvasCoords(event, canvas);
-        mousePos.x = Math.floor(pos.x / cell_size);
-        mousePos.y = Math.floor(pos.y / cell_size);
-    });
+    const col = Math.floor(x / (cellSize + padding));
+    const row = Math.floor(y / (cellSize + padding));
+    const idx = row * grainsPerRow + col;
 
-    canvas.addEventListener("touchend", function(event) {
-        clearInterval(mouseInterval);
-        mouseInterval = null;
-        mousePos.x = -1;
-        mousePos.y = -1;
-    });
-
-    canvas.addEventListener("touchcancel", function(event) {
-        clearInterval(mouseInterval);
-        mouseInterval = null;
-        mousePos.x = -1;
-        mousePos.y = -1;
-    });
-});
-// Redraw menu when grain changes
-function nextGrain(){
-    if(current_grain < grainTypes.length)
-        current_grain++;
-    else 
+    if (col < 0 || row < 0 || col >= grainsPerRow || idx < 0 || idx >= grainTypes.length) {
         current_grain = 0;
-    drawMaterialPreview();
+    } else {
+        current_grain = idx + 1;
+    }
     drawGrainMenu();
+    drawMaterialPreview();
 }
 
-function prevGrain(){
-    if(current_grain > 0)
-        current_grain--;
-    else
-        current_grain = grainTypes.length;
-    drawMaterialPreview();
-    drawGrainMenu();
+// Remove any duplicate listeners first
+const grainMenu = document.getElementById("grainMenu");
+if (grainMenu) {
+    grainMenu.replaceWith(grainMenu.cloneNode(true)); // Remove all listeners
+    const newMenu = document.getElementById("grainMenu");
+    newMenu.addEventListener("mousedown", handleGrainMenuSelect);
+    newMenu.addEventListener("touchstart", handleGrainMenuSelect);
 }
 
 // Draw menu on load and when DOM is ready
 window.addEventListener('DOMContentLoaded', drawGrainMenu);
+window.addEventListener('DOMContentLoaded', drawMaterialPreview);
 
 function handleMouse(){
     if (mousePos.x < 0 || mousePos.y < 0) return; // Ignore if outside canvas
@@ -2188,6 +2179,7 @@ function handleMouse(){
 }
 
 function start(){
+
     intervalID = window.setInterval(gameLoop, 1);
 }
 
@@ -2321,10 +2313,27 @@ function drawMaterialPreview() {
     const ctxPrev = preview.getContext("2d");
     ctxPrev.clearRect(0, 0, preview.width, preview.height);
 
+    if (current_grain === 0) {
+        // If no grain selected, show empty
+        ctxPrev.fillStyle = "#262626ff";
+        ctxPrev.fillRect(0, 0, preview.width, preview.height);
+        const grainNameElem = document.getElementById("grainName");
+        if (grainNameElem) {
+            grainNameElem.textContent = "Air";
+        }
+        return;
+    }
+
     // 3x3 grid, each cell 16x16 px
     const cellSize = 16;
     let grainType = grainTypes[current_grain-1];
     if (!grainType) return;
+
+    // Set the grain name in the UI
+    const grainNameElem = document.getElementById("grainName");
+    if (grainNameElem) {
+        grainNameElem.textContent = grainType.type.name;
+    }
 
     for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {

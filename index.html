@@ -15,18 +15,22 @@
     </div> -->
 
     <div class="main-layout">
-        <canvas id="grainMenu" style="border:2px solid gold;"></canvas>
         <div class="center">
             <br>
-            <label for="log" id="log">Click</label>
+            <label for="log" id="log">SandboxJS</label>
             <br>
-            <canvas id="canvas" style="margin-bottom: 30px;"></canvas>
+            <canvas id="canvas"></canvas>
             <br>
+            <p id="grainName">Air</p>
             <div class="button-container" style="margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-direction: column; justify-content: center;">
-                <div>
-                    <button onclick="prevGrain()" class="button-19"><</button>
-                    <canvas id="materialPreview" width="48" height="48" style="border:2px solid gold;"></canvas>
-                    <button onclick="nextGrain()" class="button-19">></button>
+                <div id="materialMenu">
+                    <canvas id="grainMenu"></canvas>
+                    <div>
+                        <button onclick="prevGrain()" class="button-19"><</button>
+                        <canvas id="materialPreview" width="48" height="48" ></canvas>
+                        <button onclick="nextGrain()" class="button-19">></button>
+                    </div>
+
                 </div>
                 <input type="range" id="brushSize" min="1" max="20" value="3"  onchange="setBrushSize(this.value)">
             </div>
