@@ -226,7 +226,7 @@ class ExplosiveGrain extends Grain {
                         var sideGrain = result[x][y];
                         if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
                             var grainObj = grains[sideGrain - 1];
-                            if (grainObj.type instanceof Fire) {
+                            if (grainObj.type instanceof Fire || grainObj.type instanceof Lava) {
                                 if (getRandom(0, 100) < this.explosionChance ) {
                                     // change near grains to fire if their density is lower than the power of the explosion
                                     for (var i = 0; i < 3; i++) {
@@ -293,6 +293,7 @@ class Liquid extends Grain {
 
         if (arraysEqual(surrounding, result)) {
             var self = result[1][1];
+
 
             // 1. Try to move under a lower-density liquid (swap places)
             var below = result[1][2];
@@ -377,7 +378,7 @@ class Liquid extends Grain {
                         var sideGrain = result[x][y];
                         if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
                             var grainObj = grains[sideGrain - 1];
-                            if (this.killsFire && grainObj.type instanceof Fire) {
+                            if (this.killsFire && (grainObj.type instanceof Fire || grainObj.type instanceof Lava)) {
                                 if (this.gasForm)  {
                                     result[1][1] = this.gasForm.getGrainInt(); // Change to gas form
                                 }
@@ -783,10 +784,10 @@ class Uran extends ElectricalProducer {
                     var surroundingGrain = surrounding[x][y];
                     if (surroundingGrain != 0 && surroundingGrain != unexistingGrain) {
                         var grainObj = grains[surroundingGrain - 1];
-                        if (grainObj.type instanceof Liquid) {
+                        if (grainObj.type instanceof Liquid && grainObj.type.killsFire) {
                             canPlaceFlame = false;
                         }
-                        if (grainObj.type instanceof Fire){
+                        if (grainObj.type instanceof Fire || grainObj.type instanceof Lava) {
                             touchesFire += 1;
                         }
                     } 
@@ -1056,6 +1057,7 @@ class Acid extends Liquid{
         if(arraysEqual(result, surrounding)){ 
             console.log("Acid applied phisics");
             result = destroyNear(result, [Iron], 40, true, 100, 1);
+            result = destroyNear(result, [Stone], 40, true, 100, 1);
             result = destroyNear(result, [RustIron], 40, true, 100, 1);
             result = destroyNear(result, [WeakRustIron], 40, true, 100, 1);
             result = destroyNear(result, [Wood], 40, true, 100, 1);
@@ -1074,6 +1076,167 @@ class Acid extends Liquid{
         return result;
     }
     
+}
+
+
+class Lava extends Liquid {
+    stone = null; // The grain type this lava turns into when it cools down
+    constructor(chanceToPlaceFire = 0.01, stone = null) {
+        super(3, false, null, true);
+        this.chanceToPlaceFire = chanceToPlaceFire; // Chance to place fire around
+        this.stone = stone; // The grain type this lava turns into when it cools down
+    }
+
+    applyPhisics(surrounding) {
+        var result = surrounding;
+        for (var x = 0; x < 3; x++) {
+                for (var y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1) { // Only check sides
+                        if (result[x][y] === 0) {
+                            if (getRandom(0.0, 100.0) < this.chanceToPlaceFire * 100) {
+                                result[x][y] = normal_fire.getGrainInt(); // Place fire
+                                return result;
+                            }
+                        }
+                        else if (result[x][y] !== unexistingGrain) {
+                            var sideGrain = result[x][y];
+                            var grainObj = grains[sideGrain - 1];
+                            if (grainObj.type instanceof Liquid && grainObj.type != this) {
+                                result[x][y] = this.stone.getGrainInt(); // Turn into stone
+                                return result; // Return the result after turning into stone
+                                // Check if the stone can turn into a different type
+                            }
+                            if (grainObj.type instanceof FlamableGrain) {
+                               
+                                result[x][y] = normal_fire.getGrainInt(); // Place fire
+                                return result;
+                            }
+                        }
+                    }
+                }
+            }
+
+        result = super.applyPhisics(surrounding);
+        if (arraysEqual(surrounding, result)) {
+            // if has fre space around places fire
+            
+        }
+        return result;
+    }
+
+}
+
+class FlamableLiquid extends Liquid {
+    chanceToBurn = 1;
+    constructor(chanceToBurn = 1) {
+        super(3, false, null, true);
+        this.chanceToBurn = chanceToBurn; // Chance to place fire around
+    }
+    applyPhisics(surrounding) {
+        var result = surrounding
+        var hasFire = false;
+        var hasAir = false;
+        for (var x = 0; x < 3; x++) {
+            for (var y = 0; y < 3; y++) {
+                if ((x + y) % 2 === 1) { // Only check sides
+                    if (result[x][y] !== 0 && result[x][y] !== unexistingGrain) {
+                        var sideGrain = result[x][y];
+                        var grainObj = grains[sideGrain - 1];
+                        if (grainObj.type instanceof Fire || grainObj.type instanceof Lava) {
+                            hasFire = true; // There is fire around
+                        }
+                        
+                    }
+                    else if (result[x][y] === 0) {
+                        hasAir = true; // There is air around
+                    }
+                }
+            }
+        }
+
+        if (hasFire && hasAir) {
+            // Check if it can burn
+            var rnd = getRandom(0.0, 100.0);
+            if (rnd < this.chanceToBurn * 100) {
+                result[1][1] = normal_fire.getGrainInt(); // Turn into fire
+                return result; // Return the result after turning into fire
+            }
+        }
+
+        result = super.applyPhisics(surrounding);
+        return result;
+    }    
+}
+
+class Oil extends FlamableLiquid {
+    constructor(chanceToBurn = 1) {
+        super(chanceToBurn);
+    }
+}
+
+class Stone extends Grain {
+    constructor(chanceToTurnIntoLava = 0.01, chanceToTurnIntoLavaFromFire = 0.0009) {
+        super(0, 0, 10);
+        this.chanceToTurnIntoLava = chanceToTurnIntoLava; // Chance to turn into lava
+        this.chanceToTurnIntoLavaFromFire = chanceToTurnIntoLavaFromFire; // Chance to turn into lava from fire
+    }
+    applyPhisics(surrounding) {
+        var result = super.applyPhisics(surrounding);
+        if (arraysEqual(surrounding, result)) {
+            var hasWater = false;
+            var hasFire
+            var lavaPositions = [];
+            // check if there if touches lava and water, if so turns lava into stone
+            for (var x = 0; x < 3; x++) {
+                for (var y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1) { // Only check sides
+                        var sideGrain = result[x][y];
+                        if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+                            var grainObj = grains[sideGrain - 1];
+                            if (grainObj.type instanceof Lava) {
+                                lavaPositions.push({
+                                    x: x,
+                                    y: y
+                                });
+                            }
+                            if (grainObj.type instanceof Liquid && grainObj.type != normal_lava) {
+                                hasWater = true;
+                            }
+                            if (grainObj.type instanceof Fire) {
+                                hasFire = true;
+                            
+                            }
+                        }
+                    }
+                }
+            }
+            if (hasWater && lavaPositions.length > 0) {
+                // Turn lava into stone
+                for (var i = 0; i < lavaPositions.length; i++) {
+                    var pos = lavaPositions[i];
+                    result[pos.x][pos.y] = result[1][1];
+                }
+                return result;
+            }
+            else if (lavaPositions.length > 0) {
+                // Turn into lava
+                var rnd = getRandom(0.0, 100.0);
+                if (rnd < this.chanceToTurnIntoLava * 100) {
+                    result[1][1] = normal_lava.getGrainInt();
+                    return result;
+                }
+            }
+            else if (!hasWater && hasFire) {
+                // Turn into lava from fire
+                var rnd = getRandom(0.0, 100.0);
+                if (rnd < this.chanceToTurnIntoLavaFromFire * 100) {
+                    result[1][1] = normal_lava.getGrainInt();
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
 }
 
 class Iron extends LiquidAffectable{
@@ -1345,7 +1508,7 @@ class FruitFly extends Fly {
 
 class RadioactiveFly extends Fly {
     constructor(meat) {
-        super(meat, 0.1, [Wood, Sand, Acid, AcidVapor, FruitFly, RustIron, WeakRustIron, Uran, Fire], [Water, WaterVapor], false, 0.1);
+        super(meat, 0.1, [Wood, Sand, Acid, AcidVapor, FruitFly, RustIron, WeakRustIron, Uran, Fire], [Water, WaterVapor, Lava], false, 0.1);
     }
 }
 
@@ -1385,8 +1548,41 @@ class RadioactiveMeat extends Meat {
         return result;
     }
 }
-                    
 
+class FrozenGrain extends Grain {
+    normalForm = null; // The normal grain type this frozen grain can thaw into
+    constructor(gravity, normalForm) {
+        super(gravity, 0, 10);
+        this.normalForm = normalForm; // The normal grain type this frozen grain can thaw into
+    }
+    applyPhisics(surrounding) {
+        var result = surrounding;
+        for (var x = 0; x < 3; x++) {
+            for (var y = 0; y < 3; y++) {
+                if ((x + y) % 2 === 1 && result[x][y] !== 0 && result[x][y] !== unexistingGrain) { // Only check sides
+                    var sideGrain = result[x][y];
+                    var grainObj = grains[sideGrain - 1];
+                    if (grainObj.type instanceof Fire || grainObj.type instanceof Lava || grainObj.type instanceof Uran) {
+                        // If touches fire or lava, then thaws into the normal form
+                        result[1][1] = this.normalForm.getGrainInt();
+                        return result; // Return the result after thawing
+                    }
+                }
+            }
+        }
+
+        result = super.applyPhisics(surrounding);
+        return result;
+    }
+}
+
+
+class Ice extends FrozenGrain {
+
+    constructor(water = null) {
+        super(0, water);
+    }
+}
 
 //sourrounding formats:
 // format 0
@@ -1422,6 +1618,7 @@ normal_sand.wetGrain = normal_wetSand;
 const normal_water = new Water(null);
 const normal_waterVapor = new WaterVapor(normal_water);
 normal_water.gasForm = normal_waterVapor;
+const normal_ice = new Ice(normal_water);
 
 const normal_rustIron = new RustIron();
 const normal_weakRustIron = new WeakRustIron();
@@ -1431,6 +1628,15 @@ const normal_iron = new Iron([normal_rustIron, normal_weakRustIron], null);
 const normal_acid = new Acid(null);
 const normal_acidVapor = new AcidVapor(normal_acid);
 normal_acid.gasForm = normal_acidVapor;
+
+
+const normal_oil = new Oil(1);
+
+const normal_stone = new Stone();
+
+const normal_lava = new Lava(0.1, normal_stone);
+
+
 
 const normal_wood = new Wood();
 const normal_leaf = new Leaf();
@@ -1482,6 +1688,49 @@ grains = [
     new GrainType("#ade1dd", normal_waterVapor),
     new GrainType("#b6e5ff", normal_waterVapor),
     new GrainType("#ade3ff", normal_waterVapor),
+    new GrainType("#b9e8ea", normal_ice),
+    new GrainType("#86d6d8", normal_ice),
+    new GrainType("#3fd0d4", normal_ice),
+    new GrainType("#20c3d0", normal_ice),
+
+
+    new GrainType("#f4ffd1", normal_acid),
+    new GrainType("#f4ff9f", normal_acid),
+    new GrainType("#f5ff62", normal_acid),
+    new GrainType("#e7ff2c", normal_acid),
+    new GrainType("#d2ff46", normal_acid),
+    new GrainType("#b8c9c6", normal_acidVapor),
+    new GrainType("#b9d6cb", normal_acidVapor),
+    new GrainType("#c4dbc7", normal_acidVapor),
+    new GrainType("#d2e3c7", normal_acidVapor),
+    new GrainType("#dceabd", normal_acidVapor),
+
+    new GrainType("#e0ac69", normal_oil),
+    new GrainType("#f1c27d", normal_oil),
+    new GrainType("#ffdbac", normal_oil),
+
+    new GrainType("#ed1f0a", normal_fire),
+    new GrainType("#f8420b", normal_fire),
+    new GrainType("#f95504", normal_fire),
+    new GrainType("#f76f0b", normal_fire),
+    new GrainType("#ff900a", normal_fire),
+
+
+
+
+
+    new GrainType("#ffdb00", normal_lava), // Charged wire
+    new GrainType("#ffa904", normal_lava),
+    new GrainType("#ff6600", normal_lava),
+    new GrainType("#ee7b06", normal_lava),
+
+
+    new GrainType("#414a4c", normal_stone), // Charged wire
+    new GrainType("#3b444b", normal_stone),
+    new GrainType("#353839", normal_stone),
+    new GrainType("#232b2b", normal_stone),
+    new GrainType("#0e1111", normal_stone),
+
     new GrainType("#848482", normal_iron),
     new GrainType("#cbcdcd", normal_iron),
     new GrainType("#999e98", normal_iron),
@@ -1496,22 +1745,8 @@ grains = [
     new GrainType("#B8430F", normal_weakRustIron),
     new GrainType("#CD9671", normal_weakRustIron),
     new GrainType("#B25A27", normal_weakRustIron),
-    new GrainType("#f4ffd1", normal_acid),
-    new GrainType("#f4ff9f", normal_acid),
-    new GrainType("#f5ff62", normal_acid),
-    new GrainType("#e7ff2c", normal_acid),
-    new GrainType("#d2ff46", normal_acid),
-    new GrainType("#b8c9c6", normal_acidVapor),
-    new GrainType("#b9d6cb", normal_acidVapor),
-    new GrainType("#c4dbc7", normal_acidVapor),
-    new GrainType("#d2e3c7", normal_acidVapor),
-    new GrainType("#dceabd", normal_acidVapor),
 
-    new GrainType("#ed1f0a", normal_fire),
-    new GrainType("#f8420b", normal_fire),
-    new GrainType("#f95504", normal_fire),
-    new GrainType("#f76f0b", normal_fire),
-    new GrainType("#ff900a", normal_fire),
+
     new GrainType("#f7f7f7", normal_gunpowder),
     new GrainType("#e0e0e0", normal_gunpowder),
     new GrainType("#c9c9c9", normal_gunpowder),
@@ -1577,6 +1812,11 @@ grains = [
     new GrainType("#88ff00", normal_radioactiveFly),
     new GrainType("#64ff00", normal_radioactiveFly),
     new GrainType("#1dff00", normal_radioactiveFly),
+
+
+
+
+
 
 
 ]
@@ -1809,6 +2049,8 @@ function drawGrainMenu() {
     
 }
 
+
+
 // Handle clicks on the grain menu
 document.getElementById("grainMenu").addEventListener("click", function(e) {
     const rect = this.getBoundingClientRect();
@@ -2013,7 +2255,7 @@ function drawStep(){
     for(y = 0; y < height; y++){
         for(x = 0; x < width; x++){
             var grain = findGrain(screen[x][y])
-            ctx.fillStyle = grain? grain.color : "#242926";
+            ctx.fillStyle = grain? grain.color : "#262626ff";
             ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size);
         }
     }
