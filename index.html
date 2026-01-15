@@ -34,6 +34,11 @@
                 </div>
                 <input type="range" id="brushSize" min="1" max="20" value="3"  onchange="setBrushSize(this.value)">
             </div>
+
+            <input type="file" id="fileInput" accept=".sx,.json" style="display:none">
+            <button onclick="importFromFile()">Import</button>
+            <button onclick="exportToFile()">Export</button>
+
         </div>
     </div>
 </body>

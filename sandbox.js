@@ -720,6 +720,70 @@ class DuplicateElement extends Grain {
         return result;
     }
 }
+
+class Sensor extends Grain{
+    detect;
+    constructor(name = "Sensor", detect = [Fire]) {
+        super(0, 0, 1, name);
+        this.detect = detect
+    }
+    applyPhisics(surrounding) {
+        var result = super.applyPhisics(surrounding);
+        var wireGrainPos = {
+            x: -1,
+            y: -1   
+        }
+
+        var emptyWireGrainPos = {
+            x: -1,
+            y: -1   
+        }
+
+        if (arraysEqual(surrounding, result)) {
+            // Check for grains around
+            var sideGrains = [];
+            for (var x = 0; x < 3; x++) {
+                for (var y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1 && result[x][y] != 0 && result[x][y] != unexistingGrain) { // Only check sides
+                        
+                        var sideGrain = result[x][y];
+                        var grainObj = grains[sideGrain - 1];
+
+                        if (grainObj.type instanceof WireGrain) {
+                            if (sideGrain > grainObj.type.normalInt) {
+                                wireGrainPos.x = x;
+                                wireGrainPos.y = y;
+                            }
+                            else {
+                                emptyWireGrainPos.x = x;
+                                emptyWireGrainPos.y = y;
+                            }
+                        }
+                        else{
+                            sideGrains.push(grainObj.type);
+                        }
+                        
+                    }
+                }
+            }
+            if (sideGrains.length > 0 && sideGrains.length < 4 && wireGrainPos.x != -1 && wireGrainPos.y != -1) { 
+
+                for(let sideGrain in sideGrains){ 
+                    for(let d of this.detect)  {
+                        if (sideGrain.type instanceof d) {
+                            result[emptyWireGrainPos.x][emptyWireGrainPos.y] += 1; // Place the new grain
+                            result[wireGrainPos.x][wireGrainPos.y] -= 1; // Decrease charge of the wire grain
+                            return result;
+                        }
+                    }    
+                    
+                }
+            }
+        }
+        return result;
+    }
+
+}
                         
 
 class Gas extends Grain {
@@ -821,6 +885,13 @@ class Uran extends ElectricalProducer {
         return result;
     }
 }
+
+class HeatSensor extends Sensor{
+    constructor(){
+        super("HeatSensor", [Fire, Lava]);
+    }
+}
+
 
 class Sand extends LiquidAffectable{
     constructor(wetGrain = null, dryGrain = null, name = "Sand"){
@@ -1671,6 +1742,7 @@ const normal_electricalDispenser = new ElectricalDispenser();
 const normal_uran = new Uran();
 const normal_heatingElement = new HeatingElement();
 const normal_duplicateElement = new DuplicateElement();
+const normal_heatSensor = new HeatSensor();
 
 // Meat and Fly
 const normal_meat = new Meat();
@@ -1778,6 +1850,7 @@ grains = [
     new GrainType("#c2f8cb", normal_electricalDispenser),
     new GrainType("#bd370a", normal_heatingElement),
     new GrainType("#5a2e88", normal_duplicateElement),
+    new GrainType("#243b73", normal_heatSensor),
 
     new GrainType("#cca463", normal_wood),
     new GrainType("#a57847", normal_wood),
@@ -1931,6 +2004,56 @@ function getCanvasCoords(event, canvas) {
     const x = Math.floor((clientX - rect.left) * (canvas.width / rect.width));
     const y = Math.floor((clientY - rect.top) * (canvas.height / rect.height));
     return { x, y };
+}
+
+function exportToFile() {
+    const data = {
+        width: width,
+        height: height,
+        screen: screen
+    };
+
+    const json = JSON.stringify(data);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sandbox.sx";
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+function importFromFile() {
+    const input = document.getElementById("fileInput");
+    input.click();
+
+    input.onchange = () => {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+
+                // Basic validation
+                if (!data.screen || !Array.isArray(data.screen)) {
+                    alert("Invalid file");
+                    return;
+                }
+
+                // Restore sandbox
+                screen = data.screen;
+
+            } catch (err) {
+                alert("Failed to load file");
+                console.error(err);
+            }
+        };
+        reader.readAsText(file);
+    };
 }
 
 // For canvas
