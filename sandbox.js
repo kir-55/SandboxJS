@@ -952,6 +952,7 @@ class Gas extends Grain {
 class Uran extends ElectricalProducer {
 	chanceToFlame = 0.1;
 	chanceToBlowup = 0.01;
+	
 	constructor(chanceToFlame = 0.1, name = "Uran") {
 		super(0, 0, 10, 55, name);
 		this.chanceToFlame = chanceToFlame;
@@ -959,11 +960,13 @@ class Uran extends ElectricalProducer {
 
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
+		var touchesIce = 0;
 
 		if (arraysEqual(surrounding, result)) {
 			// can place flame around it only if there is no water touching it
 			var canPlaceFlame = true;
 			var touchesFire = 0;
+			
 
 			for (var x = 0; x < 3; x++) {
 				for (var y = 0; y < 3; y++) {
@@ -985,6 +988,8 @@ class Uran extends ElectricalProducer {
 						) {
 							touchesFire += 1;
 						}
+
+						
 					}
 				}
 			}
@@ -1254,6 +1259,38 @@ const WaterVapor = class WaterVapor extends Gas {
 const Water = class Water extends Liquid {
 	constructor(gasForm, name = "Water") {
 		super(1, true, gasForm, true, name);
+	}
+
+	applyPhisics(surrounding) {
+		var result = super.applyPhisics(surrounding);
+		var touchesIce = 0;
+
+		if (arraysEqual(surrounding, result)) {
+			var touchesIce = 0;
+			
+
+			for (var x = 0; x < 3; x++) {
+				for (var y = 0; y < 3; y++) {
+					var surroundingGrain = surrounding[x][y];
+					if (
+						surroundingGrain != 0 &&
+						surroundingGrain != unexistingGrain
+					) {
+						var grainObj = grains[surroundingGrain - 1];
+						if (
+							grainObj.type instanceof Ice
+						) {
+							touchesIce+=1;
+						}	
+					}
+				}
+			}
+			if (touchesIce > 2){
+				result[1][1] = normal_ice.getGrainInt();
+				return result;
+			}
+		}
+		return result;
 	}
 };
 
