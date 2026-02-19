@@ -960,7 +960,6 @@ class Uran extends ElectricalProducer {
 
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
-		var touchesIce = 0;
 
 		if (arraysEqual(surrounding, result)) {
 			// can place flame around it only if there is no water touching it
@@ -1254,6 +1253,35 @@ const WaterVapor = class WaterVapor extends Gas {
 	constructor(normalForm, name = "Water Vapor") {
 		super(0, 0.01, normalForm, name);
 	}
+
+	applyPhisics(surrounding) {
+		var result = surrounding
+		for (var x = 0; x < 3; x++) {
+			for (var y = 0; y < 3; y++) {
+				var surroundingGrain = surrounding[x][y];
+				if (
+					surroundingGrain != 0 &&
+					surroundingGrain != unexistingGrain
+				) {
+					var grainObj = grains[surroundingGrain - 1];
+					if (
+						grainObj.type instanceof Ice
+					) {
+						result[1][1] = normal_water.getGrainInt();
+						return result;
+					}	
+				}
+			}
+		}
+		
+
+		if (arraysEqual(surrounding, result)) {
+			
+			return super.applyPhisics(surrounding);
+			
+		}
+		return result;
+	}
 };
 
 const Water = class Water extends Liquid {
@@ -1262,33 +1290,34 @@ const Water = class Water extends Liquid {
 	}
 
 	applyPhisics(surrounding) {
-		var result = super.applyPhisics(surrounding);
+		var result = surrounding;
 		var touchesIce = 0;
-
-		if (arraysEqual(surrounding, result)) {
-			var touchesIce = 0;
 			
 
-			for (var x = 0; x < 3; x++) {
-				for (var y = 0; y < 3; y++) {
-					var surroundingGrain = surrounding[x][y];
+		for (var x = 0; x < 3; x++) {
+			for (var y = 0; y < 3; y++) {
+				var surroundingGrain = surrounding[x][y];
+				if (
+					surroundingGrain != 0 &&
+					surroundingGrain != unexistingGrain
+				) {
+					var grainObj = grains[surroundingGrain - 1];
 					if (
-						surroundingGrain != 0 &&
-						surroundingGrain != unexistingGrain
+						grainObj.type instanceof Ice
 					) {
-						var grainObj = grains[surroundingGrain - 1];
-						if (
-							grainObj.type instanceof Ice
-						) {
-							touchesIce+=1;
-						}	
-					}
+						touchesIce+=1;
+					}	
 				}
 			}
-			if (touchesIce > 2){
-				result[1][1] = normal_ice.getGrainInt();
-				return result;
-			}
+		}
+		if (touchesIce > 0 && getRandom(0, 100) < 1){
+			result[1][1] = normal_ice.getGrainInt();
+			return result;
+		}
+
+		if (arraysEqual(surrounding, result)) {
+			return super.applyPhisics(surrounding);
+
 		}
 		return result;
 	}
@@ -1331,6 +1360,7 @@ class Acid extends Liquid {
 			);
 			result = destroyNear(result, [DuplicateElement], 40, true, 100, 1);
 			result = destroyNear(result, [HeatingElement], 40, true, 100, 1);
+			result = destroyNear(result, [Ice], 40, true, 100, 1);
 		}
 		return result;
 	}
@@ -2173,6 +2203,8 @@ class GrainVariety {
 	}
 }
 
+
+
 function getGrainTypes() {
 	var lastGrain;
 	var i = 0;
@@ -2395,17 +2427,24 @@ document.addEventListener("mousemove", function (event) {
 });
 
 document.addEventListener("mousedown", function (event) {
-	// Clear any existing interval before setting a new one
-	if (mousePos.x < 0 || mousePos.y < 0) return; // Ignore if outside canvas
+	if (mousePos.x < 0 || mousePos.y < 0) return;
+
+	dragStart = { x: mousePos.x, y: mousePos.y };
+	lockedAxis = null; // reset axis
+
 	if (mouseInterval) clearInterval(mouseInterval);
 	mouseInterval = setInterval(handleMouse, 20);
 });
 
+
 document.addEventListener("mouseup", function (event) {
-	// Clear the interval on mouse release
 	clearInterval(mouseInterval);
-	mouseInterval = null; // Reset the interval to avoid future conflicts
+	mouseInterval = null;
+	dragStart = null;
+	lockedAxis = null;
 });
+
+
 
 // Optionally handle the scenario where the mouse leaves the canvas
 document.addEventListener("mouseleave", function (event) {
@@ -2503,6 +2542,7 @@ function getMenuLayout() {
 	return { grainsPerRow, cellSize, padding };
 }
 
+
 // Handle clicks/touches on the grain menu
 function handleGrainMenuSelect(e) {
 	e.preventDefault();
@@ -2558,10 +2598,107 @@ if (grainMenu) {
 window.addEventListener("DOMContentLoaded", drawGrainMenu);
 window.addEventListener("DOMContentLoaded", drawMaterialPreview);
 
-function handleMouse() {
-	if (mousePos.x < 0 || mousePos.y < 0) return; // Ignore if outside canvas
-	placeBrush(mousePos.x, mousePos.y);
+// drowking listeners
+let lockedAxis = null; // "x" or "y"
+let shiftPressed = false;
+let dragStart = null;
+
+
+document.addEventListener("keydown", (e) => {
+	if (e.key === "Shift") shiftPressed = true;
+});
+
+document.addEventListener("keyup", (e) => {
+	if (e.key === "Shift") shiftPressed = false;
+});
+
+canvas.addEventListener("wheel", function (event) {
+	event.preventDefault();
+
+	const step = event.shiftKey ? 3 : 1;
+
+	if (event.deltaY < 0) {
+		normal_brush_size += step;
+	} else {
+		normal_brush_size -= step;
+	}
+
+	normal_brush_size = Math.max(1, Math.min(20, normal_brush_size));
+
+	// 🔥 Update slider position
+	const slider = document.getElementById("brushSize");
+	if (slider) {
+		slider.value = normal_brush_size;
+	}
+});
+
+
+
+
+function drawBrushOutline() {
+	if (mousePos.x < 0 || mousePos.y < 0) return;
+
+	const pos = getLockedMousePos();
+
+	ctx.strokeStyle = "white";
+	ctx.lineWidth = 2;
+
+	const size = normal_brush_size * cell_size;
+	const offset = (normal_brush_size %2 ? Math.ceil(normal_brush_size / 2) - 1 : normal_brush_size/2) * cell_size;
+
+
+
+	ctx.strokeRect(
+		pos.x * cell_size - offset,
+		pos.y * cell_size - offset,
+		size,
+		size
+	);
 }
+
+
+function getLockedMousePos() {
+	if (!shiftPressed || !dragStart) {
+		return { x: mousePos.x, y: mousePos.y };
+	}
+
+	const dx = mousePos.x - dragStart.x;
+	const dy = mousePos.y - dragStart.y;
+
+	// If axis not chosen yet
+	if (!lockedAxis) {
+
+		// Do NOT decide if no movement yet
+		if (dx === 0 && dy === 0) {
+			return { x: mousePos.x, y: mousePos.y };
+		}
+
+		// Choose dominant axis
+		if (Math.abs(dx) > Math.abs(dy)) {
+			lockedAxis = "y"; // horizontal line
+		} else {
+			lockedAxis = "x"; // vertical line
+		}
+	}
+
+	if (lockedAxis === "y") {
+		return { x: mousePos.x, y: dragStart.y };
+	} else {
+		return { x: dragStart.x, y: mousePos.y };
+	}
+}
+
+
+
+
+function handleMouse() {
+	if (mousePos.x < 0 || mousePos.y < 0) return;
+
+	const pos = getLockedMousePos();
+	placeBrush(pos.x, pos.y);
+}
+
+
 
 function start() {
 	intervalID = window.setInterval(gameLoop, 1);
@@ -2628,7 +2765,14 @@ function destroyNear(
 
 function setBrushSize(val) {
 	normal_brush_size = Math.max(1, Math.min(20, parseInt(val) || 1));
+
+	// Sync slider position
+	const slider = document.getElementById("brushSize");
+	if (slider) {
+		slider.value = normal_brush_size;
+	}
 }
+
 
 function getSurrounding(surroundingFormat, x, y, screen) {
 	var sideLength = surroundingFormat * 2 + 3;
@@ -2733,6 +2877,9 @@ function drawStep() {
 			ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size);
 		}
 	}
+
+	// Draw brush outline ON TOP
+	drawBrushOutline();
 }
 
 function drawMaterialPreview() {
