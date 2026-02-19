@@ -960,7 +960,6 @@ class Uran extends ElectricalProducer {
 
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
-
 		if (arraysEqual(surrounding, result)) {
 			// can place flame around it only if there is no water touching it
 			var canPlaceFlame = true;
@@ -1350,6 +1349,7 @@ class Acid extends Liquid {
 			result = destroyNear(result, [TreeSeed], 40, true, 100, 1);
 			result = destroyNear(result, [Plant], 40, true, 100, 1);
 			result = destroyNear(result, [Meat], 40, true, 100, 1);
+			
 			result = destroyNear(
 				result,
 				[ElectricalDispenser],
@@ -1360,6 +1360,8 @@ class Acid extends Liquid {
 			);
 			result = destroyNear(result, [DuplicateElement], 40, true, 100, 1);
 			result = destroyNear(result, [HeatingElement], 40, true, 100, 1);
+			result = destroyNear(result, [HeatSensor], 40, true, 100, 1);
+
 			result = destroyNear(result, [Ice], 40, true, 100, 1);
 		}
 		return result;
@@ -1420,7 +1422,7 @@ class Lava extends Liquid {
 class FlamableLiquid extends Liquid {
 	chanceToBurn = 1;
 	constructor(chanceToBurn = 1, name = "Flamable Liquid") {
-		super(3, false, null, true, name);
+		super(0, false, null, true, name);
 		this.chanceToBurn = chanceToBurn; // Chance to place fire around
 	}
 	applyPhisics(surrounding) {
@@ -2625,7 +2627,7 @@ canvas.addEventListener("wheel", function (event) {
 
 	normal_brush_size = Math.max(1, Math.min(20, normal_brush_size));
 
-	// 🔥 Update slider position
+	// Update slider position
 	const slider = document.getElementById("brushSize");
 	if (slider) {
 		slider.value = normal_brush_size;
