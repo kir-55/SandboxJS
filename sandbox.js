@@ -125,6 +125,7 @@ class Grain {
 	}
 }
 
+
 class Fire extends Grain {
 	chanceToDie = 5; // Percentage chance to die each step
 	constructor() {
@@ -1034,6 +1035,18 @@ class WetSand extends LiquidAffectable {
 	}
 }
 
+class Dirt extends LiquidAffectable {
+	constructor(wetGrain = null, dryGrain = null, name = "Dirt") {
+		super(1, 0, 3, wetGrain, dryGrain, 3, 0.1, true, false, 0, name);
+	}
+}
+
+class WetDirt extends LiquidAffectable {
+	constructor(wetGrain = null, dryGrain = null, name = "Wet Dirt") {
+		super(0, 0, 3, wetGrain, dryGrain, 0, 0, false, true, 0.01, name);
+	}
+}
+
 class Seed extends FlamableGrain {
 	chanceToGrow = 0.01; // Percentage chance to grow into a plant
 	needsWater = true; // Whether this seed needs water to grow
@@ -1076,12 +1089,12 @@ class Seed extends FlamableGrain {
 									hasWater = true;
 								}
 
-								if (grainObj.type instanceof Sand) {
+								if (grainObj.type instanceof Sand || grainObj.type instanceof Dirt) {
 									// Check for dirt
 									hasDirt = true;
 								}
 
-								if (grainObj.type instanceof WetSand) {
+								if (grainObj.type instanceof WetSand || grainObj.type instanceof WetDirt) {
 									// Check for wet Sand
 									hasDirt = true;
 									hasWater = true; // Wet Sand has water
@@ -1994,6 +2007,11 @@ const normal_sand = new Sand(normal_wetSand, null);
 normal_wetSand.dryGrain = normal_sand;
 normal_sand.wetGrain = normal_wetSand;
 
+const normal_wetDirt = new WetDirt(null, null);
+const normal_dirt = new Dirt(normal_wetDirt, null);
+normal_wetDirt.dryGrain = normal_dirt;
+normal_dirt.wetGrain = normal_wetDirt;
+
 const normal_water = new Water(null);
 const normal_waterVapor = new WaterVapor(normal_water);
 normal_water.gasForm = normal_waterVapor;
@@ -2066,6 +2084,15 @@ grains = [
 	new GrainType("#eccca2", normal_sand),
 	new GrainType("#e7c496", normal_wetSand),
 	new GrainType("#e1bf92", normal_wetSand),
+
+
+	new GrainType("#a6786b", normal_dirt),
+	new GrainType("#8b6154ff", normal_dirt),
+	new GrainType("#7e584dff", normal_dirt),
+	new GrainType("#8f6458", normal_dirt),
+
+	new GrainType("#6d4639", normal_wetDirt),
+	new GrainType("#5b3a2d", normal_wetDirt),
 
 	new GrainType("#0b4470ff", normal_water),
 	new GrainType("#0f5e9c", normal_water),
