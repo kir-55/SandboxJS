@@ -960,7 +960,6 @@ class Uran extends ElectricalProducer {
 
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
-		var touchesIce = 0;
 
 		if (arraysEqual(surrounding, result)) {
 			// can place flame around it only if there is no water touching it
@@ -1254,6 +1253,35 @@ const WaterVapor = class WaterVapor extends Gas {
 	constructor(normalForm, name = "Water Vapor") {
 		super(0, 0.01, normalForm, name);
 	}
+
+	applyPhisics(surrounding) {
+		var result = surrounding
+		for (var x = 0; x < 3; x++) {
+			for (var y = 0; y < 3; y++) {
+				var surroundingGrain = surrounding[x][y];
+				if (
+					surroundingGrain != 0 &&
+					surroundingGrain != unexistingGrain
+				) {
+					var grainObj = grains[surroundingGrain - 1];
+					if (
+						grainObj.type instanceof Ice
+					) {
+						result[1][1] = normal_water.getGrainInt();
+						return result;
+					}	
+				}
+			}
+		}
+		
+
+		if (arraysEqual(surrounding, result)) {
+			
+			return super.applyPhisics(surrounding);
+			
+		}
+		return result;
+	}
 };
 
 const Water = class Water extends Liquid {
@@ -1262,33 +1290,34 @@ const Water = class Water extends Liquid {
 	}
 
 	applyPhisics(surrounding) {
-		var result = super.applyPhisics(surrounding);
+		var result = surrounding;
 		var touchesIce = 0;
-
-		if (arraysEqual(surrounding, result)) {
-			var touchesIce = 0;
 			
 
-			for (var x = 0; x < 3; x++) {
-				for (var y = 0; y < 3; y++) {
-					var surroundingGrain = surrounding[x][y];
+		for (var x = 0; x < 3; x++) {
+			for (var y = 0; y < 3; y++) {
+				var surroundingGrain = surrounding[x][y];
+				if (
+					surroundingGrain != 0 &&
+					surroundingGrain != unexistingGrain
+				) {
+					var grainObj = grains[surroundingGrain - 1];
 					if (
-						surroundingGrain != 0 &&
-						surroundingGrain != unexistingGrain
+						grainObj.type instanceof Ice
 					) {
-						var grainObj = grains[surroundingGrain - 1];
-						if (
-							grainObj.type instanceof Ice
-						) {
-							touchesIce+=1;
-						}	
-					}
+						touchesIce+=1;
+					}	
 				}
 			}
-			if (touchesIce > 2){
-				result[1][1] = normal_ice.getGrainInt();
-				return result;
-			}
+		}
+		if (touchesIce > 0 && getRandom(0, 100) < 1){
+			result[1][1] = normal_ice.getGrainInt();
+			return result;
+		}
+
+		if (arraysEqual(surrounding, result)) {
+			return super.applyPhisics(surrounding);
+
 		}
 		return result;
 	}
@@ -1331,6 +1360,7 @@ class Acid extends Liquid {
 			);
 			result = destroyNear(result, [DuplicateElement], 40, true, 100, 1);
 			result = destroyNear(result, [HeatingElement], 40, true, 100, 1);
+			result = destroyNear(result, [Ice], 40, true, 100, 1);
 		}
 		return result;
 	}
