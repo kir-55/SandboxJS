@@ -937,32 +937,68 @@ class Gas extends Grain {
 
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
-		// checks left and right if free then moves to the side
+
 		if (arraysEqual(surrounding, result)) {
+
 			var left = result[0][1];
 			var right = result[2][1];
+			var top = result[1][0];
 			var self = result[1][1];
 
-			if (left === 0 && right === 0) {
-				result[getRandomInt(0, 2) * 2][1] = self;
-				result[1][1] = 0;
-				return result;
-			} else if (left === 0) {
-				result[0][1] = self;
-				result[1][1] = 0;
-				return result;
-			} else if (right === 0) {
-				result[2][1] = self;
-				result[1][1] = 0;
+			var possibleMoves = [];
+
+			// up empty
+			if (top === 0) {
+				possibleMoves.push([1, 2]);
+			}
+			// up density swap
+			else if (top !== unexistingGrain) {
+				var topGrain = grains[top - 1];
+				if (topGrain && topGrain.type instanceof Liquid && topGrain.type.density > this.density) {
+					possibleMoves.push([1, 0]);
+				}
+			}
+
+			// left empty
+			if (left === 0) {
+				possibleMoves.push([0, 1]);
+			}
+			else if (left !== unexistingGrain) {
+				var leftGrain = grains[left - 1];
+				if (leftGrain && leftGrain.type instanceof Liquid && leftGrain.type.density > this.density) {
+					possibleMoves.push([0, 1]);
+				}
+			}
+
+			// right empty
+			if (right === 0) {
+				possibleMoves.push([2, 1]);
+			}
+			else if (right !== unexistingGrain) {
+				var rightGrain = grains[right - 1];
+				if (rightGrain && rightGrain.type instanceof Liquid && rightGrain.type.density > this.density) {
+					possibleMoves.push([2, 1]);
+				}
+			}
+
+			// if any move available, choose random
+			if (possibleMoves.length > 0) {
+				var move = possibleMoves[getRandomInt(0, possibleMoves.length)];
+				var target = result[move[0]][move[1]];
+
+				result[move[0]][move[1]] = self;
+				result[1][1] = target === 0 ? 0 : target;
 				return result;
 			}
 
+			// Condense
 			var rnd = getRandom(0.0, 100.0);
 			if (rnd < this.chanceToReturnToNonGasForm * 100) {
 				result[1][1] = this.nonGasForm.getGrainInt();
 				return result;
 			}
 		}
+
 		return result;
 	}
 }
@@ -1280,7 +1316,7 @@ class Leaf extends FlamableGrain {
 
 const WaterVapor = class WaterVapor extends Gas {
 	constructor(normalForm, name = "Water Vapor") {
-		super(0, 0.01, normalForm, name);
+		super(-1, 0.01, normalForm, name);
 	}
 
 	applyPhisics(surrounding) {
@@ -1379,6 +1415,9 @@ class Acid extends Liquid {
 			result = destroyNear(result, [TreeSeed], 40, true, 100, 1);
 			result = destroyNear(result, [Plant], 40, true, 100, 1);
 			result = destroyNear(result, [Meat], 40, true, 100, 1);
+			result = destroyNear(result, [Grass], 40, true, 100, 1);
+			result = destroyNear(result, [GrassSeed], 40, true, 100, 1);
+			result = destroyNear(result, [GrassSprout], 40, true, 100, 1);
 			
 			result = destroyNear(
 				result,
@@ -1601,6 +1640,19 @@ class TreeSeed extends Seed {
 	}
 }
 
+class GrassSeed extends Seed{
+		constructor(
+		turnInto,
+		needsWater = true,
+		needsDirt = true,
+		name = "Grass Seed",
+	) {
+		super(turnInto, 0.002, needsWater, needsDirt, name);
+	}
+}
+
+
+
 class TreeSprout extends Plant {
 	constructor(
 		grownForm,
@@ -1611,11 +1663,15 @@ class TreeSprout extends Plant {
 		growthChance = 0.01,
 		chanceToGrowLeafs = 0.0001,
 		name = "Tree Sprout",
+		turnInto = normal_wood,
+		chanceToDie = 0.0001
 	) {
 		super(grownForm, leaf, growthChance, 0, chanceToGrowLeafs, name);
 		this.chanceToDoble = chanceToDoble; // Chance to double the size
 		this.chanceToTrowSeed = chanceToThrowSeed; // Chance to trow a seed
 		this.seed = seed; // The seed this sprout can trow
+		this.turnInto = turnInto;
+		this.chanceToDie = chanceToDie;
 	}
 
 	applyPhisics(surrounding) {
@@ -1631,16 +1687,27 @@ class TreeSprout extends Plant {
 					var sideGrain = result[x][y];
 					if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 						var grainObj = grains[sideGrain - 1];
-						if (grainObj.type instanceof Wood) {
+						if (grainObj.type == this.turnInto) {
 							woodCount++;
 						}
 					}
 				}
 			}
 			if (woodCount >= 3) {
-				result[1][1] = normal_wood.getGrainInt(); // Turn into
+				result[1][1] = this.turnInto.getGrainInt(); // Turn into
 				return result;
 			}
+
+			if (result[1][2] === 0) {
+				rnd = getRandom(0.0, 100.0);
+				if (rnd < this.chanceToThrowSeed * 100) {
+					result[1][2] = this.seed.getGrainInt(); // Trow a seed
+				}
+			}
+
+
+
+			
 
 			var rnd = getRandom(0.0, 100.0);
 			if (rnd < this.chanceToDoble * 100) {
@@ -1658,14 +1725,37 @@ class TreeSprout extends Plant {
 				}
 			}
 
-			if (result[1][2] === 0) {
-				rnd = getRandom(0.0, 100.0);
-				if (rnd < this.chanceToThrowSeed * 100) {
-					result[1][2] = this.seed.getGrainInt(); // Trow a seed
-				}
+			rnd = getRandom(0.0, 100.0);
+			if (rnd < this.chanceToDie * 100) {
+				result[1][2] = 0; // Trow a seed
 			}
+
+
+			
 		}
 		return result;
+	}
+}
+
+class GrassSprout extends TreeSprout{
+	constructor(		
+		grownForm,
+		seed = null,
+		chanceToThrowSeed = 0.1,
+		growthChance = 0.01,
+		
+		turnInto = null,
+		chnaceToDie = 0.03,
+		name = "Grass Sprout"
+	)
+	{
+		super(grownForm, seed, null, 0, chanceToThrowSeed, growthChance, 0, name, turnInto, chnaceToDie);
+	}
+}
+
+class Grass extends Wood{
+	constructor (name = "Grass"){
+		super(name);
 	}
 }
 
@@ -2064,6 +2154,18 @@ const normal_treeSprout = new TreeSprout(
 const normal_treeSeed = new TreeSeed(normal_treeSprout);
 normal_treeSprout.seed = normal_treeSeed;
 
+const normal_grass = new Grass();
+const normal_grassSprout = new GrassSprout(
+	normal_grass,
+	null,
+	0.01,
+	0.01,
+	null,
+	0.003
+)
+const normal_grassSeed = new GrassSeed(normal_grassSprout);
+normal_grassSprout.seed = normal_grassSeed;
+
 const normal_fire = new Fire();
 
 const normal_fireLeaf = new Leaf();
@@ -2208,6 +2310,18 @@ grains = [
 	new GrainType("#9ac37b", normal_leaf),
 	new GrainType("#72a24e", normal_leaf),
 	new GrainType("#54862e", normal_leaf),
+
+
+	new GrainType("#136d15", normal_grass),
+	new GrainType("#117c13", normal_grass),
+	new GrainType("#138510", normal_grass),
+	new GrainType("#268b07", normal_grass),
+	new GrainType("#41980a", normal_grass),
+	new GrainType("#eacdabff", normal_grassSeed),
+	new GrainType("#e7cfb4", normal_grassSeed),
+	new GrainType("#b5eaabff", normal_grassSprout),
+	new GrainType("#98c778ff", normal_grassSprout),
+	new GrainType("#5f886eff", normal_grassSprout),
 
 	new GrainType("#bd4343", normal_fireTreeSeed),
 	new GrainType("#ff6b6b", normal_fireTreeSeed),
