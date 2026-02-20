@@ -769,6 +769,23 @@ class ElectricalDispenser extends Grain {
 	}
 }
 
+class RandomElectricalDispenser extends ElectricalDispenser {
+	chance = 1;
+	constructor(chance = 1, name = "Random Electrical Dispenser") {
+		super(name);
+		this.chance = chance;
+	}
+
+	applyPhisics(surrounding) {
+		var rnd = getRandomInt(0, 100);
+
+		if (this.chance > rnd)
+			return super.applyPhisics(surrounding);
+
+		return surrounding;
+	}
+}
+
 class DuplicateElement extends Grain {
 	constructor(name = "Duplicate Element") {
 		super(0, 0, 1, name);
@@ -2047,6 +2064,7 @@ const normal_gunpowder = new Gunpowder();
 
 const normal_wire = new WireGrain(5);
 const normal_electricalDispenser = new ElectricalDispenser();
+const normal_randomElectricalDispenser = new RandomElectricalDispenser();
 
 const normal_uran = new Uran();
 const normal_heatingElement = new HeatingElement();
@@ -2144,6 +2162,7 @@ grains = [
 	new GrainType("#ee7272", normal_wire),
 	new GrainType("#ffb9b9", normal_wire),
 	new GrainType("#c2f8cb", normal_electricalDispenser),
+	new GrainType("#fff27dff", normal_randomElectricalDispenser),
 	new GrainType("#bd370a", normal_heatingElement),
 	new GrainType("#5a2e88", normal_duplicateElement),
 	new GrainType("#243b73", normal_heatSensor),
