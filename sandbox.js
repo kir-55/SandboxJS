@@ -125,6 +125,7 @@ class Grain {
 	}
 }
 
+
 class Fire extends Grain {
 	chanceToDie = 5; // Percentage chance to die each step
 	constructor() {
@@ -769,6 +770,23 @@ class ElectricalDispenser extends Grain {
 	}
 }
 
+class RandomElectricalDispenser extends ElectricalDispenser {
+	chance = 1;
+	constructor(chance = 1, name = "Random Electrical Dispenser") {
+		super(name);
+		this.chance = chance;
+	}
+
+	applyPhisics(surrounding) {
+		var rnd = getRandomInt(0, 100);
+
+		if (this.chance > rnd)
+			return super.applyPhisics(surrounding);
+
+		return surrounding;
+	}
+}
+
 class DuplicateElement extends Grain {
 	constructor(name = "Duplicate Element") {
 		super(0, 0, 1, name);
@@ -960,7 +978,6 @@ class Uran extends ElectricalProducer {
 
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
-
 		if (arraysEqual(surrounding, result)) {
 			// can place flame around it only if there is no water touching it
 			var canPlaceFlame = true;
@@ -1035,6 +1052,18 @@ class WetSand extends LiquidAffectable {
 	}
 }
 
+class Dirt extends LiquidAffectable {
+	constructor(wetGrain = null, dryGrain = null, name = "Dirt") {
+		super(1, 0, 3, wetGrain, dryGrain, 3, 0.1, true, false, 0, name);
+	}
+}
+
+class WetDirt extends LiquidAffectable {
+	constructor(wetGrain = null, dryGrain = null, name = "Wet Dirt") {
+		super(0, 0, 3, wetGrain, dryGrain, 0, 0, false, true, 0.01, name);
+	}
+}
+
 class Seed extends FlamableGrain {
 	chanceToGrow = 0.01; // Percentage chance to grow into a plant
 	needsWater = true; // Whether this seed needs water to grow
@@ -1077,12 +1106,12 @@ class Seed extends FlamableGrain {
 									hasWater = true;
 								}
 
-								if (grainObj.type instanceof Sand) {
+								if (grainObj.type instanceof Sand || grainObj.type instanceof Dirt) {
 									// Check for dirt
 									hasDirt = true;
 								}
 
-								if (grainObj.type instanceof WetSand) {
+								if (grainObj.type instanceof WetSand || grainObj.type instanceof WetDirt) {
 									// Check for wet Sand
 									hasDirt = true;
 									hasWater = true; // Wet Sand has water
@@ -1350,6 +1379,7 @@ class Acid extends Liquid {
 			result = destroyNear(result, [TreeSeed], 40, true, 100, 1);
 			result = destroyNear(result, [Plant], 40, true, 100, 1);
 			result = destroyNear(result, [Meat], 40, true, 100, 1);
+			
 			result = destroyNear(
 				result,
 				[ElectricalDispenser],
@@ -1360,6 +1390,8 @@ class Acid extends Liquid {
 			);
 			result = destroyNear(result, [DuplicateElement], 40, true, 100, 1);
 			result = destroyNear(result, [HeatingElement], 40, true, 100, 1);
+			result = destroyNear(result, [HeatSensor], 40, true, 100, 1);
+
 			result = destroyNear(result, [Ice], 40, true, 100, 1);
 		}
 		return result;
@@ -1420,7 +1452,7 @@ class Lava extends Liquid {
 class FlamableLiquid extends Liquid {
 	chanceToBurn = 1;
 	constructor(chanceToBurn = 1, name = "Flamable Liquid") {
-		super(3, false, null, true, name);
+		super(0, false, null, true, name);
 		this.chanceToBurn = chanceToBurn; // Chance to place fire around
 	}
 	applyPhisics(surrounding) {
@@ -1992,6 +2024,11 @@ const normal_sand = new Sand(normal_wetSand, null);
 normal_wetSand.dryGrain = normal_sand;
 normal_sand.wetGrain = normal_wetSand;
 
+const normal_wetDirt = new WetDirt(null, null);
+const normal_dirt = new Dirt(normal_wetDirt, null);
+normal_wetDirt.dryGrain = normal_dirt;
+normal_dirt.wetGrain = normal_wetDirt;
+
 const normal_water = new Water(null);
 const normal_waterVapor = new WaterVapor(normal_water);
 normal_water.gasForm = normal_waterVapor;
@@ -2045,6 +2082,7 @@ const normal_gunpowder = new Gunpowder();
 
 const normal_wire = new WireGrain(5);
 const normal_electricalDispenser = new ElectricalDispenser();
+const normal_randomElectricalDispenser = new RandomElectricalDispenser();
 
 const normal_uran = new Uran();
 const normal_heatingElement = new HeatingElement();
@@ -2064,6 +2102,15 @@ grains = [
 	new GrainType("#eccca2", normal_sand),
 	new GrainType("#e7c496", normal_wetSand),
 	new GrainType("#e1bf92", normal_wetSand),
+
+
+	new GrainType("#a6786b", normal_dirt),
+	new GrainType("#8b6154ff", normal_dirt),
+	new GrainType("#7e584dff", normal_dirt),
+	new GrainType("#8f6458", normal_dirt),
+
+	new GrainType("#6d4639", normal_wetDirt),
+	new GrainType("#5b3a2d", normal_wetDirt),
 
 	new GrainType("#0b4470ff", normal_water),
 	new GrainType("#0f5e9c", normal_water),
@@ -2142,6 +2189,7 @@ grains = [
 	new GrainType("#ee7272", normal_wire),
 	new GrainType("#ffb9b9", normal_wire),
 	new GrainType("#c2f8cb", normal_electricalDispenser),
+	new GrainType("#fff27dff", normal_randomElectricalDispenser),
 	new GrainType("#bd370a", normal_heatingElement),
 	new GrainType("#5a2e88", normal_duplicateElement),
 	new GrainType("#243b73", normal_heatSensor),
@@ -2202,6 +2250,8 @@ class GrainVariety {
 		this.type = type;
 	}
 }
+
+
 
 function getGrainTypes() {
 	var lastGrain;
@@ -2425,17 +2475,24 @@ document.addEventListener("mousemove", function (event) {
 });
 
 document.addEventListener("mousedown", function (event) {
-	// Clear any existing interval before setting a new one
-	if (mousePos.x < 0 || mousePos.y < 0) return; // Ignore if outside canvas
+	if (mousePos.x < 0 || mousePos.y < 0) return;
+
+	dragStart = { x: mousePos.x, y: mousePos.y };
+	lockedAxis = null; // reset axis
+
 	if (mouseInterval) clearInterval(mouseInterval);
 	mouseInterval = setInterval(handleMouse, 20);
 });
 
+
 document.addEventListener("mouseup", function (event) {
-	// Clear the interval on mouse release
 	clearInterval(mouseInterval);
-	mouseInterval = null; // Reset the interval to avoid future conflicts
+	mouseInterval = null;
+	dragStart = null;
+	lockedAxis = null;
 });
+
+
 
 // Optionally handle the scenario where the mouse leaves the canvas
 document.addEventListener("mouseleave", function (event) {
@@ -2533,6 +2590,7 @@ function getMenuLayout() {
 	return { grainsPerRow, cellSize, padding };
 }
 
+
 // Handle clicks/touches on the grain menu
 function handleGrainMenuSelect(e) {
 	e.preventDefault();
@@ -2588,10 +2646,107 @@ if (grainMenu) {
 window.addEventListener("DOMContentLoaded", drawGrainMenu);
 window.addEventListener("DOMContentLoaded", drawMaterialPreview);
 
-function handleMouse() {
-	if (mousePos.x < 0 || mousePos.y < 0) return; // Ignore if outside canvas
-	placeBrush(mousePos.x, mousePos.y);
+// drowking listeners
+let lockedAxis = null; // "x" or "y"
+let shiftPressed = false;
+let dragStart = null;
+
+
+document.addEventListener("keydown", (e) => {
+	if (e.key === "Shift") shiftPressed = true;
+});
+
+document.addEventListener("keyup", (e) => {
+	if (e.key === "Shift") shiftPressed = false;
+});
+
+canvas.addEventListener("wheel", function (event) {
+	event.preventDefault();
+
+	const step = event.shiftKey ? 3 : 1;
+
+	if (event.deltaY < 0) {
+		normal_brush_size += step;
+	} else {
+		normal_brush_size -= step;
+	}
+
+	normal_brush_size = Math.max(1, Math.min(20, normal_brush_size));
+
+	// Update slider position
+	const slider = document.getElementById("brushSize");
+	if (slider) {
+		slider.value = normal_brush_size;
+	}
+});
+
+
+
+
+function drawBrushOutline() {
+	if (mousePos.x < 0 || mousePos.y < 0) return;
+
+	const pos = getLockedMousePos();
+
+	ctx.strokeStyle = "white";
+	ctx.lineWidth = 2;
+
+	const size = normal_brush_size * cell_size;
+	const offset = (normal_brush_size %2 ? Math.ceil(normal_brush_size / 2) - 1 : normal_brush_size/2) * cell_size;
+
+
+
+	ctx.strokeRect(
+		pos.x * cell_size - offset,
+		pos.y * cell_size - offset,
+		size,
+		size
+	);
 }
+
+
+function getLockedMousePos() {
+	if (!shiftPressed || !dragStart) {
+		return { x: mousePos.x, y: mousePos.y };
+	}
+
+	const dx = mousePos.x - dragStart.x;
+	const dy = mousePos.y - dragStart.y;
+
+	// If axis not chosen yet
+	if (!lockedAxis) {
+
+		// Do NOT decide if no movement yet
+		if (dx === 0 && dy === 0) {
+			return { x: mousePos.x, y: mousePos.y };
+		}
+
+		// Choose dominant axis
+		if (Math.abs(dx) > Math.abs(dy)) {
+			lockedAxis = "y"; // horizontal line
+		} else {
+			lockedAxis = "x"; // vertical line
+		}
+	}
+
+	if (lockedAxis === "y") {
+		return { x: mousePos.x, y: dragStart.y };
+	} else {
+		return { x: dragStart.x, y: mousePos.y };
+	}
+}
+
+
+
+
+function handleMouse() {
+	if (mousePos.x < 0 || mousePos.y < 0) return;
+
+	const pos = getLockedMousePos();
+	placeBrush(pos.x, pos.y);
+}
+
+
 
 function start() {
 	intervalID = window.setInterval(gameLoop, 1);
@@ -2658,7 +2813,14 @@ function destroyNear(
 
 function setBrushSize(val) {
 	normal_brush_size = Math.max(1, Math.min(20, parseInt(val) || 1));
+
+	// Sync slider position
+	const slider = document.getElementById("brushSize");
+	if (slider) {
+		slider.value = normal_brush_size;
+	}
 }
+
 
 function getSurrounding(surroundingFormat, x, y, screen) {
 	var sideLength = surroundingFormat * 2 + 3;
@@ -2763,6 +2925,9 @@ function drawStep() {
 			ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size);
 		}
 	}
+
+	// Draw brush outline ON TOP
+	drawBrushOutline();
 }
 
 function drawMaterialPreview() {
