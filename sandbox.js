@@ -1405,6 +1405,8 @@ class Acid extends Liquid {
 			console.log("Acid applied phisics");
 			result = destroyNear(result, [Iron], 40, true, 100, 1);
 			result = destroyNear(result, [Stone], 40, true, 100, 1);
+			result = destroyNear(result, [Dirt], 40, true, 100, 1);
+			result = destroyNear(result, [WetDirt], 40, true, 100, 1);
 			result = destroyNear(result, [RustIron], 40, true, 100, 1);
 			result = destroyNear(result, [WeakRustIron], 40, true, 100, 1);
 			result = destroyNear(result, [Wood], 40, true, 100, 1);
@@ -1737,21 +1739,99 @@ class TreeSprout extends Plant {
 	}
 }
 
-class GrassSprout extends TreeSprout{
+class GrassSprout extends Plant {
 	constructor(		
 		grownForm,
 		seed = null,
 		chanceToThrowSeed = 0.1,
 		growthChance = 0.01,
-		
 		turnInto = null,
-		chnaceToDie = 0.03,
+		chanceToDie = 0.03,
 		name = "Grass Sprout"
-	)
-	{
-		super(grownForm, seed, null, 0, chanceToThrowSeed, growthChance, 0, name, turnInto, chnaceToDie);
+	) {
+		super(grownForm, null, growthChance, 0, 0, name);
+		this.seed = seed;
+		this.chanceToThrowSeed = chanceToThrowSeed;
+		this.turnInto = turnInto;
+		this.chanceToDie = chanceToDie;
+	}
+
+	applyPhisics(surrounding) {
+		// Clone surrounding
+		var result = surrounding.map(row => row.slice());
+
+		// =========================
+		// 🌱 Grow into full grass
+		// =========================
+		var rnd = getRandom(0.0, 100.0);
+		if (rnd < this.growthChance * 100) {
+			result[1][1] = this.grownForm.getGrainInt();
+			return result;
+		}
+
+		// =========================
+		// 🌾 Spread sideways
+		// =========================
+		rnd = getRandom(0.0, 100.0);
+		if (rnd < this.growthChance * 50) {
+			let sides = [
+				[0,1], // left
+				[2,1]  // right
+			];
+
+			let s = getRandomInt(0, sides.length);
+			let x = sides[s][0];
+			let y = sides[s][1];
+
+			if (result[x][y] === 0) {
+				result[x][y] = this.getGrainInt();
+				return result;
+			}
+		}
+
+		// =========================
+		// 🌰 Throw seed downward
+		// =========================
+		if (this.seed && result[1][2] === 0) {
+			rnd = getRandom(0.0, 100.0);
+			if (rnd < this.chanceToThrowSeed * 100) {
+				result[1][2] = this.seed.getGrainInt();
+				return result;
+			}
+		}
+
+		// =========================
+		// 🪵 Turn into another type if surrounded
+		// =========================
+		if (this.turnInto) {
+			let count = 0;
+			for (let x = 0; x < 3; x++) {
+				for (let y = 0; y < 3; y++) {
+					if (x === 1 && y === 1) continue;
+					if (result[x][y] === this.turnInto.getGrainInt()) {
+						count++;
+					}
+				}
+			}
+			if (count >= 3) {
+				result[1][1] = this.turnInto.getGrainInt();
+				return result;
+			}
+		}
+
+		// =========================
+		// 💀 Chance to die
+		// =========================
+		rnd = getRandom(0.0, 100.0);
+		if (rnd < this.chanceToDie * 100) {
+			result[1][1] = 0;
+			return result;
+		}
+
+		return result;
 	}
 }
+
 
 class Grass extends Wood{
 	constructor (name = "Grass"){
@@ -1985,6 +2065,7 @@ class RadioactiveFly extends Fly {
 			[
 				Wood,
 				Sand,
+				Dirt,
 				Acid,
 				AcidVapor,
 				FruitFly,
