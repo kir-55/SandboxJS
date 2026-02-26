@@ -1339,6 +1339,33 @@ class Wood extends FlamableGrain {
 	constructor(name = "Wood") {
 		super(0, 0, 10, 55, name);
 	}
+
+	
+	applyPhisics(surrounding) {
+		var result = surrounding;
+
+		for (var x = 0; x < 3; x++) {
+			for (var y = 0; y < 3; y++) {
+				if ((x + y) % 2 === 1) {
+					// Only check sides
+					var sideGrain = result[x][y];
+					if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+						var grainObj = grains[sideGrain - 1];
+						// flamibility is not defined
+
+						if (grainObj.type instanceof Fire) {
+							if (getRandom(0, 100) < 4) {
+								result[1][1] = normal_coal.getGrainInt(); // Burn this grain
+								return result;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return super.applyPhisics(surrounding);
+	}
 }
 
 class Leaf extends FlamableGrain {
@@ -1900,9 +1927,9 @@ class GrassSprout extends Plant {
 }
 
 
-class Grass extends Wood{
+class Grass extends FlamableGrain{
 	constructor (name = "Grass"){
-		super(name);
+		super(0, 0, 10, 55, name);
 	}
 }
 
@@ -2490,10 +2517,10 @@ grains = [
 	new GrainType("#ff9750", normal_fireLeaf),
 
 
-	new GrainType("#616161", normal_coal),
+	new GrainType("#161616", normal_coal),
 	new GrainType("#414141", normal_coal),
-	new GrainType("#2c2c2c", normal_coal),
-	new GrainType("#181818", normal_coal),
+	new GrainType("#575757", normal_coal),
+	new GrainType("#797979", normal_coal),
 
 	new GrainType("#ff7a7a", normal_meat),
 	new GrainType("#742f35", normal_meat), // more rotten color
