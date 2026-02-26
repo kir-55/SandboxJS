@@ -211,9 +211,9 @@ class FlamableGrain extends Grain {
 }
 
 class Coal extends FlamableGrain{
-	chanceToDie = 0.005;
-	constructor (name="Coal", chanceToDie = 0.005){
-		super(0, 0, 6, 3, name);
+	chanceToDie = 0.05;
+	constructor (name="Coal", chanceToDie = 0.1){
+		super(0, 0, 6, 30, name);
 		this.chanceToDie = chanceToDie;
 		
 	}
@@ -228,8 +228,6 @@ class Coal extends FlamableGrain{
 				if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 
 					var grainObj = grains[sideGrain - 1];
-					console.log(sideGrain);
-					console.log(grainObj);
 					
 					if (
 						grainObj.type instanceof Fire ||
@@ -238,7 +236,6 @@ class Coal extends FlamableGrain{
 						// place fire all around it
 						for (var x1 = 0; x1 < 3; x1++) {
 							for (var y1 = 0; y1 < 3; y1++) {
-
 								if (getRandom(0, 100) < this.flammability && result[x1][y1] == 0){
 									result[x1][y1] = normal_fire.getGrainInt();
 								}
@@ -1032,13 +1029,31 @@ class Gas extends Grain {
 			}
 
 			// if any move available, choose random
-			if (possibleMoves.length > 0) {
-				var move = possibleMoves[getRandomInt(0, possibleMoves.length)];
+			while (possibleMoves.length > 0) {
+
+				var randomIndex = getRandomInt(0, possibleMoves.length);
+				var move = possibleMoves[randomIndex];
 				var target = result[move[0]][move[1]];
 
-				result[move[0]][move[1]] = self;
-				result[1][1] = target === 0 ? 0 : target;
-				return result;
+				if (target) {
+					var targetGrain = grains[target - 1].type;
+
+					if (targetGrain instanceof Liquid) {
+						
+						result[1][1] = target === 0 ? 0 : target;
+						result[move[0]][move[1]] = self;
+						// Remove this move from possibleMoves
+						return result;
+					}else{
+						possibleMoves.splice(randomIndex, 1);
+						continue;
+					}
+
+				} else {
+					result[move[0]][move[1]] = self;
+					result[1][1]=0;
+					return result;
+				}
 			}
 
 			// Condense
@@ -1197,7 +1212,7 @@ class Seed extends FlamableGrain {
 									hasDirt = true;
 								}
 
-								if (grainObj.type instanceof WetSand || grainObj.type instanceof WetDirt) {
+								if (grainObj.type instanceof WetSand || grainObj.type instanceof WetDirt || grainObj.type instanceof Grass) {
 									// Check for wet Sand
 									hasDirt = true;
 									hasWater = true; // Wet Sand has water
@@ -1382,8 +1397,10 @@ const WaterVapor = class WaterVapor extends Gas {
 					if (
 						grainObj.type instanceof Ice
 					) {
-						result[1][1] = normal_water.getGrainInt();
-						return result;
+						if (getRandom(0, 100) < 20){
+							result[1][1] = normal_water.getGrainInt();
+							return result;
+						}
 					}	
 				}
 			}
@@ -1491,7 +1508,7 @@ class Acid extends Liquid {
 
 class Lava extends Liquid {
 	stone = null; // The grain type this lava turns into when it cools down
-	constructor(chanceToPlaceFire = 0.01, stone = null, name = "Lava") {
+	constructor(chanceToPlaceFire = 0.001, stone = null, name = "Lava") {
 		super(3, false, null, true, name);
 		this.chanceToPlaceFire = chanceToPlaceFire; // Chance to place fire around
 		this.stone = stone; // The grain type this lava turns into when it cools down
@@ -1519,7 +1536,7 @@ class Lava extends Liquid {
 							grainObj.type != this &&
 							!(grainObj.type instanceof Oil)
 						) {
-							result[x][y] = this.stone.getGrainInt(); // Turn into stone
+							result[1][1] = this.stone.getGrainInt(); // Turn into stone
 							return result; // Return the result after turning into stone
 							// Check if the stone can turn into a different type
 						}
@@ -2204,6 +2221,14 @@ class FrozenGrain extends Grain {
 						result[1][1] = this.normalForm.getGrainInt();
 						return result; // Return the result after thawing
 					}
+					if (
+						grainObj.type instanceof Gas
+					) {
+						if (getRandom(0, 100) < 1){
+							result[1][1] = normal_water.getGrainInt();
+							return result;
+						}
+					}	
 				}
 			}
 		}
@@ -2271,7 +2296,7 @@ const normal_oil = new Oil(1);
 
 const normal_stone = new Stone();
 
-const normal_lava = new Lava(0.1, normal_stone);
+const normal_lava = new Lava(0.001, normal_stone);
 
 const normal_wood = new Wood();
 const normal_leaf = new Leaf();
