@@ -12,6 +12,8 @@ var current_grain = 1;
 
 grainTypes = [];
 
+let running = false;
+
 //gravity types
 // 0 - no gravity
 // 1 - full gravity
@@ -2673,8 +2675,11 @@ function importFromFile() {
 					return;
 				}
 
-				// Restore sandbox
+				stop();
+
 				screen = data.screen;
+
+				start();
 			} catch (err) {
 				alert("Failed to load file");
 				console.error(err);
@@ -3053,8 +3058,24 @@ function handleMouse() {
 
 
 
+
+
 function start() {
-	intervalID = window.setInterval(gameLoop, 1);
+	if (!running) {
+		running = true;
+		requestAnimationFrame(loop);
+	}
+}
+
+function loop() {
+	if (!running) return;
+
+	gameLoop();
+	requestAnimationFrame(loop);
+}
+
+function stop() {
+	running = false;
 }
 
 function arraysEqual(arr1, arr2) {
