@@ -1382,8 +1382,10 @@ const WaterVapor = class WaterVapor extends Gas {
 					if (
 						grainObj.type instanceof Ice
 					) {
-						result[1][1] = normal_water.getGrainInt();
-						return result;
+						if (getRandom(0, 100) < 20){
+							result[1][1] = normal_water.getGrainInt();
+							return result;
+						}
 					}	
 				}
 			}
@@ -1519,7 +1521,7 @@ class Lava extends Liquid {
 							grainObj.type != this &&
 							!(grainObj.type instanceof Oil)
 						) {
-							result[x][y] = this.stone.getGrainInt(); // Turn into stone
+							result[1][1] = this.stone.getGrainInt(); // Turn into stone
 							return result; // Return the result after turning into stone
 							// Check if the stone can turn into a different type
 						}
