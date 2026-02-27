@@ -1037,7 +1037,7 @@ class Gas extends Grain {
 				var move = possibleMoves[randomIndex];
 				var target = result[move[0]][move[1]];
 
-				if (target) {
+				if (target && grains[target - 1]) {
 					var targetGrain = grains[target - 1].type;
 
 					if (targetGrain instanceof Liquid) {
