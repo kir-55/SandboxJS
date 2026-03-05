@@ -26,17 +26,20 @@ class Grain {
 	normalInt;
 	surroundingFormat = 0;
 	name = "Unknown";
+	description = "This is basic grain, it may have gravity";
 
 	constructor(
 		gravity = 1,
 		surroundingFormat = 0,
 		density = 1,
 		name = "Unknown",
+		description = "This is basic grain, it may have gravity"
 	) {
 		this.gravity = gravity;
 		this.surroundingFormat = surroundingFormat;
 		this.density = density;
 		this.name = name;
+		this.description = description;
 	}
 
 	findNormalInt(type) {
@@ -2599,6 +2602,8 @@ getGrainTypes();
 
 start();
 
+updateSideMenu();
+
 //mouse handling
 var mouseInterval;
 // Helper for both mouse and touch
@@ -2941,6 +2946,19 @@ function handleGrainMenuSelect(e) {
 	}
 	drawGrainMenu();
 	drawMaterialPreview();
+
+	updateSideMenu();
+}
+
+function updateSideMenu(){
+	const nameLabel = document.getElementById("side-panel-grain-name");
+	const descriptionLabel = document.getElementById("side-panel-grain-description");
+	if (current_grain != 0){
+		nameLabel.innerHTML = grainTypes[current_grain -1 ].type.name;
+		descriptionLabel.innerHTML = grainTypes[current_grain -1 ].type.description;
+
+
+	}
 }
 
 // Remove any duplicate listeners first

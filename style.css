@@ -20,6 +20,31 @@ p{
   text-align: left;
 }
 
+.side-panel{
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: gold;
+  width: 20%;
+  height: 100vh;
+
+  background-color:rgb(19, 18, 18);
+
+  border-left: 1px rgba(255, 255, 255, 0.2) solid;
+
+  padding: 20px;
+}
+
+.grain-name {
+  width: 100%;
+  text-align:  center;
+}
+
+.grain-description {
+  width: 100%;
+  text-align:  center;
+}
+
 /* 
 #materialPreview{
   width: 48px;
