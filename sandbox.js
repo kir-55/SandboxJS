@@ -2694,6 +2694,14 @@ function importFromFile() {
 	};
 }
 
+document.getElementById("close-btn").onclick = () => {
+    document.getElementById("side-panel").style.display = "none";
+};
+
+document.getElementById("open-btn").onclick = () => {
+    document.getElementById("side-panel").style.display = "block";
+};
+
 // For canvas
 // Existing mousemove handler
 document.addEventListener("mousemove", function (event) {
