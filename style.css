@@ -139,7 +139,6 @@ p{
 }
 
 #brushSize {
-  -webkit-appearance: none;
   width: 180px;
   height: 18px;
   background: #222;
