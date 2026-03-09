@@ -1467,7 +1467,7 @@ const Water = class Water extends Liquid {
 				) {
 					var grainObj = grains[surroundingGrain - 1];
 					if (
-						grainObj.type instanceof Ice
+						grainObj.type instanceof FrozenGrain
 					) {
 						touchesIce+=1;
 					}	
@@ -1500,6 +1500,29 @@ class Acid extends Liquid {
 
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
+		var touchesIce = 0;
+
+		for (var x = 0; x < 3; x++) {
+			for (var y = 0; y < 3; y++) {
+				var surroundingGrain = surrounding[x][y];
+				if (
+					surroundingGrain != 0 &&
+					surroundingGrain != unexistingGrain
+				) {
+					var grainObj = grains[surroundingGrain - 1];
+					if (
+						grainObj.type instanceof FrozenGrain
+					) {
+						touchesIce+=1;
+					}	
+				}
+			}
+		}
+		if (touchesIce > 0 && getRandom(0, 100) < 1){
+			result[1][1] = normal_acidIce.getGrainInt();
+			return result;
+		}
+
 		if (arraysEqual(result, surrounding)) {
 			console.log("Acid applied phisics");
 			result = destroyNear(result, [Iron], 40, true, 100, 1);
@@ -2276,6 +2299,12 @@ class Ice extends FrozenGrain {
 	}
 }
 
+class AcidIce extends FrozenGrain {
+	constructor(acid = null, name = "Acid Ice") {
+		super(0, acid, name);
+	}
+}
+
 //sourrounding formats:
 // format 0
 //  0|1|2
@@ -2323,6 +2352,7 @@ const normal_iron = new Iron([normal_rustIron], null);
 const normal_acid = new Acid(null);
 const normal_acidVapor = new AcidVapor(normal_acid);
 normal_acid.gasForm = normal_acidVapor;
+const normal_acidIce = new AcidIce(normal_acid);
 
 const normal_oil = new Oil(1);
 
@@ -2429,6 +2459,11 @@ grains = [
 	new GrainType("#c4dbc7", normal_acidVapor),
 	new GrainType("#d2e3c7", normal_acidVapor),
 	new GrainType("#dceabd", normal_acidVapor),
+	new GrainType("#d6e79eff", normal_acidIce),
+	new GrainType("#ebf2aeff", normal_acidIce),
+	new GrainType("#ebefb0ff", normal_acidIce),
+	new GrainType("#d9e95fff", normal_acidIce),
+	new GrainType("#d6f677ff", normal_acidIce),
 
 	new GrainType("#e0ac69", normal_oil),
 	new GrainType("#f1c27d", normal_oil),
