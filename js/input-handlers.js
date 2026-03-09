@@ -1,11 +1,16 @@
-//mouse handling
+// input-handlers.js
+
+// Global state
 var mouseInterval;
+var shiftPressed = false;
+var lockedAxis = null;
+var dragStart = null;
+
 // Helper for both mouse and touch
 function setPointerPos(x, y) {
 	mousePos.x = x;
 	mousePos.y = y;
 }
-
 
 document.getElementById("close-btn").onclick = () => {
     document.getElementById("side-panel").style.display = "none";
@@ -15,8 +20,7 @@ document.getElementById("open-btn").onclick = () => {
     document.getElementById("side-panel").style.display = "block";
 };
 
-// For canvas
-// Existing mousemove handler
+// Canvas mouse/touch handling
 document.addEventListener("mousemove", function (event) {
 	var rect = canvas.getBoundingClientRect();
 	if (
@@ -33,12 +37,9 @@ document.addEventListener("mousemove", function (event) {
 	mousePos.y = Math.floor((event.clientY - rect.top) / cell_size);
 });
 
-// Add touch handlers with matching calculation logic
-
 canvas.addEventListener("touchstart", function (event) {
 	event.preventDefault();
 	var rect = canvas.getBoundingClientRect();
-	var touch = event.touches[0];
 	const pos = getCanvasCoords(event, canvas);
 	mousePos.x = Math.floor(pos.x / cell_size);
 	mousePos.y = Math.floor(pos.y / cell_size);
@@ -48,8 +49,6 @@ canvas.addEventListener("touchstart", function (event) {
 
 canvas.addEventListener("touchmove", function (event) {
 	event.preventDefault();
-	var rect = canvas.getBoundingClientRect();
-	var touch = event.touches[0];
 	const pos = getCanvasCoords(event, canvas);
 	mousePos.x = Math.floor(pos.x / cell_size);
 	mousePos.y = Math.floor(pos.y / cell_size);
@@ -69,57 +68,20 @@ canvas.addEventListener("touchcancel", function (event) {
 	mousePos.y = -1;
 });
 
-// For grainMenu (selection menu)
-document
-	.getElementById("grainMenu")
-	.addEventListener("touchstart", function (e) {
-		e.preventDefault();
-		const rect = this.getBoundingClientRect();
-		const touch = e.touches[0];
-		const y = touch.clientY - rect.top;
-		const x = touch.clientX - rect.left;
-		const cellSize = 9 * 5;
-		const idx = Math.floor(
-			(Math.floor(y / cellSize) * rect.width) / cellSize +
-				Math.floor(x / cellSize),
-		);
-		if (idx >= 0 && idx < grainTypes.length) {
-			current_grain = idx + 1;
-			drawGrainMenu();
-			drawMaterialPreview();
-		} else {
-			current_grain = 0;
-			drawGrainMenu();
-			drawMaterialPreview();
-		}
-	});
-
-document.addEventListener("mousemove", function (event) {
-	var rect = canvas.getBoundingClientRect();
-	if (
-		event.clientX < rect.left ||
-		event.clientX > rect.right ||
-		event.clientY < rect.top ||
-		event.clientY > rect.bottom
-	) {
-		mousePos.x = -1;
-		mousePos.y = -1;
-		return;
-	}
-	mousePos.x = Math.floor((event.clientX - rect.left) / cell_size);
-	mousePos.y = Math.floor((event.clientY - rect.top) / cell_size);
-});
+// Grain menu event listeners (replaces the old incorrect touchstart)
+const grainMenu = document.getElementById("grainMenu");
+if (grainMenu) {
+	grainMenu.addEventListener("mousedown", handleGrainMenuSelect);
+	grainMenu.addEventListener("touchstart", handleGrainMenuSelect);
+}
 
 document.addEventListener("mousedown", function (event) {
 	if (mousePos.x < 0 || mousePos.y < 0) return;
-
 	dragStart = { x: mousePos.x, y: mousePos.y };
-	lockedAxis = null; // reset axis
-
+	lockedAxis = null;
 	if (mouseInterval) clearInterval(mouseInterval);
 	mouseInterval = setInterval(handleMouse, 20);
 });
-
 
 document.addEventListener("mouseup", function (event) {
 	clearInterval(mouseInterval);
@@ -128,27 +90,20 @@ document.addEventListener("mouseup", function (event) {
 	lockedAxis = null;
 });
 
-
-
-// Optionally handle the scenario where the mouse leaves the canvas
 document.addEventListener("mouseleave", function (event) {
 	if (mouseInterval) clearInterval(mouseInterval);
 });
 
-
-
+// Resize handling
 function resizeCanvasForMobile() {
 	const canvas = document.getElementById("canvas");
 	const preview = document.getElementById("materialPreview");
 
-	// Desktop: large canvas
 	if (window.innerWidth > 700) {
-		// Set your preferred desktop size here
 		canvas.width = 700;
 		canvas.height = 700;
 		cell_size = Math.floor(canvas.width / width);
 	} else {
-		// Mobile: responsive square
 		let size = Math.min(window.innerWidth, window.innerHeight);
 		size = Math.max(size, 200);
 		cell_size = Math.floor(size / width);
@@ -164,61 +119,43 @@ function resizeCanvasForMobile() {
 window.addEventListener("resize", resizeCanvasForMobile);
 window.addEventListener("DOMContentLoaded", resizeCanvasForMobile);
 
-
+// Keyboard modifiers
 document.addEventListener("keydown", (e) => {
 	if (e.key === "Shift") shiftPressed = true;
 });
-
 document.addEventListener("keyup", (e) => {
 	if (e.key === "Shift") shiftPressed = false;
 });
 
+// Brush size via wheel
 canvas.addEventListener("wheel", function (event) {
 	event.preventDefault();
-
 	const step = event.shiftKey ? 3 : 1;
-
 	if (event.deltaY < 0) {
 		normal_brush_size += step;
 	} else {
 		normal_brush_size -= step;
 	}
-
 	normal_brush_size = Math.max(1, Math.min(20, normal_brush_size));
-
-	// Update slider position
 	const slider = document.getElementById("brushSize");
-	if (slider) {
-		slider.value = normal_brush_size;
-	}
+	if (slider) slider.value = normal_brush_size;
 });
 
-
-
+// Locked mouse position for straight lines
 function getLockedMousePos() {
 	if (!shiftPressed || !dragStart) {
 		return { x: mousePos.x, y: mousePos.y };
 	}
-
 	const dx = mousePos.x - dragStart.x;
 	const dy = mousePos.y - dragStart.y;
-
-	// If axis not chosen yet
 	if (!lockedAxis) {
-
-		// Do NOT decide if no movement yet
-		if (dx === 0 && dy === 0) {
-			return { x: mousePos.x, y: mousePos.y };
-		}
-
-		// Choose dominant axis
+		if (dx === 0 && dy === 0) return { x: mousePos.x, y: mousePos.y };
 		if (Math.abs(dx) > Math.abs(dy)) {
-			lockedAxis = "y"; // horizontal line
+			lockedAxis = "y";
 		} else {
-			lockedAxis = "x"; // vertical line
+			lockedAxis = "x";
 		}
 	}
-
 	if (lockedAxis === "y") {
 		return { x: mousePos.x, y: dragStart.y };
 	} else {
@@ -226,40 +163,31 @@ function getLockedMousePos() {
 	}
 }
 
-
-
-
+// Brush size from slider
 function setBrushSize(val) {
 	normal_brush_size = Math.max(1, Math.min(20, parseInt(val) || 1));
-
-	// Sync slider position
 	const slider = document.getElementById("brushSize");
-	if (slider) {
-		slider.value = normal_brush_size;
-	}
+	if (slider) slider.value = normal_brush_size;
 }
 
-
-
-
-
+// Next/previous grain buttons
 function nextGrain() {
-    if (current_grain < grainTypes.length) current_grain++;
-    else current_grain = 0;
-    drawMaterialPreview();
-    drawGrainMenu();
+	if (current_grain < grainTypes.length) current_grain++;
+	else current_grain = 0;
+	drawMaterialPreview();
+	drawGrainMenu();
+	updateSideMenu();
 }
 
 function prevGrain() {
-    if (current_grain > 0) current_grain--;
-    else current_grain = grainTypes.length;
-    drawMaterialPreview();
-    drawGrainMenu();
+	if (current_grain > 0) current_grain--;
+	else current_grain = grainTypes.length;
+	drawMaterialPreview();
+	drawGrainMenu();
+	updateSideMenu();
 }
 
-
-
-// Handle clicks/touches on the grain menu
+// Handle clicks/touches on the grain menu (uses proper layout)
 function handleGrainMenuSelect(e) {
 	e.preventDefault();
 	const menu = document.getElementById("grainMenu");
@@ -299,7 +227,5 @@ function handleGrainMenuSelect(e) {
 	}
 	drawGrainMenu();
 	drawMaterialPreview();
-
 	updateSideMenu();
 }
-
