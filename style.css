@@ -69,6 +69,12 @@ p{
     display: block;
 }
 
+.canvas-container{
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .open-btn{
   position: absolute;
 

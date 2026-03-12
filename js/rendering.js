@@ -116,5 +116,19 @@ function updateSideMenu() {
     if (current_grain != 0) {
         nameLabel.innerHTML = grainTypes[current_grain - 1].type.name;
         descriptionLabel.innerHTML = grainTypes[current_grain - 1].type.description;
+
+        // Start example preview with the selected grain
+        if (typeof startExample === 'function') {
+            startExample(grainTypes[current_grain - 1].type);
+        }
+    } else {
+        // If air is selected, stop the example and clear the canvas
+        if (typeof stopExample === 'function') {
+            stopExample();
+        }
+        const exampleCanvas = document.getElementById("example-canvas");
+        if (exampleCanvas) {
+            exampleCanvas.getContext('2d').clearRect(0, 0, exampleCanvas.width, exampleCanvas.height);
+        }
     }
 }

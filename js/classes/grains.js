@@ -7,6 +7,9 @@ class Grain {
 	surroundingFormat = 0;
 	name = "Unknown";
 	description = "This is basic grain, it may have gravity";
+	exampleInstructions = [
+        { time: 0, x: 30, y: 30, size: 4, grain: this }
+    ];
 
 	constructor(
 		gravity = 1,
@@ -45,6 +48,10 @@ class Grain {
 			realI += grainTypes[i].amount;
 		}
 		return 0;
+	}
+
+	addExample(instructions){
+		this.exampleInstructions = instructions;
 	}
 	// GRAVITY
 	// 0 - no gravity
@@ -671,6 +678,8 @@ class WireGrain extends FlamableGrain {
 	constructor(maxCharge = 5, name = "Wire") {
 		super(0, 0, 5, 1, name);
 		this.maxCharge = maxCharge;
+
+
 	}
 	// if collides with weaker charged grain, it will transfer charge to it
 	applyPhisics(surrounding) {

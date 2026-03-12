@@ -48,7 +48,7 @@
                 <path d="M22 4a2 2 0 0 0-2-2h-6v20h6a2 2 0 0 0 2-2z"></path>
             </svg>
         </button>
-        <div class="side-panel" id="side-panel">
+        <div class="side-panel" id="side-panel" style="display: none">
             
             <div  class="side-panel-header">
                 <h3 class="grain-name" id="side-panel-grain-name">Grain Name</h3>
@@ -68,7 +68,9 @@
                 </button>
             </div>
             <p class="grain-description" id="side-panel-grain-description">this is base grain, has no functionality, may be affected by gravity</p>
-            <canvas id="example-canvas"></canvas>
+            <div class="canvas-container">
+                <canvas id="example-canvas"></canvas>
+            </div>
         </div>
     </div>
 
@@ -82,5 +84,6 @@
     <script src="js/port.js"></script>
     <script src="js/input-handlers.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/example.js"></script>
 </body>
 </html>
