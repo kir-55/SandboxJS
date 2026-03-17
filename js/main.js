@@ -19,7 +19,7 @@ const pixelWidth = width * cell_size;
 canvas.width = pixelWidth;
 canvas.height = pixelHeight;
 
-
+stepCounter = 0;
 
 var screen = new Array(width).fill(0).map(() => new Array(height).fill(0));
 
@@ -48,6 +48,7 @@ function loop() {
 }
 
 function gameLoop() {
+    stepCounter++;
     runPhysics();
     drawStep();
 }

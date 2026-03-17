@@ -1,4 +1,6 @@
-
+let recording = true;
+let recordedInstructions = [];
+let recordingStartStep = 10;
 
 function runPhysics() {
 	var newScreen = JSON.parse(JSON.stringify(screen));
@@ -47,25 +49,60 @@ function runPhysics() {
 }
 
 function placeBrush(x, y, brush_size = normal_brush_size) {
-	ctx.fillStyle = "#eeaa00";
-	for (x1 = -brush_size / 2; x1 < brush_size / 2; x1++) {
-		for (y1 = -brush_size / 2; y1 < brush_size / 2; y1++) {
-			var globalX = x + Math.round(x1);
-			var globalY = y + Math.round(y1);
-			if (
-				globalX >= 0 &&
-				globalX < width &&
-				globalY >= 0 &&
-				globalY < height
-			)
-				screen[x + Math.round(x1)][y + Math.round(y1)] =
-					current_grain > 0
-						? grainTypes[current_grain - 1].type.getGrainInt()
-						: 0;
-		}
-	}
+    ctx.fillStyle = "#eeaa00";
+
+    // 🟢 RECORD ACTION
+    if (recording) {
+        recordedInstructions.push({
+            time: stepCounter - recordingStartStep,
+            x: x,
+            y: y,
+            size: brush_size,
+            grain: grainTypes[current_grain - 1]
+        });
+    }
+
+    for (x1 = -brush_size / 2; x1 < brush_size / 2; x1++) {
+        for (y1 = -brush_size / 2; y1 < brush_size / 2; y1++) {
+            var globalX = x + Math.round(x1);
+            var globalY = y + Math.round(y1);
+
+            if (
+                globalX >= 0 &&
+                globalX < width &&
+                globalY >= 0 &&
+                globalY < height
+            ) {
+                screen[globalX][globalY] =
+                    current_grain > 0
+                        ? grainTypes[current_grain - 1].type.getGrainInt()
+                        : 0;
+            }
+        }
+    }
 }
 
+function exportExample() {
+    const cleaned = recordedInstructions.map(instr => ({
+        time: instr.time,
+        x: instr.x,
+        y: instr.y,
+        size: instr.size,
+        grain: instr.grain.type.name // 👈 IMPORTANT (see below)
+    }));
+
+    const json = JSON.stringify(cleaned, null, 2);
+
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "example.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
 
 
 function getSurrounding(surroundingFormat, x, y, screen) {
