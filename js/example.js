@@ -116,57 +116,81 @@ function placeExampleBrush(x, y, size, grainType) {
 // Simplified physics for example screen (3×3 neighbourhood)
 function runExamplePhysics() {
     let newScreen = JSON.parse(JSON.stringify(exampleScreen));
+
     for (let x = 0; x < exampleWidth; x++) {
         for (let y = 0; y < exampleHeight; y++) {
             let currentGrainInt = exampleScreen[x][y];
-            if (currentGrainInt !== 0 && currentGrainInt !== unexistingGrain && currentGrainInt === newScreen[x][y]) {
+
+            if (
+                currentGrainInt !== 0 &&
+                currentGrainInt !== unexistingGrain &&
+                currentGrainInt === newScreen[x][y]
+            ) {
                 let currentGrainType = grains[currentGrainInt - 1];
                 let currentGrain = currentGrainType.type;
-                let surrounding = getExampleSurrounding(x, y, newScreen);
+
+                let format = currentGrain.surroundingFormat;
+                let sideLength = format * 2 + 3;
+
+                let surrounding = getExampleSurrounding(format, x, y, newScreen);
+
                 let newSurrounding = currentGrain.applyPhisics(surrounding);
 
-                // If the grain moved (center changed)
-                if (newSurrounding[1][1] !== currentGrainInt) {
-                    // Clear old position
-                    newScreen[x][y] = 0;
-                    // Apply the new 3×3 neighbourhood (only non‑zero values)
-                    for (let dx = -1; dx <= 1; dx++) {
-                        for (let dy = -1; dy <= 1; dy++) {
-                            let nx = x + dx;
-                            let ny = y + dy;
-                            if (nx >= 0 && nx < exampleWidth && ny >= 0 && ny < exampleHeight) {
-                                let val = newSurrounding[dx + 1][dy + 1];
-                                if (val !== 0 && newScreen[nx][ny] === 0) {
-                                    newScreen[nx][ny] = val;
-                                }
-                            }
+                // APPLY FULL SURROUNDING (same as main sim)
+                for (let x1 = -sideLength / 2; x1 < sideLength / 2; x1++) {
+                    for (let y1 = -sideLength / 2; y1 < sideLength / 2; y1++) {
+                        let globalX = x + Math.round(x1);
+                        let globalY = y + Math.round(y1);
+
+                        if (
+                            globalX >= 0 &&
+                            globalX < exampleWidth &&
+                            globalY >= 0 &&
+                            globalY < exampleHeight
+                        ) {
+                            newScreen[globalX][globalY] =
+                                newSurrounding[Math.floor(sideLength / 2 + x1)][
+                                    Math.floor(sideLength / 2 + y1)
+                                ];
                         }
                     }
                 }
             }
         }
     }
+
     exampleScreen = newScreen;
 }
 
-// Get 3×3 surrounding (format 0)
-function getExampleSurrounding(x, y, scr) {
-    let surrounding = [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
-    ];
-    for (let dx = -1; dx <= 1; dx++) {
-        for (let dy = -1; dy <= 1; dy++) {
-            let nx = x + dx;
-            let ny = y + dy;
-            if (nx >= 0 && nx < exampleWidth && ny >= 0 && ny < exampleHeight) {
-                surrounding[dx + 1][dy + 1] = scr[nx][ny];
+function getExampleSurrounding(surroundingFormat, x, y, scr) {
+    let sideLength = surroundingFormat * 2 + 3;
+
+    let surrounding = new Array(sideLength)
+        .fill(0)
+        .map(() => new Array(sideLength).fill(0));
+
+    for (let x1 = -sideLength / 2; x1 < sideLength / 2; x1++) {
+        for (let y1 = -sideLength / 2; y1 < sideLength / 2; y1++) {
+            let globalX = x + Math.round(x1);
+            let globalY = y + Math.round(y1);
+
+            if (
+                globalX >= 0 &&
+                globalX < exampleWidth &&
+                globalY >= 0 &&
+                globalY < exampleHeight
+            ) {
+                surrounding[Math.floor(sideLength / 2 + x1)][
+                    Math.floor(sideLength / 2 + y1)
+                ] = scr[globalX][globalY];
             } else {
-                surrounding[dx + 1][dy + 1] = unexistingGrain;
+                surrounding[Math.floor(sideLength / 2 + x1)][
+                    Math.floor(sideLength / 2 + y1)
+                ] = unexistingGrain;
             }
         }
     }
+
     return surrounding;
 }
 

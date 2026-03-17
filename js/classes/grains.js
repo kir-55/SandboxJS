@@ -2569,3 +2569,12 @@ function getGrainTypes() {
 		grainType.type.findNormalInt(grainType.type);
 	}
 }
+
+
+// ANIMATIONS 
+
+normal_wire.exampleInstructions = [
+	{ time: 0, x: 30, y: 30, size: 10, grain: normal_wire },
+	{ time: 5, x: 30, y: 32, size: 1, grain: normal_uran }
+
+];
