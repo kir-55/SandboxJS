@@ -1,0 +1,36 @@
+{
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.3.1",
+    "ejs": "^5.0.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "mysql2": "^3.20.0"
+  },
+  "name": "sandboxjs",
+  "version": "1.0.0",
+  "description": "simulation of grains",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kir-55/SandboxJS.git"
+  },
+  "keywords": [
+    "sandbox",
+    "js",
+    "grains",
+    "simulation"
+  ],
+  "author": "FireGame",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kir-55/SandboxJS/issues"
+  },
+  "homepage": "https://github.com/kir-55/SandboxJS#readme"
+}
