@@ -1,6 +1,10 @@
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import mysql from "mysql2/promise";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -13,12 +17,14 @@ app.use(express.static("public"));
 const port = process.env.PORT;
 const host = process.env.HOST;
 
+const name = "SandboxJS";
+
 app.get("/", (req, res) => {
-  res.render("index", {name: process.env.NAME});
+  res.render("index", {name: name});
 });
 
 app.get("/simulation/", (req, res) => {
-  res.render("simulation", {name: process.env.NAME});
+  res.render("simulation", {name: name});
 });
 
 
