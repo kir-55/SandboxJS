@@ -13,8 +13,9 @@ app.use(express.static("public"));
 const port = process.env.PORT;
 const host = process.env.HOST;
 
-
-
+app.get("/", (req, res) => {
+  res.render("index", {name: process.env.NAME});
+});
 
 app.get("/simulation/", (req, res) => {
   res.render("simulation", {name: process.env.NAME});
