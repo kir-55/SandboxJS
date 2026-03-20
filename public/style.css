@@ -1,84 +1,93 @@
-body{
-    background-color: rgb(28, 28, 28);
+:root {
+  --accent: #D95F02;
+  --side-panel: #F5E4D6;
+  --side-panel-header: #efcfb5;
+  --text-color: black;
 }
 
-label{
-    color: gold;
-    font-size: 30;
-    font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+body {
+  background-color: rgb(173, 173, 173);
+  margin: 0;
+
+}
+
+label {
+  color: var(--accent);
+  font-size: 30;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 
 
-p{
-    color: white;
-    font-size: 13;
-    font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+p {
+  color: var(--text-color);
+  font-size: 13;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.left{
+.left {
   margin-bottom: auto;
   align-items: left;
   text-align: left;
 }
 
-.side-panel{
+.side-panel {
   position: absolute;
   right: 0;
-  top: 0;
-  color: gold;
+  top: 60px;
+  color: var(--accent);
   width: 20%;
-  height: 100vh;
+  height: calc(100vh - 60px);
 
-  background-color:rgb(19, 18, 18);
+  background-color: var(--side-panel);
 
-  border-left: 1px rgba(255, 255, 255, 0.2) solid;
+  /* border-left: 1px rgba(255, 255, 255, 0.2) solid; */
 
 }
 
 .grain-name {
-  text-align:  left;
+  text-align: left;
 }
 
 .grain-description {
   width: 100%;
-  text-align:  center;
+  text-align: center;
 }
 
 .side-panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #222;
-    width: 100%;
-    padding-left: 20px;
-    padding-right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--side-panel-header);
+  width: 100%;
+  padding-left: 20px;
+  padding-right: 20px;
 
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .close-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: white;
 }
 
 .close-btn svg {
-    display: block;
+  display: block;
 }
 
-.canvas-container{
+.canvas-container {
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
 }
 
-.open-btn{
+.open-btn {
   position: absolute;
 
-  top: 40px;
+  top: 80px;
   right: 40px;
 
   background: none;
@@ -107,7 +116,7 @@ p{
   box-sizing: border-box;
   cursor: pointer;
   display: inline-block;
-  font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 32px;
   font-weight: 700;
   letter-spacing: .8px;
@@ -136,12 +145,12 @@ p{
 
 
 
-.center{
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
-    align-items: center;
-    text-align: center;
+.center {
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+  text-align: center;
 }
 
 #brushSize {
@@ -229,11 +238,11 @@ p{
   background: #222;
 }
 
-#materialMenu{
-  display: flex; 
-  flex-direction: row; 
-  align-items: center; 
-  gap: 10px; 
+#materialMenu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   justify-content: center;
 }
 
@@ -244,17 +253,20 @@ p{
     flex-direction: column;
     align-items: center;
   }
+
   #grainMenu {
     float: none;
     display: block;
     margin: 0 auto 10px auto;
   }
+
   #canvas {
     width: 90vw !important;
     height: 90vw !important;
     display: block;
     margin: 0 auto;
   }
+
   .button-container {
     flex-direction: column;
     align-items: center;
@@ -269,11 +281,13 @@ p{
     flex-direction: column;
     align-items: center;
   }
+
   #grainMenu {
     margin: 10px auto 0 auto;
     display: block;
     order: 2;
   }
+
   .center {
     order: 1;
   }

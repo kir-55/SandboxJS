@@ -99,12 +99,13 @@ function resizeCanvasForMobile() {
 	const canvas = document.getElementById("canvas");
 	const preview = document.getElementById("materialPreview");
 
-	if (window.innerWidth > 700) {
+	if (window.innerWidth > 2000) {
 		canvas.width = 700;
 		canvas.height = 700;
 		cell_size = Math.floor(canvas.width / width);
 	} else {
 		let size = Math.min(window.innerWidth, window.innerHeight);
+		size -= size * 0.26;
 		size = Math.max(size, 200);
 		cell_size = Math.floor(size / width);
 		canvas.width = width * cell_size;

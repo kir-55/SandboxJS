@@ -4,7 +4,7 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
-var cell_size = 8;
+var cell_size = 10;
 var normal_brush_size = 3;
 var current_grain = 1;
 var grainTypes = [];

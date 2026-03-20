@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Register - <%= name%>
+    </title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+        <main class="container">
+            <h2>Register</h2>
+            <form id="registerForm">
+                <div>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <p id="message"></p>
+            <p>Already have an account? <a href="/login">Login</a></p>
+        </main>
+        <%- include('partials/footer') %>
+            <script>
+                document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    } else {
+                        document.getElementById('message').textContent = data.error || 'Registration failed';
+                    }
+                });
+            </script>
+</body>
+
+</html>

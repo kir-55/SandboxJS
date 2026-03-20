@@ -4,7 +4,7 @@ function drawStep() {
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             var grain = findGrain(screen[x][y]);
-            ctx.fillStyle = grain ? grain.color : "#262626ff";
+            ctx.fillStyle = grain ? grain.color : simulationBackgroundColor;
             ctx.fillRect(x * cell_size, y * cell_size, cell_size, cell_size);
         }
     }
@@ -18,7 +18,7 @@ function drawMaterialPreview() {
     ctxPrev.clearRect(0, 0, preview.width, preview.height);
 
     if (current_grain === 0) {
-        ctxPrev.fillStyle = "#262626ff";
+        ctxPrev.fillStyle = "rgb(255, 255, 255)";
         ctxPrev.fillRect(0, 0, preview.width, preview.height);
         const grainNameElem = document.getElementById("grainName");
         if (grainNameElem) grainNameElem.textContent = "Air";

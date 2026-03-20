@@ -200,7 +200,7 @@ function drawExample() {
     for (let x = 0; x < exampleWidth; x++) {
         for (let y = 0; y < exampleHeight; y++) {
             let grainInt = exampleScreen[x][y];
-            let color = "#262626ff"; // default black
+            let color = simulationBackgroundColor; // default black
             if (grainInt !== 0 && grainInt !== unexistingGrain) {
                 let grain = findGrain(grainInt);
                 if (grain) color = grain.color;

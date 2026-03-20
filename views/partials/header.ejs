@@ -1,0 +1,104 @@
+<header class="site-header">
+    <div class="container header-container">
+        <div class="logo">
+            <a href="/">
+                <%= name %>
+            </a>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/simulation/" class="nav-cta">Launch Sim</a></li>
+                <% if (locals.user) { %>
+                    <li class="hide-mobile"><a href="/saves">My Saves</a></li>
+                    <li>
+                        <a href="/logout" style="display:flex;align-items:center;gap:6px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            <span class="hide-mobile nav-user">
+                                <%= user.username %>
+                            </span>
+                        </a>
+                    </li>
+                    <% } else { %>
+                        <li class="hide-mobile"><a href="/login">Login</a></li>
+                        <li><a href="/register">Register</a>
+                        </li>
+                        <% } %>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<style>
+    .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #fff;
+        border-bottom: 1px solid #E8E6E1;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .header-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 60px;
+    }
+
+    /* Logo */
+    .logo a {
+        color: var(--accent);
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: -0.02em;
+    }
+
+    /* Nav */
+    .main-nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .main-nav a {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #666;
+        text-decoration: none;
+        padding: 6px 12px;
+        transition: background 150ms, color 150ms;
+    }
+
+    .main-nav a:hover {
+        background: #F3F1EC;
+        color: #111;
+    }
+
+    /* Username label */
+    .main-nav .nav-user {
+        font-size: 0.82rem;
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    @media (max-width: 500px) {
+        .hide-mobile {
+            display: none;
+        }
+    }
+</style>
