@@ -1,6 +1,6 @@
 // main.js
 
-// Global variables (already declared in other files, but ensure they exist)
+// Global variables (declared in other files, but ensure they exist)
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
@@ -11,17 +11,31 @@ var grainTypes = [];
 var running = false;
 var mousePos = { x: 0, y: 0 };
 const unexistingGrain = 9999;
-const height = 100;
-const width = 100;
+
+// Check for loaded world data
+let width, height, screen;
+if (window.loadedScreenData) {
+    // Use the loaded world
+    width = window.loadedWidth;
+    height = window.loadedHeight;
+    // Deep copy the 2D array
+    screen = window.loadedScreenData.map(row => [...row]);
+    // Clean up to free memory
+    delete window.loadedScreenData;
+    delete window.loadedWidth;
+    delete window.loadedHeight;
+} else {
+    // Default empty world
+    width = 100;
+    height = 100;
+    screen = new Array(width).fill(0).map(() => new Array(height).fill(0));
+}
+
+// Set canvas dimensions based on cell size and world size
 const pixelHeight = height * cell_size;
 const pixelWidth = width * cell_size;
-
 canvas.width = pixelWidth;
 canvas.height = pixelHeight;
-
-
-
-var screen = new Array(width).fill(0).map(() => new Array(height).fill(0));
 
 // Call getGrainTypes to populate grainTypes (defined in grains.js)
 getGrainTypes();
@@ -32,14 +46,6 @@ drawGrainMenu();
 
 // Update side panel
 updateSideMenu();
-
-
-
-// Remove the following line – it was causing an error:
-// const mainSim = new Simulation(width, height, cell_size);
-
-// All other functions (loop, gameLoop, handleMouse, etc.) are defined elsewhere.
-// But we need to define loop and gameLoop here (or move them). I'll define them here:
 
 function loop() {
     if (!running) return;
@@ -58,5 +64,5 @@ function handleMouse() {
     placeBrush(pos.x, pos.y);
 }
 
-// Ensure placeBrush is defined (it's in simulation.js, but we need it globally)
-// It should already be there.
+// Note: runPhysics, drawStep, placeBrush, getLockedMousePos, start, etc.
+// are defined in other included scripts (simulation.js, rendering.js, etc.)

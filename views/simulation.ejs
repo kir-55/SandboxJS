@@ -6,8 +6,7 @@
                 <canvas id="canvas"></canvas>
                 <br>
                 <p id="grainName">Air</p>
-                <div class="button-container"
-                    style="margin-top: 10px; display: flex; align-items: center; gap: 10px; flex-direction: column; justify-content: center;">
+                <div class="button-container">
                     <div id="materialMenu">
                         <canvas id="grainMenu"></canvas>
                         <div>
@@ -26,7 +25,7 @@
                 <input type="file" id="fileInput" accept=".sx,.json" style="display:none">
                 <button onclick="importFromFile()">Import</button>
                 <button onclick="exportToFile()">Export</button>
-
+                <button onclick="saveToDatabase()">Save</butto>
             </div>
             <button class="open-btn" id="open-btn" aria-label="Open grain info">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -47,7 +46,8 @@
                         </svg>
                     </button>
                 </div>
-                <p class="grain-description" id="side-panel-grain-description">this is base grain, has no functionality,
+                <p class="grain-description" id="side-panel-grain-description">this is base grain, has no
+                    functionality,
                     may be affected by gravity</p>
                 <div class="canvas-container">
                     <canvas id="example-canvas"></canvas>
@@ -55,10 +55,19 @@
             </div>
         </div>
 
-
         <script>
-            const simulationBackgroundColor = "#7a7a7a";
-
+            const simulationBackgroundColor = '<%= simulation_background_color %>';
+            // Conditionally define screen if saveData is provided
+            console.log("not loaded loaded loaded");
+            <% if (saveData) { %>
+                // Use JSON.stringify to safely embed the array
+                window.loadedScreenData = <%= JSON.stringify(saveData.screen_data) %>;
+                window.loadedWidth = <%= saveData.width %>;
+                window.loadedHeight = <%= saveData.height %>;
+                console.log("loaded loaded loaded");
+                // We'll set these in main.js after it loads, but we can define them here
+                // Note: This must run before main.js, but we need to ensure main.js uses them
+            <% } %>
         </script>
 
         <script src="/js/utils/helpers.js"></script>
@@ -67,6 +76,9 @@
         <script src="/js/rendering.js"></script>
         <script src="/js/port.js"></script>
         <script src="/js/input-handlers.js"></script>
+
+
         <script src="/js/main.js"></script>
         <script src="/js/example.js"></script>
+
         <%- include('partials/footer') %>

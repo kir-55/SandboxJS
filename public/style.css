@@ -1,12 +1,12 @@
 :root {
   --accent: #D95F02;
-  --side-panel: #F5E4D6;
-  --side-panel-header: #efcfb5;
+  --side-panel: #bbb8b6;
+  --side-panel-header: #7f7974;
   --text-color: black;
 }
 
 body {
-  background-color: rgb(173, 173, 173);
+  background-color: var(--side-panel);
   margin: 0;
 
 }
@@ -41,7 +41,7 @@ p {
 
   background-color: var(--side-panel);
 
-  /* border-left: 1px rgba(255, 255, 255, 0.2) solid; */
+  border-left: 1px rgba(43, 43, 43, 0.2) solid;
 
 }
 
@@ -246,6 +246,23 @@ p {
   justify-content: center;
 }
 
+.button-container {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-direction: column;
+  justify-content: center;
+  background-color: var(--side-panel-header);
+
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  border-radius: 30px;
+
+}
+
 
 
 @media (max-width: 700px) {
@@ -268,8 +285,13 @@ p {
   }
 
   .button-container {
-    flex-direction: column;
+    margin-top: 10px;
+    display: flex;
     align-items: center;
+    gap: 10px;
+    flex-direction: column;
+    justify-content: center;
+    background-color: black;
   }
 
   .button-19 {

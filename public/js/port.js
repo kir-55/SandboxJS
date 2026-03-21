@@ -53,3 +53,36 @@ function importFromFile() {
 		reader.readAsText(file);
 	};
 }
+
+ async function saveToDatabase() {
+        const worldName = prompt("Enter a name for this world:", "My Sandbox");
+        if (!worldName) return;
+
+        const payload = {
+            world_name: worldName,
+            screen_data: screen,    // global 2D array
+            width: width,           // global width
+            height: height          // global height
+        };
+
+        try {
+            const response = await fetch('/api/saves', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert(`World "${worldName}" saved successfully!`);
+            } else {
+                if (response.status === 401) {
+                    alert("You need to log in to save worlds.");
+                } else {
+                    alert(`Error: ${data.error || 'Unknown error'}`);
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Network error');
+        }
+    }

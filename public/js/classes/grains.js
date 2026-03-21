@@ -2578,3 +2578,9 @@ normal_wire.exampleInstructions = [
 	{ time: 5, x: 30, y: 32, size: 1, grain: normal_uran }
 
 ];
+
+function findGrain(int) {
+	if (int == 0) return;
+	for (let grainIndex in grains)
+		if (grainIndex == int - 1) return grains[grainIndex];
+}

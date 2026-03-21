@@ -1,3 +1,5 @@
+
+
 function getRandom(min, max) {
 	// this function should return a random float between min (inclusive) and max (exclusive)
 	return Math.random() * (max - min) + min;

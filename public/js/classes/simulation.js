@@ -12,34 +12,35 @@ function runPhysics() {
 			) {
 				var currentGrainType = grains[currentGrainInt - 1];
 				var currentGrain = currentGrainType.type;
-				var newSurrounding = currentGrain.applyPhisics(
-					getSurrounding(
-						currentGrain.surroundingFormat,
-						x,
-						y,
-						newScreen,
-					),
-				);
-				var sideLength = currentGrain.surroundingFormat * 2 + 3;
+					var newSurrounding = currentGrain.applyPhisics(
+						getSurrounding(
+							currentGrain.surroundingFormat,
+							x,
+							y,
+							newScreen,
+						),
+					);
+					var sideLength = currentGrain.surroundingFormat * 2 + 3;
 
-				//applying the new surrounding
-				for (x1 = -sideLength / 2; x1 < sideLength / 2; x1++) {
-					for (y1 = -sideLength / 2; y1 < sideLength / 2; y1++) {
-						var globalX = x + Math.round(x1);
-						var globalY = y + Math.round(y1);
-						if (
-							globalX >= 0 &&
-							globalX < width &&
-							globalY >= 0 &&
-							globalY < height
-						) {
-							newScreen[globalX][globalY] =
-								newSurrounding[Math.floor(sideLength / 2 + x1)][
-									Math.floor(sideLength / 2 + y1)
-								];
+					//applying the new surrounding
+					for (x1 = -sideLength / 2; x1 < sideLength / 2; x1++) {
+						for (y1 = -sideLength / 2; y1 < sideLength / 2; y1++) {
+							var globalX = x + Math.round(x1);
+							var globalY = y + Math.round(y1);
+							if (
+								globalX >= 0 &&
+								globalX < width &&
+								globalY >= 0 &&
+								globalY < height
+							) {
+								newScreen[globalX][globalY] =
+									newSurrounding[Math.floor(sideLength / 2 + x1)][
+										Math.floor(sideLength / 2 + y1)
+									];
+							}
 						}
 					}
-				}
+
 			}
 		}
 	}
@@ -136,11 +137,6 @@ function destroyNear(
 	return surrounding;
 }
 
-function findGrain(int) {
-	if (int == 0) return;
-	for (let grainIndex in grains)
-		if (grainIndex == int - 1) return grains[grainIndex];
-}
 
 
 function start() {

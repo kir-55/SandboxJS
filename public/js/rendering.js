@@ -1,5 +1,28 @@
 // rendering.js
 
+function previewSave(canvasId, screenData, scale=2) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = parseInt(canvas.width);
+    const height = parseInt(canvas.height);
+    const cellW = canvas.width  / width * scale;
+    const cellH = canvas.height / height * scale;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let x = 0; x < width; x++) {
+        // Flip the y index: the top row of the canvas corresponds to the last row in the data
+        const row = screenData[x];
+        for (let y = 0; y < height; y++) {
+            const materialId = row?.[y];
+            const grain = findGrain(materialId);
+            ctx.fillStyle = grain ? grain.color : simulationBackgroundColor;
+            ctx.fillRect(x * cellW, y * cellH, cellW, cellH);
+        }
+    }
+}
+
 function drawStep() {
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {

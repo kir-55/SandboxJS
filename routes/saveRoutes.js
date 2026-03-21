@@ -11,10 +11,22 @@ import {
 
 const router = express.Router();
 
-router.get('/', authenticateToken, async (req, res) => {
+// routes/saveRoutes.js (partial)
+router.post('/', authenticateToken, async (req, res) => {
+    const { world_name, screen_data, width, height } = req.body;
+    if (!world_name || !screen_data) {
+        return res.status(400).json({ error: 'Missing fields' });
+    }
+
     try {
-        const saves = await getSavesByUserId(req.user.id);
-        res.json(saves);
+        const existing = await getSaveByUserAndWorld(req.user.id, world_name);
+        if (existing) {
+            await updateSave(req.user.id, world_name, screen_data, width, height);
+            res.json({ message: 'World updated' });
+        } else {
+            await createSave(req.user.id, world_name, screen_data, width, height);
+            res.status(201).json({ message: 'World saved' });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Database error' });
