@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes.js';
 import saveRoutes from './routes/saveRoutes.js';
-import { getSavesByUserId, getSaveByUserAndWorld } from './models/saveModel.js';
+import { getSavesByUserId, getSaveByUserAndWorld, getAllSavesWithUser, getSaveById } from './models/saveModel.js';
 
 
 const app = express();
@@ -70,26 +70,60 @@ app.get('/register/', (req, res) => {
     res.render('register', { name });
 });
 
+app.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/');
+});
 
+
+app.get('/discover', async (req, res) => {
+    let worlds = [];
+    try {
+        worlds = await getAllSavesWithUser();
+    } catch (err) {
+        console.error('Error fetching worlds:', err);
+    }
+    res.render('discover', { name, simulation_background_color, user: req.user, worlds });
+});
 
 app.get('/simulation/', async (req, res) => {
     let saveData = null;
-    if (req.user && req.query.load) {
+    const cloneId = req.query.clone;
+    const loadWorld = req.query.load;
+
+    if (req.user && loadWorld) {
         try {
-            const worldName = req.query.load;
+            const worldName = loadWorld;
             const save = await getSaveByUserAndWorld(req.user.id, worldName);
             if (save) {
                 saveData = {
                     world_name: worldName,
                     screen_data: save.screen_data,
                     width: save.width,
-                    height: save.height
+                    height: save.height,
+                    isClone: false
                 };
             }
         } catch (err) {
             console.error('Error loading save:', err);
         }
+    } else if (cloneId) {
+        try {
+            const save = await getSaveById(cloneId);
+            if (save) {
+                saveData = {
+                    world_name: `Clone of ${save.world_name}`,
+                    screen_data: save.screen_data,
+                    width: save.width,
+                    height: save.height,
+                    isClone: true
+                };
+            }
+        } catch (err) {
+            console.error('Error cloning world:', err);
+        }
     }
+
     res.render('simulation', { name, simulation_background_color, saveData });
 });
 

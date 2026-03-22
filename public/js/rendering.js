@@ -35,12 +35,14 @@ function drawStep() {
 }
 
 function drawMaterialPreview() {
+    
     const preview = document.getElementById("materialPreview");
     if (!preview) return;
     const ctxPrev = preview.getContext("2d");
     ctxPrev.clearRect(0, 0, preview.width, preview.height);
-
+    console.log("preview material: " + grainTypes.length);
     if (current_grain === 0) {
+        
         ctxPrev.fillStyle = "rgb(255, 255, 255)";
         ctxPrev.fillRect(0, 0, preview.width, preview.height);
         const grainNameElem = document.getElementById("grainName");
@@ -121,6 +123,8 @@ function drawGrainMenu() {
             ctx.strokeRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
         }
     }
+
+    
 }
 
 function drawBrushOutline() {

@@ -2,6 +2,7 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
 import {
+    getSaveById,
     getSavesByUserId,
     getSaveByUserAndWorld,
     createSave,
@@ -53,6 +54,26 @@ router.post('/', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Database error' });
     }
 });
+
+// Public route to get a save by id (no auth required)
+router.get('/public/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const save = await getSaveById(id);
+        if (!save) return res.status(404).json({ error: 'World not found' });
+        res.json({
+            world_name: save.world_name,
+            screen_data: save.screen_data,
+            width: save.width,
+            height: save.height
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+
 
 router.get('/:worldName', authenticateToken, async (req, res) => {
     const { worldName } = req.params;

@@ -2552,7 +2552,7 @@ class GrainVariety {
 
 
 
-function getGrainTypes() {
+async function getGrainTypes() {
 	var lastGrain;
 	var i = 0;
 	for (grain of grains) {

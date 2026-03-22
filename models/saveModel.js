@@ -36,6 +36,30 @@ export async function getSavesByUserId(userId) {
     return parsedRows;
 }
 
+// Add these exports to the existing file
+export async function getAllSavesWithUser() {
+    const [rows] = await pool.execute(
+        `SELECT s.id, s.world_name, s.width, s.height, s.created_at, s.updated_at, u.username as author
+         FROM saves s
+         JOIN users u ON s.user_id = u.id
+         ORDER BY s.updated_at DESC`
+    );
+    return rows;
+}
+
+export async function getSaveById(saveId) {
+    const [rows] = await pool.execute(
+        'SELECT screen_data, width, height, world_name, user_id FROM saves WHERE id = ?',
+        [saveId]
+    );
+    if (rows.length === 0) return null;
+    const row = rows[0];
+    return {
+        ...row,
+        screen_data: typeof row.screen_data === 'string' ? JSON.parse(row.screen_data) : row.screen_data
+    };
+}
+
 export async function getSaveByUserAndWorld(userId, worldName) {
     const [rows] = await pool.execute(
         'SELECT screen_data, width, height FROM saves WHERE user_id = ? AND world_name = ?',
