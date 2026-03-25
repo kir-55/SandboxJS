@@ -2,18 +2,11 @@
   --nav-menu: #1E1E22;
   --background-color: #121214;
   --accent: #F77F00;
-
-  --text-primary: #EAEAEA;
-  --text-secondary: #D6D6D6;
-
-  --panel: #2A2A2E;
-  --panel-header: #1A1A1D;
-
-  --panel-text: #D6D6D6;
-  --panel-header-text: #FFFFFF;
-
-  --button-primary: #FF9F1C;
-  --button-secondary: #3A3A3F;
+  --side-panel: #98b3c2;
+  --side-panel-header: #003049;
+  --backgroun-color: #FCBF49;
+  --text-color: #000000;
+  --buttons-color: white;
 }
 
 body {
@@ -58,6 +51,7 @@ p {
 
 .grain-name {
   text-align: left;
+
 }
 
 .grain-description {
@@ -277,7 +271,7 @@ p {
 .auth-card {
   max-width: 400px;
   margin: 40px auto;
-  background: var(--side-panel-header);
+  background: var(--side-panel);
   /* dark header color */
   border-radius: 16px;
   padding: 2rem;
@@ -286,9 +280,13 @@ p {
 }
 
 .auth-card h2 {
-  color: var(--accent);
+  color: var(--text-color);
   margin-bottom: 1.5rem;
   font-size: 2rem;
+}
+
+p {
+  text-align: center;
 }
 
 .form-group {
@@ -305,7 +303,7 @@ p {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--text-color);
 }
 
 .form-group input {
@@ -314,7 +312,7 @@ p {
   background: var(--side-panel);
   border: 1px solid #444;
   border-radius: 8px;
-  color: white;
+  color: var(--text-color);
   font-size: 1rem;
   transition: border 0.2s;
 }
@@ -433,17 +431,6 @@ p {
 
 .delete-btn-icon:hover {
   transform: scale(1.1);
-}
-
-.world-title-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#grainName {
-  margin: 5px;
 }
 
 @media (max-width: 700px) {
