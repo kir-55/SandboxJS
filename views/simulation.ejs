@@ -5,7 +5,7 @@
                 <% if (locals.user) { %>
                     <div class="world-name-control">
                         <input type="text" id="worldNameInput" placeholder="Enter world name" value="Untitled">
-                        <% if (saveData) { %>
+                        <% if (saveData && !saveData.isClone) { %>
                             <button id="deleteWorldBtn" class="delete-btn-icon" title="Delete this world">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                     fill="none" stroke="red" stroke-width="2" stroke-linecap="round"

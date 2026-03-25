@@ -79,6 +79,8 @@ function importFromFile() {
 
                 worldNameInput.value = worldName;
 
+				window.location.href = '/simulation?load=' + worldName;
+
             } catch (err) {
                 console.error(err);
                 saveMessage.textContent = 'Network error';

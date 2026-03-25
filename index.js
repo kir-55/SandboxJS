@@ -23,7 +23,7 @@ app.use((req, res, next) => {
             console.log('Token validated:');
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.user = decoded;              
-            res.locals.user = decoded;        /
+            res.locals.user = decoded;        
         } catch (err) {
             console.log('Invalid token:', err.message);
         }
@@ -41,16 +41,6 @@ const host = process.env.HOST;
 
 const name = 'SandboxJS';
 const simulation_background_color = "#7a7a7a";
-const nav_menu_color = "";
-const body_color = "";
-const accent_text_color = "";
-const normal_text_color = "";
-const panel_color = "";
-const panel_header_color = "";
-const panel_text_color = "";
-const panel_header_text_color = "";
-const port_buttons_color = "";
-const normal_button_color = "";
 
 
 app.use('/api/auth', authRoutes);
