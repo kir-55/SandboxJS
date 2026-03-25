@@ -7,7 +7,8 @@ import {
     getSaveByUserAndWorld,
     createSave,
     updateSave,
-    deleteSave
+    deleteSave,
+    deleteSaveById
 } from '../models/saveModel.js';
 
 const router = express.Router();
@@ -55,7 +56,6 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
-// Public route to get a save by id (no auth required)
 router.get('/public/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -92,9 +92,24 @@ router.get('/:worldName', authenticateToken, async (req, res) => {
 
 router.delete('/:worldName', authenticateToken, async (req, res) => {
     const { worldName } = req.params;
+
     try {
         const affected = await deleteSave(req.user.id, worldName);
         if (affected === 0) return res.status(404).json({ error: 'World not found' });
+        res.json({ message: 'World deleted' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
+router.delete('/moderator/:worldId', authenticateToken, async (req, res) => {
+    const { worldId } = req.params;
+
+    try {
+        const affected = await deleteSaveById(req.user.id, worldId);
+        console.log('world id : ' + worldId);
+        if (affected === 0 || affected === null) return res.status(404).json({ error: 'World not found' });
         res.json({ message: 'World deleted' });
     } catch (err) {
         console.error(err);

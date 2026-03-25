@@ -90,10 +90,51 @@ export async function updateSave(userId, worldName, screenData, width = 100, hei
     );
 }
 
+export async function getRole(userId) {
+    const [rows] = await pool.execute(
+        'SELECT role FROM users WHERE id = ?',
+        [userId]
+    );
+    if (!rows.length) return null;
+    return rows[0].role;
+}
+export async function deleteSaveById(userId, worldId) {
+    const role = await getRole(userId);
+    const save = await getSaveById(worldId);
+
+    const authorId = save.user_id;
+    let result;
+    console.log("role: " + role);
+    console.log("userId: " + userId);
+    console.log("authorId: " + authorId);
+    console.log("worldId: " + worldId);
+
+
+    if (['admin', 'moderator'].includes(role)){
+        const [res] = await pool.execute(
+            'DELETE FROM saves WHERE user_id = ? AND id = ?',
+            [authorId, worldId]
+        );
+
+        result = res;
+    }
+    else {
+        return null;
+    }
+   
+    return result.affectedRows;
+}
+
 export async function deleteSave(userId, worldName) {
+
+    console.log('userId' + userId);
+    console.log('worldName' + worldName);
+
     const [result] = await pool.execute(
         'DELETE FROM saves WHERE user_id = ? AND world_name = ?',
         [userId, worldName]
     );
+
+   
     return result.affectedRows;
 }

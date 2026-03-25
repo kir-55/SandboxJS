@@ -15,23 +15,26 @@ async function seed() {
         await pool.execute('DELETE FROM users');
         console.log('Cleared existing data');
 
-        const username = 'firegame';
-        const password = 'password';
+        let username = 'admin';
+        let password = 'adminpassword';
+        let role = 'admin';
 
-        let userId;
-        const existing = await findUserByUsername(username);
-        if (existing) {
-            console.log(`User ${username} already exists, using existing user id ${existing.id}`);
-            userId = existing.id;
-        } else {
-            userId = await createUser(username, password);
-            console.log(`Created user ${username} with id ${userId}`);
-        }
+        let userId = await createUser(username, password, role);
+        console.log(`Created ${role} ${username} with id ${userId}`);
+
+
+        username = 'user';
+        password = 'userpassword';
+        role = 'user';
+
+        userId = await createUser(username, password, role);
+        console.log(`Created ${role} ${username} with id ${userId}`);
+        
 
         const worldName = 'My Sandbox';
         const screenData = sandboxData.screen;
-        const width = sandboxData.width;   // 100
-        const height = sandboxData.height; // 100
+        const width = sandboxData.width;  
+        const height = sandboxData.height; 
 
         await createSave(userId, worldName, screenData, width, height);
         console.log(`Saved world "${worldName}" for user ${username}`);

@@ -22,10 +22,9 @@ app.use((req, res, next) => {
         try {
             console.log('Token validated:');
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = decoded;               // attach to req for routes
-            res.locals.user = decoded;        // attach for views (EJS)
+            req.user = decoded;              
+            res.locals.user = decoded;        /
         } catch (err) {
-            // token invalid – ignore, user remains undefined
             console.log('Invalid token:', err.message);
         }
     }else{
@@ -42,17 +41,26 @@ const host = process.env.HOST;
 
 const name = 'SandboxJS';
 const simulation_background_color = "#7a7a7a";
+const nav_menu_color = "";
+const body_color = "";
+const accent_text_color = "";
+const normal_text_color = "";
+const panel_color = "";
+const panel_header_color = "";
+const panel_text_color = "";
+const panel_header_text_color = "";
+const port_buttons_color = "";
+const normal_button_color = "";
 
-// Use routes
+
 app.use('/api/auth', authRoutes);
 app.use('/api/saves', saveRoutes);
 
-// Frontend routes
+
 app.get('/', async (req, res) => {
     let saves = [];
     if (req.user) {
         try {
-            
             saves = await getSavesByUserId(req.user.id);
         } catch (err) {
             console.error('Error fetching saves:', err);
@@ -97,6 +105,7 @@ app.get('/simulation/', async (req, res) => {
             const save = await getSaveByUserAndWorld(req.user.id, worldName);
             if (save) {
                 saveData = {
+                    world_id: save.id,
                     world_name: worldName,
                     screen_data: save.screen_data,
                     width: save.width,

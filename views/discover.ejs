@@ -77,9 +77,25 @@
                             <div class="save-card">
                                 <canvas width="<%= world.width * 2 %>" height="<%= world.height * 2 %>"
                                     id="preview_<%= world.id %>" class="save-preview"></canvas>
-                                <h3>
-                                    <%= world.world_name %>
-                                </h3>
+                                <div class="world-title-row">
+                                    <h3>
+                                        <%= world.world_name %>
+                                    </h3>
+                                    <% if (['admin', 'moderator' ].includes(locals.user.role) ) { %>
+                                        <button id="deleteWorldBtn" class="delete-btn-icon" title="Delete this world"
+                                            onclick="deleteWorld(<%= world.id %>, event)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0h10"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            </svg>
+                                        </button>
+                                        <% } %>
+                                </div>
+
                                 <p>by <span class="author">
                                         <%= world.author %>
                                     </span></p>
@@ -89,16 +105,40 @@
                                 <script>
                                     // Fetch the screen data for preview using the public API
                                     fetch(`/api/saves/public/${<%= world.id %>}`)
-                                .then(res => res.json())
-                                .then(data => {
-                                    previewSave('preview_<%= world.id %>', data.screen_data, 2);
-                                })
-                                .catch(err => console.error('Error loading preview:', err));
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        previewSave('preview_<%= world.id %>', data.screen_data, 2);
+                                    })
+                                    .catch(err => console.error('Error loading preview:', err));
+
+
+
+
                                 </script>
                             </div>
                         </a>
                         <% }); %>
                 </div>
+                <script>
+                    async function deleteWorld(worldId, event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (!confirm('Delete this world? This action cannot be undone.')) return;
+                        try {
+                            const response = await fetch('/api/saves/moderator/' + worldId, { method: 'DELETE' });
+                            if (response.ok) {
+                                alert('World deleted.');
+                                window.location.href = '/discover';
+                            } else {
+                                const data = await response.json();
+                                alert(data.error || 'Delete failed');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Network error');
+                        }
+                    }
+                </script>
                 <% } else { %>
                     <p>No worlds to discover yet. Be the first to create one!</p>
                     <% } %>

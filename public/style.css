@@ -1,10 +1,19 @@
 :root {
+  --nav-menu: #1E1E22;
+  --background-color: #121214;
   --accent: #F77F00;
-  --side-panel: #98b3c2;
-  --side-panel-header: #003049;
-  --backgroun-color: #FCBF49;
-  --text-color: #000000;
-  --buttons-color: white;
+
+  --text-primary: #EAEAEA;
+  --text-secondary: #D6D6D6;
+
+  --panel: #2A2A2E;
+  --panel-header: #1A1A1D;
+
+  --panel-text: #D6D6D6;
+  --panel-header-text: #FFFFFF;
+
+  --button-primary: #FF9F1C;
+  --button-secondary: #3A3A3F;
 }
 
 body {
@@ -78,6 +87,10 @@ p {
 
 .close-btn svg {
   display: block;
+}
+
+#canvas {
+  margin-top: 10px;
 }
 
 .canvas-container {
@@ -420,6 +433,17 @@ p {
 
 .delete-btn-icon:hover {
   transform: scale(1.1);
+}
+
+.world-title-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#grainName {
+  margin: 5px;
 }
 
 @media (max-width: 700px) {

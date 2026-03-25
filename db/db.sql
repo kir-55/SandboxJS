@@ -5,6 +5,7 @@ USE sandboxjs;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    role ENUM('user', 'admin', 'moderator') NOT NULL DEFAULT 'user',
     username VARCHAR(50) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
