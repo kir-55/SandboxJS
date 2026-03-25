@@ -1,10 +1,10 @@
 :root {
   --accent: #F77F00;
-  --side-panel: #98b3c2;
-  --side-panel-header: #003049;
-  --backgroun-color: #FCBF49;
+  --side-panel: #fafafa;
+  --side-panel-header: #c3c3c3;
+  --backgroun-color: #fefaf2;
   --text-color: #000000;
-  --buttons-color: white;
+  --buttons-color: #F77F00;
 }
 
 body {
@@ -49,6 +49,7 @@ p {
 
 .grain-name {
   text-align: left;
+  
 }
 
 .grain-description {
@@ -264,7 +265,7 @@ p {
 .auth-card {
   max-width: 400px;
   margin: 40px auto;
-  background: var(--side-panel-header);
+  background: var(--side-panel);
   /* dark header color */
   border-radius: 16px;
   padding: 2rem;
@@ -273,9 +274,13 @@ p {
 }
 
 .auth-card h2 {
-  color: var(--accent);
+  color: var(--text-color);
   margin-bottom: 1.5rem;
   font-size: 2rem;
+}
+
+p{
+  text-align: center;
 }
 
 .form-group {
@@ -292,7 +297,7 @@ p {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--text-color);
 }
 
 .form-group input {
@@ -301,7 +306,7 @@ p {
   background: var(--side-panel);
   border: 1px solid #444;
   border-radius: 8px;
-  color: white;
+  color: var(--text-color);
   font-size: 1rem;
   transition: border 0.2s;
 }
@@ -420,6 +425,15 @@ p {
 
 .delete-btn-icon:hover {
   transform: scale(1.1);
+}
+
+#canvas{
+  margin-top: 10px;
+}
+
+#grainName {
+  margin: 2px;
+  margin-top: 5px;
 }
 
 @media (max-width: 700px) {
