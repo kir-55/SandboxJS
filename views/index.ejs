@@ -1,0 +1,93 @@
+<%- include('partials/head') %>
+    <%- include('partials/header') %>
+        <style>
+            h2 {
+                width: 100%;
+                text-align: center;
+
+                color: black;
+                font-size: 2rem;
+            }
+
+            .saves-grid {
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+            }
+
+            .save-card-link {
+                text-decoration: none;
+                color: inherit;
+                display: block;
+            }
+
+            .save-card {
+                background: #ffffff;
+                border-radius: 8px;
+                padding: 15px;
+                text-align: center;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+
+            .save-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            }
+
+            .save-card canvas {
+                background: #1e1e1e;
+                border-radius: 4px;
+                margin-bottom: 10px;
+            }
+
+            .save-card h3 {
+                margin: 10px 0 5px;
+                font-size: 1.1rem;
+            }
+
+            .save-card p {
+                font-size: 0.8rem;
+                color: #504c4c;
+            }
+        </style>
+        <main>
+            <script>
+                const simulationBackgroundColor = '<%= simulation_background_color %>';
+            </script>
+            <script src="/js/utils/helpers.js"></script>
+            <script src="/js/classes/grains.js"></script>
+            <script src="/js/rendering.js"></script>
+
+            <% if (locals.user) { %>
+                <h2>Your Saved Worlds</h2>
+                <% if (saves.length) { %>
+                    <div class="saves-grid">
+                        <% saves.forEach(save=> { %>
+                            <a href="/simulation?load=<%= encodeURIComponent(save.world_name) %>"
+                                class="save-card-link">
+                                <div class="save-card">
+                                    <canvas width="<%= save.width * 2 %>" height="<%= save.height * 2 %>"
+                                        id="save_<%= save.id %>" class="save-preview"></canvas>
+                                    <h3>
+                                        <%= save.world_name %>
+                                    </h3>
+                                    <p>
+                                        <%= new Date(save.updated_at).toLocaleString() %>
+                                    </p>
+                                    <script>
+                                        previewSave('save_<%= save.id %>', <%= JSON.stringify(save.screen_data) %>, 2);
+                                    </script>
+                                </div>
+                            </a>
+                            <% }); %>
+                    </div>
+                    <% } else { %>
+                        <p>You have no saved worlds yet. Start the simulation and save your creations!</p>
+                        <% } %>
+                            <% } else { %>
+                                <p><a href="/login">Login</a> to save and load your sandbox worlds.</p>
+                                <% } %>
+        </main>
+
+        <%- include('partials/footer') %>

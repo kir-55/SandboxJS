@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Register - SandboxJS</title>
+    <link rel="stylesheet" href="/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+        <main class="container">
+            <div class="auth-card">
+                <h2>Create an Account</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="auth-btn">Register</button>
+                </form>
+                <p id="message" class="error-message"></p>
+                <p class="auth-footer">Already have an account? <a href="/login">Log in</a></p>
+            </div>
+        </main>
+        <%- include('partials/footer') %>
+            <script>
+                document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    } else {
+                        document.getElementById('message').textContent = data.error || 'Registration failed';
+                    }
+                });
+            </script>
+</body>
+
+</html>

@@ -1,0 +1,483 @@
+:root {
+  --accent: #F77F00;
+  --side-panel: #fafafa;
+  --side-panel-header: #c3c3c3;
+  --backgroun-color: #f3e7cf;
+  --text-color: #000000;
+  --buttons-color: #F77F00;
+}
+
+body {
+  background-color: var(--backgroun-color);
+  margin: 0;
+  width: 100%;
+}
+
+label {
+  color: var(--accent);
+  font-size: 30;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+
+
+p {
+  color: var(--text-color);
+  font-size: 13;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.left {
+  margin-bottom: auto;
+  align-items: left;
+  text-align: left;
+}
+
+.side-panel {
+  position: absolute;
+  right: 0;
+  top: 0px;
+  color: var(--accent);
+  width: 20%;
+  height: calc(100vh - 60px);
+
+  background-color: var(--side-panel);
+
+  border-left: 1px rgba(43, 43, 43, 0.2) solid;
+
+}
+
+.grain-name {
+  text-align: left;
+  color: var(--text-color);
+}
+
+.grain-description {
+  width: 100%;
+  text-align: center;
+}
+
+.side-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--side-panel-header);
+  width: 100%;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  box-sizing: border-box;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-color);
+}
+
+.close-btn svg {
+  display: block;
+}
+
+.canvas-container {
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.open-btn {
+  position: absolute;
+
+  top: 20px;
+  right: 40px;
+
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--buttons-color);
+}
+
+/* 
+#materialPreview{
+  width: 48px;
+  height: 48px;
+  margin-top: 10px;
+}
+   */
+
+
+.button-19 {
+  color: white;
+  background-color: rgba(0, 0, 0, 0);
+  appearance: button;
+  border: solid transparent;
+  border-width: 0 0 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  line-height: 20px;
+  margin: 0;
+  outline: none;
+  overflow: visible;
+  text-align: center;
+  touch-action: manipulation;
+  transform: translateZ(0);
+  transition: filter .2s;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: top;
+  white-space: nowrap;
+
+  height: 50px;
+
+}
+
+.button-19:hover {
+  transform: scale(1.03);
+}
+
+.port-buttons-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
+
+
+
+.center {
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+  text-align: center;
+}
+
+/* Modern brush size slider */
+#brushSize {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 200px;
+  height: 6px;
+  background: var(--side-panel);
+  border-radius: 3px;
+  outline: none;
+  margin: 15px 20px;
+}
+
+/* WebKit thumb */
+#brushSize::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s, background 0.2s;
+  margin-top: -6px;
+  /* center the thumb vertically */
+}
+
+#brushSize::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #e06b00;
+}
+
+#brushSize:active::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+/* Mozilla thumb */
+#brushSize::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s, background 0.2s;
+  /* Firefox centers by default, but you can adjust if needed */
+  transform: translateY(0);
+}
+
+#brushSize::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: #e06b00;
+}
+
+#brushSize:active::-moz-range-thumb {
+  transform: scale(1.1);
+}
+
+/* Tracks */
+#brushSize::-webkit-slider-runnable-track {
+  height: 6px;
+  background: var(--side-panel);
+  border-radius: 3px;
+}
+
+#brushSize::-moz-range-track {
+  height: 6px;
+  background: var(--side-panel);
+  border-radius: 3px;
+}
+
+#materialMenu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.button-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-direction: column;
+  justify-content: center;
+  background-color: var(--side-panel-header);
+
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
+  border-radius: 30px;
+
+}
+
+/* Auth pages styling */
+.auth-card {
+  max-width: 400px;
+  margin: 40px auto;
+  background: var(--side-panel);
+  /* dark header color */
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.auth-card h2 {
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+p {
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+  text-align: left;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.form-group input {
+  width: 300px;
+  padding: 0.75rem;
+  background: var(--side-panel);
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+
+.form-group input:focus {
+  width: 300px;
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(247, 127, 0, 0.2);
+}
+
+.auth-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 300px;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.auth-btn:hover {
+  background: #e06b00;
+  transform: translateY(-2px);
+}
+
+.error-message {
+  margin-top: 1rem;
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.auth-footer {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.auth-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+
+
+#worldNameInput {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 1rem;
+  margin: 10px;
+  width: 300px;
+}
+
+
+
+.save-message {
+  font-size: 0.8rem;
+  margin-top: 5px;
+  text-align: center;
+}
+
+/* Adjust main-layout to avoid overlap with panels */
+.main-layout {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.world-name-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.world-name-control input {
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 1rem;
+  width: 200px;
+}
+
+.delete-btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+.delete-btn-icon:hover {
+  transform: scale(1.1);
+}
+
+#canvas {
+  margin-top: 10px;
+}
+
+#grainName {
+  margin: 2px;
+  margin-top: 5px;
+}
+
+@media (max-width: 700px) {
+  .center {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #grainMenu {
+    float: none;
+    display: block;
+    margin: 0 auto 10px auto;
+  }
+
+  #canvas {
+    width: 90vw !important;
+    height: 90vw !important;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .button-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+
+  .main-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #grainMenu {
+    margin: 10px auto 0 auto;
+    display: block;
+    order: 2;
+  }
+
+  .center {
+    order: 1;
+  }
+
+  #materialMenu {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
