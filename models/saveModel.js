@@ -7,19 +7,13 @@ export async function getSavesByUserId(userId) {
     );
     console.log('userId: ' + userId);
     const parsedRows = rows.map(row => {
-        // Log the type and a snippet of the data
-        console.log('Raw screen_data type:', typeof row.screen_data);
-        console.log('Raw screen_data (first 100 chars):', 
-            typeof row.screen_data === 'string' ? row.screen_data.slice(0, 100) : 'Not a string');
+        typeof (row.screen_data === 'string' ? row.screen_data.slice(0, 100) : 'Not a string');
 
         let parsedData = row.screen_data;
         if (typeof row.screen_data === 'string') {
             try {
                 parsedData = JSON.parse(row.screen_data);
-                console.log('Successfully parsed JSON. Type:', typeof parsedData);
             } catch (err) {
-                console.error('JSON parse error:', err.message);
-                // fallback to empty array to avoid crashes
                 parsedData = [];
             }
         } else {
@@ -36,7 +30,6 @@ export async function getSavesByUserId(userId) {
     return parsedRows;
 }
 
-// Add these exports to the existing file
 export async function getAllSavesWithUser() {
     const [rows] = await pool.execute(
         `SELECT s.id, s.world_name, s.width, s.height, s.created_at, s.updated_at, u.username as author

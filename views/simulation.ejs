@@ -47,7 +47,6 @@
                         <input type="file" id="fileInput" accept=".sx,.json" style="display:none">
             </div>
 
-            <!-- Grain info side panel (right) -->
             <button class="open-btn" id="open-btn" aria-label="Open grain info">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -85,19 +84,15 @@
         </script>
 
         <script>
-    // Set initial world name
-    const nameInput = document.getElementById('worldNameInput');
+            const nameInput = document.getElementById('worldNameInput');
             if (nameInput) {
                 if (window.loadedWorldName) {
                     nameInput.value = window.loadedWorldName;
                 } else {
-                    // Generate a unique name: "Untitled_" + random hash
                     const hash = Math.random().toString(36).substring(2, 6);
                     nameInput.value = `Untitled_${hash}`;
                 }
             }
-
-            // Delete world function
             const deleteBtn = document.getElementById('deleteWorldBtn');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', async () => {
@@ -108,7 +103,7 @@
                         const response = await fetch(`/api/saves/${encodeURIComponent(worldName)}`, { method: 'DELETE' });
                         if (response.ok) {
                             alert(`World "${worldName}" deleted.`);
-                            window.location.href = '/'; // redirect to home
+                            window.location.href = '/';
                         } else {
                             const data = await response.json();
                             alert(data.error || 'Delete failed');

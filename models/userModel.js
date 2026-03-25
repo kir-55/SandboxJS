@@ -1,4 +1,3 @@
-// models/userModel.js
 import argon2 from 'argon2';
 import pool from '../config/db.js';
 import dotenv from 'dotenv';
@@ -7,7 +6,6 @@ dotenv.config();
 const PEPPER = process.env.PEPPER;
 
 export async function createUser(username, password, role = 'user') {
-    // Simply append the pepper to the password
     const pepperedPassword = password + (PEPPER || '');
     const hash = await argon2.hash(pepperedPassword, { type: argon2.argon2id });
     const [result] = await pool.execute(

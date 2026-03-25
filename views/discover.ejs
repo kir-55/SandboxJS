@@ -103,7 +103,6 @@
                                     <%= new Date(world.updated_at).toLocaleString() %>
                                 </p>
                                 <script>
-                                    // Fetch the screen data for preview using the public API
                                     fetch(`/api/saves/public/${<%= world.id %>}`)
                                     .then(res => res.json())
                                     .then(data => {

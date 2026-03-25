@@ -8,7 +8,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env from the project root (two levels up from config/)
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const pool = mysql.createPool({
