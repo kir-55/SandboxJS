@@ -5,8 +5,9 @@ You can create, play and delete your own worlds, but also you can discover world
 To avoid unwanted content, admin can remove worlds that are inappropriate
 
 ## SETUP
+```npm install```
 
-### What it uses?
+### If for some reason doesnt work ->
     npm install express ejs mysql2 cookie-parser dotenv argon2 jsonwebtoken
 
 ### Setup .env
