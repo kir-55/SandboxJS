@@ -29,6 +29,9 @@ To avoid unwanted content, admin can remove worlds that are inappropriate
 ### Seeder
     node db/seeder.js
 
+### Run Application
+    node index.js
+
 ### User test account:
     login: user
     password: userpassword
