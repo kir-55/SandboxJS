@@ -4,6 +4,8 @@ You can create, play and delete your own worlds, but also you can discover world
 
 To avoid unwanted content, admin can remove worlds that are inappropriate
 
+[Play Now](sandbox.firegame.pl)
+
 ## SETUP
 ```npm install```
 
