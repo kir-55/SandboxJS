@@ -184,7 +184,7 @@ class FlamableGrain extends Grain {
 							var grainObj = grains[sideGrain - 1];
 							// flamibility is not defined
 
-							if (grainObj.type instanceof Fire) {
+							if (grainObj.type instanceof Fire || grainObj.type instanceof Lava || grainObj.type instanceof MoltenIron) {
 								if (
 									this.flammability > 0 &&
 									getRandom(0, 100) < this.flammability
@@ -279,7 +279,8 @@ class ExplosiveGrain extends Grain {
 							var grainObj = grains[sideGrain - 1];
 							if (
 								grainObj.type instanceof Fire ||
-								grainObj.type instanceof Lava
+								grainObj.type instanceof Lava ||
+								grainObj.type instanceof MoltenIron
 							) {
 								if (getRandom(0, 100) < this.explosionChance) {
 									// change near grains to fire if their density is lower than the power of the explosion
@@ -534,13 +535,13 @@ class LiquidAffectable extends Grain {
 						var side = result[x][y];
 						if (side != 0 && side != unexistingGrain) {
 							var grain_type = grains[side - 1].type;
-
-							if (grain_type instanceof Liquid) {
+							if (grain_type instanceof Liquid && !(grain_type instanceof Lava) && !(grain_type instanceof MoltenIron)) {
 								var rnd = getRandom(0.0, 100.0);
 								if (
 									rnd < this.chanceToAffect &&
 									this.wetGrain
 								) {
+									
 									//this returns zero
 									// check if wet grain is array or not
 									if (Array.isArray(this.wetGrain)) {
@@ -1578,7 +1579,9 @@ class Lava extends Liquid {
 						if (
 							grainObj.type instanceof Liquid &&
 							grainObj.type != this &&
-							!(grainObj.type instanceof Oil)
+							!(grainObj.type instanceof Oil) &&
+							!(grainObj.type instanceof FlamableLiquid) &&
+							!(grainObj.type instanceof MoltenIron)
 						) {
 							result[1][1] = this.stone.getGrainInt(); // Turn into stone
 							return result; // Return the result after turning into stone
@@ -1618,7 +1621,9 @@ class FlamableLiquid extends Liquid {
 					var grainObj = grains[sideGrain - 1];
 					if (
 						grainObj.type instanceof Fire ||
-						grainObj.type instanceof Lava
+						grainObj.type instanceof Lava ||
+						grainObj.type instanceof MoltenIron
+
 					) {
 						hasFire = true; // There is fire around
 					}
@@ -1672,7 +1677,7 @@ class Stone extends Grain {
 						var sideGrain = result[x][y];
 						if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 							var grainObj = grains[sideGrain - 1];
-							if (grainObj.type instanceof Lava) {
+							if (grainObj.type instanceof Lava || grainObj.type instanceof MoltenIron) {
 								lavaPositions.push({
 									x: x,
 									y: y,
@@ -1680,7 +1685,10 @@ class Stone extends Grain {
 							}
 							if (
 								grainObj.type instanceof Liquid &&
-								grainObj.type != normal_lava
+								grainObj.type != normal_lava &&
+								!(grainObj.type instanceof Oil) &&
+								!(grainObj.type instanceof FlamableLiquid) &&
+								!(grainObj.type instanceof MoltenIron)
 							) {
 								hasWater = true;
 							}
@@ -1718,22 +1726,141 @@ class Stone extends Grain {
 	}
 }
 
+
+class MoltenIron extends Liquid {
+    constructor() {
+        super(2, false, null, true, "Molten Iron");  // density 2, does not kill fire, no gas form
+        this.chanceToSolidify = 0.5;  // 0.5% chance per step to solidify if not touching lava
+    }
+
+    applyPhisics(surrounding) {
+        // First, check for solidification triggers on the current state (before any movement)
+        let touchingLava = false;
+        let touchingOtherLiquid = false;
+
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                if ((x + y) % 2 === 1) { // cardinal directions only
+                    let neighbor = surrounding[x][y];
+                    if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                        let grainObj = grains[neighbor - 1];
+                        if (grainObj.type instanceof Lava) {
+                            touchingLava = true;
+                        }
+                        if ((grainObj.type instanceof Liquid &&
+                            !(grainObj.type instanceof Lava) &&
+                            !(grainObj.type instanceof MoltenIron)) ||
+                            grainObj.type instanceof Ice) {
+                            touchingOtherLiquid = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // If touching any liquid other than lava/ice/itself → solidify into iron
+        if (touchingOtherLiquid) {
+            let result = JSON.parse(JSON.stringify(surrounding));
+            result[1][1] = normal_iron.getGrainInt();
+            return result;
+        }
+
+        // If not touching lava, small chance to solidify over time
+        if (!touchingLava && getRandom(0, 100) < this.chanceToSolidify) {
+            let result = JSON.parse(JSON.stringify(surrounding));
+            result[1][1] = normal_iron.getGrainInt();
+            return result;
+        }
+
+        // No solidification happened → perform normal liquid physics
+        return super.applyPhisics(surrounding);
+    }
+}
+
 class Iron extends LiquidAffectable {
-	constructor(wetGrain = null, dryGrain = null, name = "Iron") {
-		super(0, 0, 55, wetGrain, dryGrain, 0.01, 0, false, false, 0, name);
-	}
+    constructor(wetGrain = null, dryGrain = null, name = "Iron") {
+        super(0, 0, 55, wetGrain, dryGrain, 0.01, 0, false, false, 0, name);
+    }
+
+    applyPhisics(surrounding) {
+        let result = super.applyPhisics(surrounding);
+        // Only proceed if still iron after parent logic
+        if (result[1][1] === this.getGrainInt()) {
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1) {
+                        let neighbor = result[x][y];
+                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                            let grainObj = grains[neighbor - 1];
+                            if (grainObj.type instanceof Lava) {
+                                // 2% chance to melt into molten iron
+                                if (getRandom(0, 100) < 2) {
+                                    result[1][1] = normal_moltenIron.getGrainInt();
+                                    return result;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }
 
 class RustIron extends LiquidAffectable {
-	constructor(wetGrain = null, dryGrain = null, name = "Rusty Iron") {
-		super(0, 0, 10, wetGrain, dryGrain, 0.005, 0.01, false, false, 0, name);
-	}
-}
+    constructor(wetGrain = null, dryGrain = null, name = "Rusty Iron") {
+        super(0, 0, 10, wetGrain, dryGrain, 0.005, 0.01, false, false, 0, name);
+    }
 
+    applyPhisics(surrounding) {
+        let result = super.applyPhisics(surrounding);
+        if (result[1][1] === this.getGrainInt()) {
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1) {
+                        let neighbor = result[x][y];
+                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                            let grainObj = grains[neighbor - 1];
+                            if (grainObj.type instanceof Lava && getRandom(0, 100) < 2) {
+                                result[1][1] = normal_moltenIron.getGrainInt();
+                                return result;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+}
 class WeakRustIron extends Grain {
-	constructor(name = "Weak Rusty Iron") {
-		super(2, 0, 5, name);
-	}
+    constructor(name = "Weak Rusty Iron") {
+        super(2, 0, 5, name);  // gravity 2 = only down
+    }
+
+    applyPhisics(surrounding) {
+        // First do normal gravity movement (since it's a falling solid)
+        let result = super.applyPhisics(surrounding);
+        if (arraysEqual(surrounding, result)) {
+            // Check for lava contact to melt
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1) {
+                        let neighbor = result[x][y];
+                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                            let grainObj = grains[neighbor - 1];
+                            if (grainObj.type instanceof Lava && getRandom(0, 100) < 2) {
+                                result[1][1] = normal_moltenIron.getGrainInt();
+                                return result;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }
 
 class Gunpowder extends ExplosiveGrain {
@@ -2259,7 +2386,8 @@ class FrozenGrain extends Grain {
 					if (
 						grainObj.type instanceof Fire ||
 						grainObj.type instanceof Lava ||
-						grainObj.type instanceof Uran
+						grainObj.type instanceof Uran ||
+						grainObj.type instanceof MoltenIron
 					) {
 						// If touches fire or lava, then thaws into the normal form
 						result[1][1] = this.normalForm.getGrainInt();
@@ -2336,6 +2464,8 @@ const normal_rustIron = new RustIron(null, null);
 normal_rustIron.dryGrain = normal_rustIron;
 normal_rustIron.wetGrain = normal_weakRustIron;
 
+
+const normal_moltenIron = new MoltenIron();
 const normal_iron = new Iron([normal_rustIron], null);
 
 const normal_acid = new Acid(null);
@@ -2489,6 +2619,11 @@ grains = [
 	new GrainType("#B8430F", normal_weakRustIron),
 	new GrainType("#CD9671", normal_weakRustIron),
 	new GrainType("#B25A27", normal_weakRustIron),
+		
+	new GrainType("#fa5c00", normal_moltenIron),
+	new GrainType("#ff6e1a", normal_moltenIron),
+	new GrainType("#ff7e33", normal_moltenIron),
+	new GrainType("#ff8e4d", normal_moltenIron),
 
 	new GrainType("#f7f7f7", normal_gunpowder),
 	new GrainType("#e0e0e0", normal_gunpowder),
@@ -2573,6 +2708,8 @@ grains = [
 	new GrainType("#88ff00", normal_radioactiveFly),
 	new GrainType("#64ff00", normal_radioactiveFly),
 	new GrainType("#1dff00", normal_radioactiveFly),
+
+
 ];
 
 class GrainVariety {

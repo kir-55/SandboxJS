@@ -78,7 +78,7 @@ function drawMaterialPreview() {
 
 function getMenuLayout() {
     const isMobile = window.innerWidth <= 700;
-    const grainsPerRow = isMobile ? 10 : 20;
+    const grainsPerRow = isMobile ? 10 : 21;
     const cellSize = 32;
     const padding = 4;
     return { grainsPerRow, cellSize, padding };
