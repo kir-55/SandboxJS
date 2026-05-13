@@ -2620,7 +2620,7 @@ grains = [
 	new GrainType("#CD9671", normal_weakRustIron),
 	new GrainType("#B25A27", normal_weakRustIron),
 		
-	new GrainType("#fa5c00", normal_moltenIron),
+	new GrainType("#0e8a5a", normal_moltenIron),
 	new GrainType("#ff6e1a", normal_moltenIron),
 	new GrainType("#ff7e33", normal_moltenIron),
 	new GrainType("#ff8e4d", normal_moltenIron),
