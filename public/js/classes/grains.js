@@ -1798,7 +1798,12 @@ class Iron extends LiquidAffectable {
                                     result[1][1] = normal_moltenIron.getGrainInt();
                                     return result;
                                 }
-                            }
+                            }else if (grainObj.type instanceof Fire){
+								if (getRandom(0, 2000) < 1) {
+                                    result[1][1] = normal_moltenIron.getGrainInt();
+                                    return result;
+                                }
+							}
                         }
                     }
                 }
