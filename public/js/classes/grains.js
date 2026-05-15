@@ -251,7 +251,7 @@ class Coal extends Grain{
 }
 
 class PowderCoal extends Coal {
-	constructor (name="Powder Coal", chanceToDie = 0.1, flammability = 10){
+	constructor (name="Powder Coal", chanceToDie = 0.1, flammability = 20){
 		super(1, name, chanceToDie, flammability);
 	}
 }
