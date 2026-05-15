@@ -1560,8 +1560,6 @@ class Acid extends Liquid {
 			result = destroyNear(result, [DuplicateElement], 40, true, 100, 1);
 			result = destroyNear(result, [HeatingElement], 40, true, 100, 1);
 			result = destroyNear(result, [HeatSensor], 40, true, 100, 1);
-
-			result = destroyNear(result, [Ice], 40, true, 100, 1);
 		}
 		return result;
 	}
