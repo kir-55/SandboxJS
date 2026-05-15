@@ -204,45 +204,45 @@ class FlamableGrain extends Grain {
 
 class Coal extends FlamableGrain{
 	chanceToDie = 0.05;
-	constructor (gravity=0, name="Coal", chanceToDie = 0.1){
-		super(gravity, 0, 6, 30, name);
+	constructor (gravity = 0, name = "Coal", chanceToDie = 0.1){
+		super(gravity, 0, 6, 0, name);
 		this.chanceToDie = chanceToDie;
 		
 	}
 
 	applyPhisics(surrounding){
-		var result = surrounding;
+		var result = super.applyPhisics(surrounding);
 
-		
-		for (var x = 0; x < 3; x++) {
-			for (var y = 0; y < 3; y++) {
-				var sideGrain = result[x][y];
-				if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+		if (arraysEqual(surrounding, result)) {
+			for (var x = 0; x < 3; x++) {
+				for (var y = 0; y < 3; y++) {
+					var sideGrain = result[x][y];
+					if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 
-					var grainObj = grains[sideGrain - 1];
-					
-					if (
-						grainObj.type instanceof Fire ||
-						grainObj.type instanceof Lava
-					) {
-						// place fire all around it
-						for (var x1 = 0; x1 < 3; x1++) {
-							for (var y1 = 0; y1 < 3; y1++) {
-								if (getRandom(0, 100) < this.flammability && result[x1][y1] == 0){
-									result[x1][y1] = normal_fire.getGrainInt();
+						var grainObj = grains[sideGrain - 1];
+						
+						if (
+							grainObj.type instanceof Fire ||
+							grainObj.type instanceof Lava
+						) {
+							// place fire all around it
+							for (var x1 = 0; x1 < 3; x1++) {
+								for (var y1 = 0; y1 < 3; y1++) {
+									if (getRandom(0, 100) < this.flammability && result[x1][y1] == 0){
+										result[x1][y1] = normal_fire.getGrainInt();
+									}
 								}
 							}
-						}
 
-						if (getRandom(0, 100) < this.chanceToDie) {
-							result[1][1] = normal_fire.getGrainInt(); // Burn this grain
-							return result;
+							if (getRandom(0, 100) < this.chanceToDie) {
+								result[1][1] = normal_fire.getGrainInt(); // Burn this grain
+								return result;
+							}
 						}
 					}
 				}
 			}
 		}
-
 
 		
 		return result;
