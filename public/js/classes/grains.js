@@ -202,10 +202,10 @@ class FlamableGrain extends Grain {
 	}
 }
 
-class Coal extends FlamableGrain{
+class Coal extends Grain{
 	chanceToDie = 0.05;
 	constructor (gravity = 0, name = "Coal", chanceToDie = 0.1){
-		super(gravity, 0, 6, 0, name);
+		super(gravity, 0, 6, name);
 		this.chanceToDie = chanceToDie;
 		
 	}
