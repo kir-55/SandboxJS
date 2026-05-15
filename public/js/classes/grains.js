@@ -204,10 +204,11 @@ class FlamableGrain extends Grain {
 
 class Coal extends Grain{
 	chanceToDie = 0.05;
-	constructor (gravity = 0, name = "Coal", chanceToDie = 0.1){
+	constructor (gravity = 0, name = "Coal", chanceToDie = 0.1, flammability = 80){
 		super(gravity, 0, 6, name);
 		this.chanceToDie = chanceToDie;
-		
+		this.flammability = flammability;
+
 	}
 
 	applyPhisics(surrounding){
@@ -250,8 +251,8 @@ class Coal extends Grain{
 }
 
 class PowderCoal extends Coal {
-	constructor (name="Powder Coal", chanceToDie = 0.1){
-		super(1, name, chanceToDie);
+	constructor (name="Powder Coal", chanceToDie = 0.1, flammability = 30){
+		super(1, name, chanceToDie, flammability);
 	}
 }
 
