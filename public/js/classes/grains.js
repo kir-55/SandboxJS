@@ -251,9 +251,7 @@ class Coal extends FlamableGrain{
 
 class PowderCoal extends Coal {
 	constructor (name="Powder Coal", chanceToDie = 0.1){
-		super(1, 0, 6, 30, name);
-		this.chanceToDie = chanceToDie;
-		
+		super(1, name, chanceToDie);
 	}
 }
 
