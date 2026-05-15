@@ -204,8 +204,8 @@ class FlamableGrain extends Grain {
 
 class Coal extends FlamableGrain{
 	chanceToDie = 0.05;
-	constructor (name="Coal", chanceToDie = 0.1){
-		super(0, 0, 6, 30, name);
+	constructor (gravity=0, name="Coal", chanceToDie = 0.1){
+		super(gravity, 0, 6, 30, name);
 		this.chanceToDie = chanceToDie;
 		
 	}
@@ -248,6 +248,15 @@ class Coal extends FlamableGrain{
 		return result;
 	}
 }
+
+class PowderCoal extends Coal {
+	constructor (name="Powder Coal", chanceToDie = 0.1){
+		super(1, 0, 6, 30, name);
+		this.chanceToDie = chanceToDie;
+		
+	}
+}
+
 
 class ExplosiveGrain extends Grain {
 	explosionChance = 10; // Percentage chance to explode when burning
@@ -2541,6 +2550,7 @@ normal_radioactiveMeat.radioactiveFly = normal_radioactiveFly;
 const normal_fly = new FruitFly(normal_meat, normal_radioactiveFly);
 
 const normal_coal = new Coal();
+const normal_powder_coal = new PowderCoal();
 
 grains = [
 	new GrainType("#f6d7b0", normal_sand),
@@ -2690,6 +2700,11 @@ grains = [
 	new GrainType("#414141", normal_coal),
 	new GrainType("#575757", normal_coal),
 	new GrainType("#797979", normal_coal),
+
+	new GrainType("#161616", normal_powder_coal),
+	new GrainType("#414141", normal_powder_coal),
+	new GrainType("#575757", normal_powder_coal),
+	new GrainType("#797979", normal_powder_coal),
 
 	new GrainType("#ff7a7a", normal_meat),
 	new GrainType("#742f35", normal_meat), // more rotten color
