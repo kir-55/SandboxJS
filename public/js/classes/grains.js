@@ -2627,11 +2627,11 @@ grains = [
 	new GrainType("#232b2b", normal_stone),
 	new GrainType("#0e1111", normal_stone),
 
-	new GrainType("#dbc8c8", normal_brick), 
-	new GrainType("#dd8060", normal_brick),
-	new GrainType("#c13b19", normal_brick),
-	new GrainType("#8d2a11", normal_brick),
-	new GrainType("#511301", normal_brick),
+	new GrainType("#dd7d7d", normal_brick), 
+	new GrainType("#cb6b6b", normal_brick),
+	new GrainType("#b65454", normal_brick),
+	new GrainType("#9e3333", normal_brick),
+	new GrainType("#842020", normal_brick),
 
 	new GrainType("#848482", normal_iron),
 	new GrainType("#cbcdcd", normal_iron),
