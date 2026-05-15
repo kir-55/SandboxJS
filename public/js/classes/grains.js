@@ -1547,6 +1547,7 @@ class Acid extends Liquid {
 			result = destroyNear(result, [Grass], 40, true, 100, 1);
 			result = destroyNear(result, [GrassSeed], 40, true, 100, 1);
 			result = destroyNear(result, [GrassSprout], 40, true, 100, 1);
+			result = destroyNear(result, [Brick], 40, true, 100, 1);
 			
 			result = destroyNear(
 				result,
