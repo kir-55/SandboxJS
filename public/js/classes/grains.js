@@ -256,6 +256,13 @@ class PowderCoal extends Coal {
 	}
 }
 
+class Brick extends Grain {
+	constructor (name = "Brick"){
+		super(0, 0, 10, name);
+
+	}
+}
+
 
 class ExplosiveGrain extends Grain {
 	explosionChance = 10; // Percentage chance to explode when burning
@@ -2489,6 +2496,7 @@ const normal_acidIce = new AcidIce(normal_acid);
 const normal_oil = new Oil(1);
 
 const normal_stone = new Stone();
+const normal_brick = new Brick();
 
 const normal_lava = new Lava(0.001, normal_stone);
 
@@ -2613,11 +2621,17 @@ grains = [
 	new GrainType("#ffa904", normal_lava),
 	new GrainType("#ffdb00", normal_lava),
 
-	new GrainType("#414a4c", normal_stone), // Charged wire
+	new GrainType("#414a4c", normal_stone), 
 	new GrainType("#3b444b", normal_stone),
 	new GrainType("#353839", normal_stone),
 	new GrainType("#232b2b", normal_stone),
 	new GrainType("#0e1111", normal_stone),
+
+	new GrainType("#dbc8c8", normal_brick), 
+	new GrainType("#dd8060", normal_brick),
+	new GrainType("#c13b19", normal_brick),
+	new GrainType("#8d2a11", normal_brick),
+	new GrainType("#511301", normal_brick),
 
 	new GrainType("#848482", normal_iron),
 	new GrainType("#cbcdcd", normal_iron),
