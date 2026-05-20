@@ -134,6 +134,19 @@
                 margin-top: 1rem;
             }
 
+            .dot-mini {
+                width: 8px;
+                height: 8px;
+                background-color: var(--accent);
+                border-radius: 50%;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .dot-mini.active {
+                background-color: var(--accent);
+                transform: scale(1.2);
+            }
 
             /* Right content */
             .welcome-content {
@@ -339,12 +352,12 @@
                                     (function () {
                                         // Replace with your own simulation preview images (or keep the SVG placeholders)
                                         const images = [
-                                            '/images/sanxbox_peek1.png',
-                                            '/images/sanxbox_peek2.png',
-                                            '/images/sanxbox_peek3.png',
-                                            '/images/sanxbox_peek4.png',
-                                            '/images/sanxbox_peek5.png',
-                                            '/images/sanxbox_peek6.png'
+                                            '/images/sandbox_peek1.png',
+                                            '/images/sandbox_peek2.png',
+                                            '/images/sandbox_peek3.png',
+                                            '/images/sandbox_peek4.png',
+                                            '/images/sandbox_peek5.png',
+                                            '/images/sandbox_peek6.png'
                                         ];
                                         let current = 0;
                                         const imgElem = document.getElementById('welcomeCarouselImg');
