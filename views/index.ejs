@@ -53,70 +53,225 @@
                 color: #504c4c;
             }
 
-            /* New styles for guest/landing info */
-            .guest-hero {
-                max-width: 980px;
-                margin: 32px auto;
-                background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
-                border-radius: 12px;
-                padding: 24px;
-                box-shadow: 0 6px 20px rgba(30, 30, 30, 0.06);
+            /* ===== NEW WELCOME SECTION (voucher style) ===== */
+
+            .welcome-sandbox {
+                background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+                padding: 2rem 2rem;
+                margin: 2rem auto;
+                border-radius: 24px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+                max-width: 1200px;
             }
 
-            .hero-grid {
+            .welcome-flex {
                 display: flex;
-                gap: 20px;
-                align-items: center;
                 flex-wrap: wrap;
+                align-items: center;
+                gap: 2rem;
+            }
+
+            /* Carousel styles */
+            .welcome-carousel {
+                flex: 1;
+                min-width: 260px;
+            }
+
+            .carousel-frame {
+                position: relative;
+                border-radius: 20px;
+                overflow: hidden;
+                background: #1e1e1e;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .carousel-frame img {
+                width: 100%;
+                height: auto;
+                display: block;
+                aspect-ratio: 4 / 3;
+                object-fit: cover;
+                transition: opacity 0.2s ease;
+            }
+
+            .carousel-arrow {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(4px);
+                border: none;
+                font-size: 1.5rem;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                cursor: pointer;
+                color: white;
+                display: flex;
+                align-items: center;
                 justify-content: center;
+                transition: all 0.2s;
+                font-weight: bold;
             }
 
-            .hero-canvas-wrap {
-                background: #111;
-                padding: 8px;
-                border-radius: 8px;
-                box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+            .carousel-arrow:hover {
+                background: rgba(0, 0, 0, 0.8);
+                transform: translateY(-50%) scale(1.05);
             }
 
-            .hero-info {
-                max-width: 520px;
+            .prev {
+                left: 12px;
+            }
+
+            .next {
+                right: 12px;
+            }
+
+            .carousel-dots-mini {
+                display: flex;
+                justify-content: center;
+                gap: 0.6rem;
+                margin-top: 1rem;
+            }
+
+            .dot-mini {
+                width: 8px;
+                height: 8px;
+                background-color: #ccc;
+                border-radius: 50%;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .dot-mini.active {
+                background-color: #2c3e50;
+                transform: scale(1.2);
+            }
+
+            /* Right content */
+            .welcome-content {
+                flex: 1;
+                min-width: 260px;
+                text-align: center;
+            }
+
+            .welcome-headline {
+                font-size: 2.2rem;
+                font-weight: 700;
+                color: #2c3e50;
+                margin-bottom: 0.5rem;
+                letter-spacing: -0.5px;
+            }
+
+            .welcome-slogan {
+                font-size: 1rem;
+                font-weight: 500;
+                color: #4a5568;
+                background: rgba(44, 62, 80, 0.08);
+                display: inline-block;
+                padding: 0.6rem 1.5rem;
+                border-radius: 40px;
+                margin-bottom: 1.5rem;
+                line-height: 1.4;
+            }
+
+            .welcome-list {
+                list-style: none;
+                padding: 0;
+                max-width: 400px;
+                margin: 0 auto 1.8rem auto;
                 text-align: left;
             }
 
-            .guest-hero h2 {
-                margin: 0 0 8px 0;
-                font-size: 1.8rem;
-            }
-
-            .guest-hero p.lead {
-                margin: 6px 0 14px 0;
-                color: #333;
-                font-size: 1rem;
-            }
-
-            .features {
+            .welcome-list li {
+                margin: 0.9rem 0;
+                font-size: 0.95rem;
                 display: flex;
-                flex-direction: column;
-                gap: 8px;
-                margin: 0 0 14px 0;
-                padding-left: 18px;
+                align-items: center;
+                gap: 0.75rem;
+                color: #1a202c;
+                font-weight: 500;
             }
 
-            .cta {
+            .check-svg {
+                flex-shrink: 0;
+                color: #2c3e50;
+                width: 20px;
+                height: 20px;
+            }
+
+            .welcome-cta {
                 display: flex;
-                flex-direction: row;
-                gap: 10px;
-                flex-wrap: nowrap;
+                justify-content: center;
+                gap: 1.2rem;
+                flex-wrap: wrap;
             }
 
-            li{
-                list-style: none;
-                position: relative;
-                padding-left: 20px;
+            .btn {
+                display: inline-block;
+                padding: 0.7rem 1.8rem;
+                font-size: 0.95rem;
+                font-weight: 600;
+                text-decoration: none;
+                border-radius: 40px;
+                transition: all 0.25s ease;
+                cursor: pointer;
+                font-family: 'Montserrat', sans-serif;
             }
+
+            .btn-primary {
+                background: #2c3e50;
+                color: white;
+                border: none;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-primary:hover {
+                background: #1e2a36;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-secondary {
+                background: transparent;
+                color: #2c3e50;
+                border: 2px solid #2c3e50;
+            }
+
+            .btn-secondary:hover {
+                background: #2c3e50;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .welcome-sandbox {
+                    margin: 1rem;
+                    padding: 1.2rem;
+                }
+
+                .welcome-flex {
+                    flex-direction: column;
+                }
+
+                .welcome-headline {
+                    font-size: 1.8rem;
+                }
+
+                .btn {
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+
+
+
 
             @media (max-width: 700px) {
-                .hero-grid { flex-direction: column; }
+                .hero-grid {
+                    flex-direction: column;
+                }
             }
         </style>
         <main>
@@ -153,27 +308,137 @@
                     <% } else { %>
                         <p>You have no saved worlds yet. Start the simulation and save your creations!</p>
                         <% } %>
-            <% } else { %>
-                <!-- Guest / landing info -->
-                <section class="guest-hero" aria-labelledby="project-title">
-                    <div class="hero-grid">
-                        <img src="/images/hero-bg.jpg" alt="">
-                        <div class="hero-info">
-                            <h2 id="project-title">SandboxJS</h2>
-                            <p class="lead">Create, experiment and save sandbox-style worlds with falling particles, custom materials and simple physics. No install required - run it in your browser.</p>
+                            <% } else { %>
+                                <!-- New beautiful welcome section inspired by voucher design -->
+                                <section class="welcome-sandbox">
+                                    <div class="welcome-flex">
+                                        <!-- Left side: Image carousel gallery -->
+                                        <div class="welcome-carousel">
+                                            <div class="carousel-frame">
+                                                <img id="welcomeCarouselImg" src=""
+                                                    alt="SandboxJS simulation preview 1">
+                                                <button class="carousel-arrow prev" aria-label="Previous">❮</button>
+                                                <button class="carousel-arrow next" aria-label="Next">❯</button>
+                                            </div>
+                                            <div class="carousel-dots-mini"></div>
+                                        </div>
 
-                            <ul class="features">
-                                <li>Real-time particle simulation with grains and fluids</li>
-                                <li>Save and share worlds when you log in</li>
-                                <li>Small, extendable codebase - perfect for learning and tinkering</li>
-                            </ul>
+                                        <!-- Right side: main content with pretty marks -->
+                                        <div class="welcome-content">
+                                            <div class="welcome-headline">SandboxJS</div>
+                                            <div class="welcome-slogan">
+                                                Create, experiment and save sandbox-style worlds with falling particles,
+                                                custom materials and simple physics.
+                                            </div>
+                                            <ul class="welcome-list">
+                                                <li>
+                                                    <svg class="check-svg" width="18" height="18" viewBox="0 0 24 24"
+                                                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <circle cx="12" cy="12" r="10" stroke="currentColor"
+                                                            stroke-width="1.5" fill="none" />
+                                                        <path d="M8 12L11 15L16 9" stroke="currentColor"
+                                                            stroke-width="1.5" stroke-linecap="round"
+                                                            stroke-linejoin="round" />
+                                                    </svg>
+                                                    Real-time particle simulation with grains and fluids
+                                                </li>
+                                                <li>
+                                                    <svg class="check-svg" width="18" height="18" viewBox="0 0 24 24"
+                                                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <circle cx="12" cy="12" r="10" stroke="currentColor"
+                                                            stroke-width="1.5" fill="none" />
+                                                        <path d="M8 12L11 15L16 9" stroke="currentColor"
+                                                            stroke-width="1.5" stroke-linecap="round"
+                                                            stroke-linejoin="round" />
+                                                    </svg>
+                                                    Save and share worlds when you log in
+                                                </li>
+                                                <li>
+                                                    <svg class="check-svg" width="18" height="18" viewBox="0 0 24 24"
+                                                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <circle cx="12" cy="12" r="10" stroke="currentColor"
+                                                            stroke-width="1.5" fill="none" />
+                                                        <path d="M8 12L11 15L16 9" stroke="currentColor"
+                                                            stroke-width="1.5" stroke-linecap="round"
+                                                            stroke-linejoin="round" />
+                                                    </svg>
+                                                    Small, extendable codebase – perfect for learning and tinkering
+                                                </li>
+                                            </ul>
+                                            <div class="welcome-cta">
+                                                <a class="btn btn-primary" href="/simulation">Try the live demo</a>
+                                                <a class="btn btn-secondary" href="/login">Login / Create account</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <script>
+                                    (function () {
+                                        // Replace with your own simulation preview images (or keep the SVG placeholders)
+                                        const images = [
+                                            '/images/sanxbox_peek1.png',
+                                            '/images/sanxbox_peek2.png',
+                                            '/images/sanxbox_peek3.png',
+                                            '/images/sanxbox_peek4.png',
+                                            '/images/sanxbox_peek5.png',
+                                            '/images/sanxbox_peek6.png'
+                                        ];
+                                        let current = 0;
+                                        const imgElem = document.getElementById('welcomeCarouselImg');
+                                        const dotsContainer = document.querySelector('.carousel-dots-mini');
+                                        let interval;
 
-                            <div class="cta">
-                                <a class="btn" href="/simulation">Try the live demo</a>
-                                <a class="btn" href="/login">Login / Create account</a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                                        function updateCarousel() {
+                                            if (imgElem) imgElem.src = images[current];
+                                            const dots = document.querySelectorAll('.dot-mini');
+                                            dots.forEach((dot, i) => {
+                                                if (i === current) dot.classList.add('active');
+                                                else dot.classList.remove('active');
+                                            });
+                                        }
 
-            <% } %>
+                                        function next() {
+                                            current = (current + 1) % images.length;
+                                            updateCarousel();
+                                            resetTimer();
+                                        }
+
+                                        function prev() {
+                                            current = (current - 1 + images.length) % images.length;
+                                            updateCarousel();
+                                            resetTimer();
+                                        }
+
+                                        function resetTimer() {
+                                            if (interval) clearInterval(interval);
+                                            interval = setInterval(next, 5000);
+                                        }
+
+                                        function createDots() {
+                                            if (!dotsContainer) return;
+                                            dotsContainer.innerHTML = '';
+                                            images.forEach((_, idx) => {
+                                                const dot = document.createElement('span');
+                                                dot.classList.add('dot-mini');
+                                                if (idx === current) dot.classList.add('active');
+                                                dot.addEventListener('click', () => {
+                                                    current = idx;
+                                                    updateCarousel();
+                                                    resetTimer();
+                                                });
+                                                dotsContainer.appendChild(dot);
+                                            });
+                                        }
+
+                                        document.addEventListener('DOMContentLoaded', () => {
+                                            createDots();
+                                            updateCarousel();
+                                            const prevBtn = document.querySelector('.carousel-arrow.prev');
+                                            const nextBtn = document.querySelector('.carousel-arrow.next');
+                                            if (prevBtn) prevBtn.addEventListener('click', prev);
+                                            if (nextBtn) nextBtn.addEventListener('click', next);
+                                            resetTimer();
+                                        });
+                                    })();
+                                </script>
+                                <% } %>
