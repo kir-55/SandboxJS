@@ -157,9 +157,7 @@
                 <!-- Guest / landing info -->
                 <section class="guest-hero" aria-labelledby="project-title">
                     <div class="hero-grid">
-                        <div class="hero-canvas-wrap" aria-hidden="true">
-                            <canvas id="demo_canvas" width="320" height="200"></canvas>
-                        </div>
+                        <img src="/images/hero-bg.jpg" alt="">
                         <div class="hero-info">
                             <h2 id="project-title">SandboxJS</h2>
                             <p class="lead">Create, experiment and save sandbox-style worlds with falling particles, custom materials and simple physics. No install required - run it in your browser.</p>
@@ -178,53 +176,4 @@
                     </div>
                 </section>
 
-                <script>
-                    // Simple animated demo for the guest preview canvas
-                    (function drawPreview() {
-                        const c = document.getElementById('demo_canvas');
-                        if (!c) return;
-                        const ctx = c.getContext('2d');
-                        const w = c.width, h = c.height;
-                        // background gradient
-                        const g = ctx.createLinearGradient(0, 0, 0, h);
-                        g.addColorStop(0, '#071029');
-                        g.addColorStop(1, '#0b2438');
-                        let particles = [];
-                        for (let i = 0; i < 60; i++) {
-                            particles.push({
-                                x: Math.random() * w,
-                                y: Math.random() * h,
-                                vy: 0.4 + Math.random() * 1.2,
-                                r: 1 + Math.random() * 2,
-                                col: `hsl(${Math.floor(Math.random()*50)+20},70%,60%)`
-                            });
-                        }
-                        function step() {
-                            ctx.fillStyle = g;
-                            ctx.fillRect(0, 0, w, h);
-                            // draw ground
-                            ctx.fillStyle = '#081722';
-                            ctx.fillRect(0, h - 18, w, 18);
-
-                            for (let p of particles) {
-                                p.y += p.vy;
-                                p.x += Math.sin(p.y * 0.02) * 0.6;
-                                if (p.y > h - 20) {
-                                    p.y = Math.random() * -20;
-                                    p.x = Math.random() * w;
-                                }
-                                ctx.fillStyle = p.col;
-                                ctx.beginPath();
-                                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                                ctx.fill();
-                            }
-                            // title overlay
-                            ctx.fillStyle = 'rgba(255,255,255,0.85)';
-                            ctx.font = '12px system-ui, -apple-system, "Segoe UI", Roboto';
-                            ctx.fillText('Live demo preview', 12, 18);
-                            requestAnimationFrame(step);
-                        }
-                        step();
-                    })();
-                </script>
             <% } %>

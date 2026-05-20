@@ -2626,12 +2626,6 @@ grains = [
 	new GrainType("#232b2b", normal_stone),
 	new GrainType("#0e1111", normal_stone),
 
-	new GrainType("#dd7d7d", normal_brick), 
-	new GrainType("#cb6b6b", normal_brick),
-	new GrainType("#b65454", normal_brick),
-	new GrainType("#9e3333", normal_brick),
-	new GrainType("#842020", normal_brick),
-
 	new GrainType("#848482", normal_iron),
 	new GrainType("#cbcdcd", normal_iron),
 	new GrainType("#999e98", normal_iron),
@@ -2741,7 +2735,11 @@ grains = [
 	new GrainType("#64ff00", normal_radioactiveFly),
 	new GrainType("#1dff00", normal_radioactiveFly),
 
-
+	new GrainType("#dd7d7d", normal_brick), 
+	new GrainType("#cb6b6b", normal_brick),
+	new GrainType("#b65454", normal_brick),
+	new GrainType("#9e3333", normal_brick),
+	new GrainType("#842020", normal_brick)
 ];
 
 class GrainVariety {
