@@ -318,7 +318,7 @@ p {
   box-shadow: 0 0 0 2px rgba(247, 127, 0, 0.2);
 }
 
-.auth-btn {
+.btn {
   background: var(--accent);
   color: white;
   border: none;
@@ -331,7 +331,7 @@ p {
   transition: transform 0.2s, background 0.2s;
 }
 
-.auth-btn:hover {
+.btn:hover {
   background: #e06b00;
   transform: translateY(-2px);
 }
