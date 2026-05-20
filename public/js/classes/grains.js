@@ -202,12 +202,13 @@ class FlamableGrain extends Grain {
 	}
 }
 
-class Coal extends FlamableGrain{
+class Coal extends Grain{
 	chanceToDie = 0.05;
-	constructor (gravity = 0, name = "Coal", chanceToDie = 0.1){
-		super(gravity, 0, 6, 0, name);
+	constructor (gravity = 0, name = "Coal", chanceToDie = 0.1, flammability = 80){
+		super(gravity, 0, 6, name);
 		this.chanceToDie = chanceToDie;
-		
+		this.flammability = flammability;
+
 	}
 
 	applyPhisics(surrounding){
@@ -250,8 +251,15 @@ class Coal extends FlamableGrain{
 }
 
 class PowderCoal extends Coal {
-	constructor (name="Powder Coal", chanceToDie = 0.1){
-		super(1, name, chanceToDie);
+	constructor (name="Powder Coal", chanceToDie = 0.1, flammability = 20){
+		super(1, name, chanceToDie, flammability);
+	}
+}
+
+class Brick extends Grain {
+	constructor (name = "Brick"){
+		super(0, 0, 10, name);
+
 	}
 }
 
@@ -1539,6 +1547,7 @@ class Acid extends Liquid {
 			result = destroyNear(result, [Grass], 40, true, 100, 1);
 			result = destroyNear(result, [GrassSeed], 40, true, 100, 1);
 			result = destroyNear(result, [GrassSprout], 40, true, 100, 1);
+			result = destroyNear(result, [Brick], 40, true, 100, 1);
 			
 			result = destroyNear(
 				result,
@@ -1551,8 +1560,6 @@ class Acid extends Liquid {
 			result = destroyNear(result, [DuplicateElement], 40, true, 100, 1);
 			result = destroyNear(result, [HeatingElement], 40, true, 100, 1);
 			result = destroyNear(result, [HeatSensor], 40, true, 100, 1);
-
-			result = destroyNear(result, [Ice], 40, true, 100, 1);
 		}
 		return result;
 	}
@@ -2488,6 +2495,7 @@ const normal_acidIce = new AcidIce(normal_acid);
 const normal_oil = new Oil(1);
 
 const normal_stone = new Stone();
+const normal_brick = new Brick();
 
 const normal_lava = new Lava(0.001, normal_stone);
 
@@ -2612,11 +2620,17 @@ grains = [
 	new GrainType("#ffa904", normal_lava),
 	new GrainType("#ffdb00", normal_lava),
 
-	new GrainType("#414a4c", normal_stone), // Charged wire
+	new GrainType("#414a4c", normal_stone), 
 	new GrainType("#3b444b", normal_stone),
 	new GrainType("#353839", normal_stone),
 	new GrainType("#232b2b", normal_stone),
 	new GrainType("#0e1111", normal_stone),
+
+	new GrainType("#dd7d7d", normal_brick), 
+	new GrainType("#cb6b6b", normal_brick),
+	new GrainType("#b65454", normal_brick),
+	new GrainType("#9e3333", normal_brick),
+	new GrainType("#842020", normal_brick),
 
 	new GrainType("#848482", normal_iron),
 	new GrainType("#cbcdcd", normal_iron),
