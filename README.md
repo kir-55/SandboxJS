@@ -26,8 +26,8 @@ To avoid unwanted content, admin can remove worlds that are inappropriate
     PEPER=peper
 
 ### DB
-    YOU WILL HAVE TO INSTALL MYSQL!!
-    (good luck with that)
+YOU WILL HAVE TO INSTALL MYSQL!!
+(good luck with that)
 
     source db/db.sql
 
