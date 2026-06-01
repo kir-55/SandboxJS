@@ -26,12 +26,13 @@ To avoid unwanted content, admin can remove worlds that are inappropriate
     PEPER=peper
 
 ### DB
-YOU WILL HAVE TO INSTALL MYSQL!!
-(good luck with that)
+1.    Install MySQL (good luck with that)
+2.    Initialize DB
 
     source db/db.sql
 
-### Seeder
+3.    Run seeder (optional)
+
     node db/seeder.js
 
 ### Run Application
