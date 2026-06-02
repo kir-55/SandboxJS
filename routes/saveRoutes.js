@@ -35,26 +35,6 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/', authenticateToken, async (req, res) => {
-    const { world_name, screen_data} = req.body;
-    if (!world_name || !screen_data) {
-        return res.status(400).json({ error: 'Missing fields' });
-    }
-
-    try {
-        const existing = await getSaveByUserAndWorld(req.user.id, world_name);
-        if (existing) {
-            await updateSave(req.user.id, world_name, screen_data);
-            res.json({ message: 'World updated' });
-        } else {
-            await createSave(req.user.id, world_name, screen_data);
-            res.status(201).json({ message: 'World saved' });
-        }
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Database error' });
-    }
-});
 
 router.get('/public/:id', async (req, res) => {
     const { id } = req.params;
