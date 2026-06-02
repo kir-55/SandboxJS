@@ -204,10 +204,10 @@ class FlamableGrain extends Grain {
 
 class Coal extends FlamableGrain {
 	chanceToDie = 0.05;
-	constructor (gravity = 0, name = "Coal", chanceToDie = 0.1, flammability = 80){
+	constructor (gravity = 0, name = "Coal", chanceToDie = 0.1, flames = 80){
 		super(gravity, 0, 6, 0, name);
 		this.chanceToDie = chanceToDie;
-		this.flammability = flammability;
+		this.flames = flames;
 
 	}
 
@@ -229,7 +229,7 @@ class Coal extends FlamableGrain {
 							// place fire all around it
 							for (var x1 = 0; x1 < 3; x1++) {
 								for (var y1 = 0; y1 < 3; y1++) {
-									if (getRandom(0, 100) < this.flammability && result[x1][y1] == 0){
+									if (getRandom(0, 100) < this.flames && result[x1][y1] == 0){
 										result[x1][y1] = normal_fire.getGrainInt();
 									}
 								}
@@ -251,8 +251,8 @@ class Coal extends FlamableGrain {
 }
 
 class PowderCoal extends Coal {
-	constructor (name="Powder Coal", chanceToDie = 0.1, flammability = 20){
-		super(1, name, chanceToDie, flammability);
+	constructor (name="Powder Coal", chanceToDie = 0.1, flames = 20){
+		super(1, name, chanceToDie, flames);
 	}
 }
 
