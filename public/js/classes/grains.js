@@ -2337,6 +2337,27 @@ class RadioactiveFly extends Fly {
 			name,
 		);
 	}
+	applyPhisics(surrounding) {
+		var result = super.applyPhisics(surrounding);
+		if (arraysEqual(surrounding, result)) {
+			// has a small chance to any flamable grains around into fire
+			for (var x = 0; x < 3; x++) {
+				for (var y = 0; y < 3; y++) {
+					if ((x + y) % 2 === 1 && result[x][y] !== 0 && result[x][y] !== unexistingGrain) {
+						var sideGrain = result[x][y];
+						var grainObj = grains[sideGrain - 1];
+						if (grainObj.type instanceof FlamableGrain) {
+							var rnd = getRandom(0.0, 100.0);
+							if (rnd < 0.1 * 100) {
+								result[x][y] = normal_fire.getGrainInt(); // Place fire
+							}
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
 }
 
 class RadioactiveMeat extends Meat {
