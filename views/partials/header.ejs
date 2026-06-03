@@ -73,6 +73,7 @@
 <style>
     /* ...existing code... */
     .site-header {
+        --site-header-height: 60px; /* used by drawer/backdrop so panel sits under header */
         position: sticky;
         top: 0;
         z-index: 100;
@@ -88,7 +89,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        height: 60px;
+        height: var(--site-header-height);
     }
 
     /* Logo */
@@ -141,7 +142,14 @@
         border: 0;
         padding: 8px;
         cursor: pointer;
+        transition: transform 320ms cubic-bezier(.2,.9,.2,1);
+        transform-origin: center;
     }
+    /* rotate the hamburger when opened */
+    .hamburger[aria-expanded="true"] {
+        transform: rotate(90deg);
+    }
+
     .hamburger .bar {
         display: block;
         width: 22px;
@@ -154,7 +162,10 @@
     /* Drawer */
     .drawer-backdrop {
         position: fixed;
-        inset: 0;
+        top: var(--site-header-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
         background: rgba(0,0,0,0.35);
         opacity: 0;
         transition: opacity 200ms ease;
@@ -168,9 +179,9 @@
 
     .mobile-drawer {
         position: fixed;
-        top: 0;
+        top: var(--site-header-height); /* sit under the header */
         right: 0;
-        height: 100vh;
+        height: calc(100vh - var(--site-header-height));
         width: min(400px, 60vw); /* covers ~400px or 60% */
         background: #fff;
         box-shadow: -8px 0 24px rgba(0,0,0,0.08);
