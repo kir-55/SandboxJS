@@ -43,7 +43,6 @@
 <!-- Mobile drawer + backdrop -->
 <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
 <aside id="mobile-drawer" class="mobile-drawer" aria-hidden="true">
-    <button class="drawer-close" aria-label="Close menu">&times;</button>
     <nav class="drawer-nav" role="navigation">
         <ul>
             <li><a href="/">Home</a></li>
@@ -142,12 +141,12 @@
         border: 0;
         padding: 8px;
         cursor: pointer;
-        transition: transform 320ms cubic-bezier(.2,.9,.2,1);
+        transition: transform 420ms cubic-bezier(.2,.9,.2,1);
         transform-origin: center;
     }
-    /* rotate the hamburger when opened */
+    /* spin the hamburger when opened */
     .hamburger[aria-expanded="true"] {
-        transform: rotate(90deg);
+        transform: rotate(360deg);
     }
 
     .hamburger .bar {
@@ -180,30 +179,23 @@
     .mobile-drawer {
         position: fixed;
         top: var(--site-header-height); /* sit under the header */
+        left: 0;
         right: 0;
-        height: calc(100vh - var(--site-header-height));
-        width: min(400px, 60vw); /* covers ~400px or 60% */
-        background: #fff;
-        box-shadow: -8px 0 24px rgba(0,0,0,0.08);
-        transform: translateX(105%);
-        transition: transform 280ms cubic-bezier(.2,.9,.2,1);
+        height: min(400px, 60vh); /* panel drops down under header */
+        width: 100%;
+        background: #f7f7f8; /* slight gray */
+        /* removed box-shadow as requested */
+        transform: translateY(-110%);
+        transition: transform 300ms cubic-bezier(.2,.9,.2,1);
         z-index: 150;
-        padding: 20px;
+        padding: 18px 16px;
         display: flex;
         flex-direction: column;
         gap: 12px;
+        border-bottom: 1px solid rgba(0,0,0,0.04);
     }
     .mobile-drawer.open {
-        transform: translateX(0);
-    }
-    .mobile-drawer .drawer-close {
-        background: transparent;
-        border: 0;
-        font-size: 28px;
-        line-height: 1;
-        padding: 4px;
-        margin-left: auto;
-        cursor: pointer;
+        transform: translateY(0);
     }
     .drawer-nav ul {
         list-style: none;
@@ -212,6 +204,7 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+        overflow: auto;
     }
     .drawer-nav a {
         display: block;
@@ -221,7 +214,7 @@
         border-radius: 6px;
     }
     .drawer-nav a:hover {
-        background: #F3F1EC;
+        background: #EFEFEF;
     }
 
     @media (max-width: 500px) {
@@ -246,12 +239,11 @@
 </style>
 
 <script>
-    // Minimal JS to toggle drawer
+    // Minimal JS to toggle drawer (close button removed)
     (function () {
         const btn = document.querySelector('.hamburger');
         const drawer = document.getElementById('mobile-drawer');
         const backdrop = document.getElementById('drawer-backdrop');
-        const closeBtn = drawer && drawer.querySelector('.drawer-close');
 
         function openDrawer() {
             drawer.classList.add('open');
@@ -268,7 +260,7 @@
             btn.setAttribute('aria-expanded', 'false');
             backdrop.classList.remove('visible');
             // wait for animation to finish before hiding backdrop to avoid flicker
-            setTimeout(() => backdrop.hidden = true, 300);
+            setTimeout(() => backdrop.hidden = true, 320);
             document.documentElement.classList.remove('no-scroll');
         }
 
@@ -277,7 +269,6 @@
                 const opened = btn.getAttribute('aria-expanded') === 'true';
                 if (opened) closeDrawer(); else openDrawer();
             });
-            closeBtn && closeBtn.addEventListener('click', closeDrawer);
             backdrop.addEventListener('click', closeDrawer);
 
             // close on escape
