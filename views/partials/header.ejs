@@ -5,7 +5,15 @@
                 <%= name %>
             </a>
         </div>
-        <nav class="main-nav">
+
+        <!-- Mobile hamburger -->
+        <button class="hamburger" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+
+        <nav class="main-nav" role="navigation">
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/simulation/" class="nav-cta">Launch Sim</a></li>
@@ -35,7 +43,27 @@
     </div>
 </header>
 
+<!-- Mobile drawer + backdrop -->
+<div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+<aside id="mobile-drawer" class="mobile-drawer" aria-hidden="true">
+    <button class="drawer-close" aria-label="Close menu">&times;</button>
+    <nav class="drawer-nav" role="navigation">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/simulation/" class="nav-cta">Launch Sim</a></li>
+            <% if (locals.user) { %>
+                <li><a href="/discover">Discover</a></li>
+                <li><a href="/logout">Logout <span class="nav-user"><%= user.username %></span></a></li>
+            <% } else { %>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            <% } %>
+        </ul>
+    </nav>
+</aside>
+
 <style>
+    /* ...existing code... */
     .site-header {
         position: sticky;
         top: 0;
@@ -95,9 +123,145 @@
         font-weight: 600;
     }
 
+    /* Hamburger (mobile) */
+    .hamburger {
+        display: none;
+        background: transparent;
+        border: 0;
+        padding: 8px;
+        cursor: pointer;
+    }
+    .hamburger .bar {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: #333;
+        margin: 4px 0;
+        transition: transform 200ms ease, opacity 200ms ease;
+    }
+
+    /* Drawer */
+    .drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.35);
+        opacity: 0;
+        transition: opacity 200ms ease;
+        z-index: 140;
+        pointer-events: none;
+    }
+    .drawer-backdrop.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .mobile-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: min(400px, 60vw); /* covers ~400px or 60% */
+        background: #fff;
+        box-shadow: -8px 0 24px rgba(0,0,0,0.08);
+        transform: translateX(105%);
+        transition: transform 280ms cubic-bezier(.2,.9,.2,1);
+        z-index: 150;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .mobile-drawer.open {
+        transform: translateX(0);
+    }
+    .mobile-drawer .drawer-close {
+        background: transparent;
+        border: 0;
+        font-size: 28px;
+        line-height: 1;
+        padding: 4px;
+        margin-left: auto;
+        cursor: pointer;
+    }
+    .drawer-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .drawer-nav a {
+        display: block;
+        padding: 10px;
+        color: #222;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+    .drawer-nav a:hover {
+        background: #F3F1EC;
+    }
+
     @media (max-width: 500px) {
         .hide-mobile {
             display: none;
         }
+        .main-nav {
+            display: none;
+        }
+        .hamburger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+    /* prevent background scroll when drawer open */
+    .no-scroll {
+        overflow: hidden;
+        height: 100vh;
     }
 </style>
+
+<script>
+    // Minimal JS to toggle drawer
+    (function () {
+        const btn = document.querySelector('.hamburger');
+        const drawer = document.getElementById('mobile-drawer');
+        const backdrop = document.getElementById('drawer-backdrop');
+        const closeBtn = drawer && drawer.querySelector('.drawer-close');
+
+        function openDrawer() {
+            drawer.classList.add('open');
+            drawer.setAttribute('aria-hidden', 'false');
+            btn.setAttribute('aria-expanded', 'true');
+            backdrop.classList.add('visible');
+            backdrop.hidden = false;
+            document.documentElement.classList.add('no-scroll');
+        }
+
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            drawer.setAttribute('aria-hidden', 'true');
+            btn.setAttribute('aria-expanded', 'false');
+            backdrop.classList.remove('visible');
+            // wait for animation to finish before hiding backdrop to avoid flicker
+            setTimeout(() => backdrop.hidden = true, 300);
+            document.documentElement.classList.remove('no-scroll');
+        }
+
+        if (btn && drawer && backdrop) {
+            btn.addEventListener('click', () => {
+                const opened = btn.getAttribute('aria-expanded') === 'true';
+                if (opened) closeDrawer(); else openDrawer();
+            });
+            closeBtn && closeBtn.addEventListener('click', closeDrawer);
+            backdrop.addEventListener('click', closeDrawer);
+
+            // close on escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+            });
+        }
+    })();
+</script>
