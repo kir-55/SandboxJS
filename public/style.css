@@ -444,6 +444,11 @@ p {
 
 @media (max-width: 700px) {
 
+  .open-btn{
+    display: none;
+
+  }
+
   .port-buttons-container{
     flex-wrap: wrap;
   }
