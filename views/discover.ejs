@@ -60,6 +60,27 @@
                 font-style: italic;
                 font-weight: bold;
             }
+
+            /* Responsive: make save/world preview cards compact on tablets and phones */
+            @media (max-width: 900px) {
+                .saves-grid { gap: 14px; }
+                .save-card {
+                    width: calc(50% - 14px);
+                    min-width: 140px;
+                    max-width: 240px;
+                }
+                .save-card canvas {
+                    width: 100%;
+                    height: auto;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .saves-grid { gap: 10px; }
+                .save-card { width: 100%; padding: 10px; border-radius: 8px; }
+                .save-card h3 { font-size: 1rem; margin: 6px 0; }
+                .save-card p { font-size: 0.78rem; }
+            }
         </style>
 
         <main>
