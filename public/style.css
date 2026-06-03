@@ -411,6 +411,9 @@ p {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  margin: 0 20px;
+  box-sizing: border-box;
+  max-width: 100vh;
 }
 
 .world-name-control input {
