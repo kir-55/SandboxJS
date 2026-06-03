@@ -178,6 +178,7 @@
 
     .mobile-drawer {
         position: fixed;
+        display: none;
         top: var(--site-header-height); /* sit under the header */
         left: 0;
         right: 0;
@@ -195,6 +196,7 @@
         border-bottom: 1px solid rgba(0,0,0,0.04);
     }
     .mobile-drawer.open {
+        display: block;
         transform: translateY(0);
     }
     .drawer-nav ul {
