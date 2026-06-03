@@ -258,6 +258,8 @@ p {
   margin-right: auto;
   padding: 10px;
   border-radius: 30px;
+
+  box-sizing: border-box;
   max-width: 100vw;
 }
 
