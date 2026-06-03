@@ -546,63 +546,46 @@ class LiquidAffectable extends Grain {
 			var touchsLiquid = false;
 			for (var x = 0; x < 3; x++) {
 				for (var y = 0; y < 3; y++) {
-					if ((x + y) % 2 == 1) {
-						var side = result[x][y];
-						if (side != 0 && side != unexistingGrain) {
-							var grain_type = grains[side - 1].type;
-							if (grain_type instanceof Liquid && !(grain_type instanceof Lava) && !(grain_type instanceof MoltenIron)) {
+					
+					var side = result[x][y];
+					if (side != 0 && side != unexistingGrain) {
+						var grain_type = grains[side - 1].type;
+						if (grain_type instanceof Liquid && !(grain_type instanceof Lava) && !(grain_type instanceof MoltenIron)) {
+							var rnd = getRandom(0.0, 100.0);
+							if (
+								rnd < this.chanceToAffect &&
+								this.wetGrain
+							) {
+								
+								//this returns zero
+								// check if wet grain is array or not
+								if (Array.isArray(this.wetGrain)) {
+									result[1][1] =
+										this.wetGrain[
+											getRandomInt(
+												0,
+												this.wetGrain.length,
+											)
+										].getGrainInt();
+								} else {
+									result[1][1] =
+										this.wetGrain.getGrainInt();
+								}
+
+								if (this.absorbsLiquid) {
+									result[x][y] = 0; // Absorb the liquid
+								}
+							}
+							touchsLiquid = true;
+						} else if (grain_type instanceof LiquidAffectable) {
+							if (grain_type.isWet) {
 								var rnd = getRandom(0.0, 100.0);
 								if (
-									rnd < this.chanceToAffect &&
-									this.wetGrain
+									rnd <
+										this
+											.chanceFroliquidAffectableToAffect &&
+									this.dryGrain
 								) {
-									
-									//this returns zero
-									// check if wet grain is array or not
-									if (Array.isArray(this.wetGrain)) {
-										result[1][1] =
-											this.wetGrain[
-												getRandomInt(
-													0,
-													this.wetGrain.length,
-												)
-											].getGrainInt();
-									} else {
-										result[1][1] =
-											this.wetGrain.getGrainInt();
-									}
-
-									if (this.absorbsLiquid) {
-										result[x][y] = 0; // Absorb the liquid
-									}
-								}
-								touchsLiquid = true;
-							} else if (grain_type instanceof LiquidAffectable) {
-								if (grain_type.isWet) {
-									var rnd = getRandom(0.0, 100.0);
-									if (
-										rnd <
-											this
-												.chanceFroliquidAffectableToAffect &&
-										this.dryGrain
-									) {
-										if (Array.isArray(this.dryGrain)) {
-											result[1][1] =
-												this.dryGrain[
-													getRandomInt(
-														0,
-														this.dryGrain.length,
-													)
-												].getGrainInt();
-										} else {
-											result[1][1] =
-												this.dryGrain.getGrainInt();
-										}
-									}
-								}
-							} else if (grain_type instanceof Fire) {
-								// If the grain is fire, it can turn this grain wet
-								if (this.isWet && this.dryGrain) {
 									if (Array.isArray(this.dryGrain)) {
 										result[1][1] =
 											this.dryGrain[
@@ -617,10 +600,9 @@ class LiquidAffectable extends Grain {
 									}
 								}
 							}
-						} else if (this.isWet && side == 0 && this.dryGrain) {
-							// If this grain is wet and absorbs liquid, it can dry out
-							var rnd = getRandom(0.0, 100.0);
-							if (rnd < this.chanceToDry && this.dryGrain) {
+						} else if (grain_type instanceof Fire) {
+							// If the grain is fire, it can turn this grain wet
+							if (this.isWet && this.dryGrain) {
 								if (Array.isArray(this.dryGrain)) {
 									result[1][1] =
 										this.dryGrain[
@@ -630,12 +612,30 @@ class LiquidAffectable extends Grain {
 											)
 										].getGrainInt();
 								} else {
-									result[1][1] = this.dryGrain.getGrainInt();
+									result[1][1] =
+										this.dryGrain.getGrainInt();
 								}
+							}
+						}
+					} else if (this.isWet && side == 0 && this.dryGrain) {
+						// If this grain is wet and absorbs liquid, it can dry out
+						var rnd = getRandom(0.0, 100.0);
+						if (rnd < this.chanceToDry && this.dryGrain) {
+							if (Array.isArray(this.dryGrain)) {
+								result[1][1] =
+									this.dryGrain[
+										getRandomInt(
+											0,
+											this.dryGrain.length,
+										)
+									].getGrainInt();
+							} else {
+								result[1][1] = this.dryGrain.getGrainInt();
 							}
 						}
 					}
 				}
+				
 			}
 		}
 		return result;
