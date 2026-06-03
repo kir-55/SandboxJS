@@ -51,6 +51,9 @@
             <% if (locals.user) { %>
                 <li><a href="/discover">Discover</a></li>
                 <li><a href="/logout" style="display:flex;align-items:center;gap:6px;">
+                    <span class="nav-user">
+                        <%= locals.user.username %>
+                    </span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
                         stroke-linejoin="round">
@@ -58,9 +61,6 @@
                         <polyline points="16 17 21 12 16 7" />
                         <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
-                    <span class="nav-user">
-                        <%= locals.user.username %>
-                    </span>
                 </a></li>
             <% } else { %>
                 <li><a href="/login">Login</a></li>
@@ -125,7 +125,7 @@
     }
 
     /* Username label */
-    .main-nav .nav-user {
+    .nav-user {
         font-size: 0.82rem;
         color: var(--accent);
         font-weight: 600;
