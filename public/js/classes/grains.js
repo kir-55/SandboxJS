@@ -1250,6 +1250,7 @@ class WetDirt extends LiquidAffectable {
 				}
 			}
 		}
+		return result;
 	}
 }
 
