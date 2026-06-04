@@ -299,7 +299,7 @@ class Charcoal extends Grain {
 							}
 						}
 						else if (grainObj.type instanceof Fire) {
-							if (getRandom(0, 100) < 1 && result[x1][y1] == 0){
+							if (getRandom(0, 100) < 1){
 								result[1][1] = normal_ash.getGrainInt();
 							}
 						}
