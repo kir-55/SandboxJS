@@ -2273,13 +2273,27 @@ class Fly extends Grain {
 	}
 }
 
+class Bee extends Fly {
+	constructor(meat, name = "Bee") {
+		super(
+			meat,
+			0.1,
+			[Leaf, TreeSeed, TreeSprout],
+			[Uran, Water, WaterVapor, Acid, AcidVapor, Fire, Lava, MoltenIron],
+			true,
+			0.1,
+			name,
+		);
+	}
+}
+
 class FruitFly extends Fly {
 	constructor(meat, radioactiveFly = null, name = "Fruit Fly") {
 		super(
 			meat,
 			0.1,
 			[Leaf, TreeSeed, TreeSprout],
-			[Water, WaterVapor, Acid, AcidVapor, Fire],
+			[Water, WaterVapor, Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
 			name,
@@ -2576,6 +2590,8 @@ const normal_radioactiveFly = new RadioactiveFly(normal_radioactiveMeat);
 normal_radioactiveMeat.radioactiveFly = normal_radioactiveFly;
 const normal_fly = new FruitFly(normal_meat, normal_radioactiveFly);
 
+const normal_bee = new Bee(normal_meat);
+
 const normal_coal = new Coal();
 const normal_powder_coal = new PowderCoal();
 
@@ -2744,6 +2760,13 @@ grains = [
 	new GrainType("#9bd662", normal_radioactiveMeat),
 	new GrainType("#508356", normal_radioactiveMeat),
 	new GrainType("#3a313e", normal_radioactiveMeat),
+
+	new GrainType("#f9c901", normal_bee),
+	new GrainType("#f6e000", normal_bee),
+	new GrainType("#985b10", normal_bee),
+	new GrainType("#6b4701", normal_bee),
+	new GrainType("#896800", normal_bee),
+
 
 	new GrainType("#f9d6d4", normal_fly),
 	new GrainType("#e5b1b9", normal_fly),
