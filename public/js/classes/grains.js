@@ -293,8 +293,14 @@ class Charcoal extends Grain {
 								for (var y1 = 0; y1 < 3; y1++) {
 									if (getRandom(0, 100) < 40 && result[x1][y1] == 0){
 										result[x1][y1] = normal_fire.getGrainInt();
+										result[1][1] = normal_ash.getGrainInt();
 									}
 								}
+							}
+						}
+						else if (grainObj.type instanceof Fire) {
+							if (getRandom(0, 100) < 1 && result[x1][y1] == 0){
+								result[1][1] = normal_ash.getGrainInt();
 							}
 						}
 					}
@@ -305,10 +311,16 @@ class Charcoal extends Grain {
 	}
 }
 
+
+class Ash extends Grain {
+	constructor (name = "Ash"){
+		super(1, 0, 0, name);
+	}
+}
+
 class Brick extends Grain {
 	constructor (name = "Brick"){
 		super(0, 0, 10, name);
-
 	}
 }
 
@@ -2739,7 +2751,7 @@ const normal_bee = new Bee(normal_honey);
 const normal_coal = new Coal();
 const normal_powder_coal = new PowderCoal();
 
-
+const normal_ash = new Ash();
 const normal_charcoal = new Charcoal();
 
 
@@ -2897,6 +2909,17 @@ grains = [
 	new GrainType("#575757", normal_powder_coal),
 	new GrainType("#797979", normal_powder_coal),
 
+	new GrainType("#635442", normal_charcoal),
+	new GrainType("#4d402f", normal_charcoal),
+	new GrainType("#403122", normal_charcoal),
+	new GrainType("#2d1d10", normal_charcoal),
+	new GrainType("#221105", normal_charcoal),
+
+	new GrainType("#c9bbb2", normal_ash),
+	new GrainType("#b6a194", normal_ash),
+	new GrainType("#827268", normal_ash),
+	new GrainType("#584d45", normal_ash),
+
 	new GrainType("#ff7a7a", normal_meat),
 	new GrainType("#742f35", normal_meat), // more rotten color
 	new GrainType("#8b594c", normal_meat),
@@ -2910,17 +2933,9 @@ grains = [
 	new GrainType("#3a313e", normal_radioactiveMeat),
 
 	
-	new GrainType("#f6e000", normal_honey),
-	new GrainType("#ffbe42", normal_honey),
-	new GrainType("#ffb100", normal_honey), 
-	new GrainType("#ed8c00", normal_honey),
-	new GrainType("#cc5d00", normal_honey),
 
-	new GrainType("#635442", normal_charcoal),
-	new GrainType("#4d402f", normal_charcoal),
-	new GrainType("#403122", normal_charcoal),
-	new GrainType("#2d1d10", normal_charcoal),
-	new GrainType("#221105", normal_charcoal),
+
+
 
 	new GrainType("#dd7d7d", normal_brick), 
 	new GrainType("#cb6b6b", normal_brick),
@@ -2946,7 +2961,13 @@ grains = [
 	new GrainType("#c3ff00", normal_radioactiveFly),
 	new GrainType("#88ff00", normal_radioactiveFly),
 	new GrainType("#64ff00", normal_radioactiveFly),
-	new GrainType("#1dff00", normal_radioactiveFly)
+	new GrainType("#1dff00", normal_radioactiveFly),
+
+	new GrainType("#f6e000", normal_honey),
+	new GrainType("#ffbe42", normal_honey),
+	new GrainType("#ffb100", normal_honey), 
+	new GrainType("#ed8c00", normal_honey),
+	new GrainType("#cc5d00", normal_honey)
 ];
 
 class GrainVariety {
