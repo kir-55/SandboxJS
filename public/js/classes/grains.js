@@ -250,7 +250,15 @@ class Coal extends FlamableGrain {
 							}
 
 							if (getRandom(0, 100) < this.chanceToDie) {
-								result[1][1] = normal_fire.getGrainInt(); // Burn this grain
+								// changeing all empty grains and itself to smoke
+								for (var x1 = 0; x1 < 3; x1++) {
+									for (var y1 = 0; y1 < 3; y1++) {
+										if (result[x1][y1] == 0){
+											result[x1][y1] = normal_smoke.getGrainInt();
+										}
+									}
+								}
+								result[1][1] = 0; // Burn this grain
 								return result;
 							}
 						}
