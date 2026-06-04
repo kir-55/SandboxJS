@@ -291,12 +291,13 @@ class Charcoal extends Grain {
 							// places fire around
 							for (var x1 = 0; x1 < 3; x1++) {
 								for (var y1 = 0; y1 < 3; y1++) {
-									if (getRandom(0, 100) < 40 && result[x1][y1] == 0){
+									if (result[x1][y1] == 0){
 										result[x1][y1] = normal_fire.getGrainInt();
-										result[1][1] = normal_ash.getGrainInt();
+										
 									}
 								}
 							}
+							result[1][1] = normal_ash.getGrainInt();
 						}
 						else if (grainObj.type instanceof Fire) {
 							if (getRandom(0, 100) < 1){
