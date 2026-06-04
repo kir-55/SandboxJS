@@ -2653,15 +2653,17 @@ class Honey extends Grain {
 
 class Maggot extends Grain {
     constructor() {
-        super(0, 0, 1, "Maggot");
-        this.chanceToEat = 0.1;        // 10% chance per step to eat adjacent meat
-        this.chanceToDuplicate = 0.2;   // when eating, 20% chance to duplicate (if under limit)
+        super(0, 0, 1, "Maggot");   // gravity 0 → does not fall or float
+        this.chanceToEat = 0.15;    // 15% chance per step to eat adjacent edible grain
+        this.chanceToDuplicate = 0.2; // when eating, 20% chance to duplicate if under limit
+        // List of grain types that maggots can eat (tunnel through)
+        this.edibleGrains = [Meat, Wood, Leaf, Grass];
     }
 
     applyPhisics(surrounding) {
         let result = super.applyPhisics(surrounding);
         if (arraysEqual(surrounding, result)) {
-            // Count nearby maggots (including self)
+            // Count nearby maggots (including self) in 3×3 area
             let maggotCount = 0;
             for (let x = 0; x < 3; x++) {
                 for (let y = 0; y < 3; y++) {
@@ -2673,52 +2675,52 @@ class Maggot extends Grain {
                 }
             }
 
-            // 1. Movement: try to move to a random empty cardinal cell
-            let emptySides = [];
-            if (result[0][1] === 0) emptySides.push([0, 1]);
-            if (result[2][1] === 0) emptySides.push([2, 1]);
-            if (result[1][0] === 0) emptySides.push([1, 0]);
-            if (result[1][2] === 0) emptySides.push([1, 2]);
-            if (emptySides.length > 0) {
-                let move = emptySides[getRandomInt(0, emptySides.length)];
-                result[move[0]][move[1]] = result[1][1];
-                result[1][1] = 0;
-                return result;
-            }
-
-            // 2. Eating: check adjacent cells for meat
+            // Look for an adjacent edible grain (cardinal directions)
+            let ediblePositions = [];
             for (let x = 0; x < 3; x++) {
                 for (let y = 0; y < 3; y++) {
-                    if ((x + y) % 2 === 1) { // cardinal directions only
+                    if ((x + y) % 2 === 1) { // cardinal only
                         let neighbor = result[x][y];
                         if (neighbor !== 0 && neighbor !== unexistingGrain) {
                             let grainObj = grains[neighbor - 1];
-                            if (grainObj.type instanceof Meat &&
-                                getRandom(0, 100) < this.chanceToEat * 100) {
-                                // Eat the meat (remove it)
-                                result[x][y] = 0;
-
-                                // Duplicate if under the limit of 2 maggots
-                                if (maggotCount < 2 &&
-                                    getRandom(0, 100) < this.chanceToDuplicate * 100) {
-                                    // Find an empty cardinal cell to place the new maggot
-                                    let emptyAdjacent = [];
-                                    for (let i = 0; i < 3; i++) {
-                                        for (let j = 0; j < 3; j++) {
-                                            if ((i + j) % 2 === 1 && result[i][j] === 0) {
-                                                emptyAdjacent.push([i, j]);
-                                            }
-                                        }
-                                    }
-                                    if (emptyAdjacent.length > 0) {
-                                        let pos = emptyAdjacent[getRandomInt(0, emptyAdjacent.length)];
-                                        result[pos[0]][pos[1]] = this.getGrainInt();
-                                    }
+                            for (let edible of this.edibleGrains) {
+                                if (grainObj.type instanceof edible) {
+                                    ediblePositions.push({x, y, grainVal: neighbor});
+                                    break;
                                 }
-                                return result;
                             }
                         }
                     }
+                }
+            }
+
+            if (ediblePositions.length > 0) {
+                // Randomly choose one edible grain to eat
+                let target = ediblePositions[getRandomInt(0, ediblePositions.length)];
+                // Chance to eat
+                if (getRandom(0, 100) < this.chanceToEat * 100) {
+                    // Move maggot into the target cell (replace target grain)
+                    result[target.x][target.y] = result[1][1];
+                    // Clear original cell
+                    result[1][1] = 0;
+
+                    // Duplicate if under the limit (max 2 maggots in 3×3)
+                    if (maggotCount < 2 && getRandom(0, 100) < this.chanceToDuplicate * 100) {
+                        // Find an adjacent empty cell (could be where we just ate, or another)
+                        let emptyAdjacent = [];
+                        for (let i = 0; i < 3; i++) {
+                            for (let j = 0; j < 3; j++) {
+                                if ((i + j) % 2 === 1 && result[i][j] === 0) {
+                                    emptyAdjacent.push([i, j]);
+                                }
+                            }
+                        }
+                        if (emptyAdjacent.length > 0) {
+                            let pos = emptyAdjacent[getRandomInt(0, emptyAdjacent.length)];
+                            result[pos[0]][pos[1]] = this.getGrainInt();
+                        }
+                    }
+                    return result;
                 }
             }
         }
