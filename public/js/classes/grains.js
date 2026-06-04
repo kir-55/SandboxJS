@@ -2537,6 +2537,7 @@ class Honey extends Grain {
 				}
 			}
 		}
+		return result;
 	}
 
 }
