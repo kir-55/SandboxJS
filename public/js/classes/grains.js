@@ -2655,7 +2655,7 @@ class Maggot extends Grain {
     constructor() {
         super(1, 0, 1, "Maggot");   // gravity 1 → falls down
         this.chanceToEat = 0.15;        // 15% chance per step to eat adjacent edible grain
-        this.chanceToMove = 0.3;        // 30% chance per step to try moving left/right/up
+        this.chanceToMove = 0.001;        // 0.1% chance per step to try moving left/right/up
         // Edible grains – maggot destroys and moves into them
         this.edibleGrains = [Meat, Wood, Leaf, Grass];
         // Burrowable grains – maggot can swap places (travel through)
