@@ -3169,10 +3169,10 @@ grains = [
 	new GrainType("#dcc8a8", normal_maggot),
 	new GrainType("#c9b48b", normal_maggot),
 
-	new GrainType("#3a3a3a", normal_smoke),
-	new GrainType("#4d4d4d", normal_smoke),
-	new GrainType("#5c5c5c", normal_smoke),
-	new GrainType("#6e6e6e", normal_smoke)
+	new GrainType("#0a0a0a", normal_smoke),
+	new GrainType("#111010", normal_smoke),
+	new GrainType("#2b2b2b", normal_smoke),
+	new GrainType("#272727", normal_smoke)
 ];
 
 class GrainVariety {
