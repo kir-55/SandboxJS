@@ -2656,19 +2656,21 @@ class Maggot extends Grain {
         super(1, 0, 1, "Maggot");   // gravity 1 → falls down
         this.chanceToEat = 0.15;        // 15% chance per step to eat adjacent edible grain
         this.chanceToMove = 0.3;        // 30% chance per step to try moving left/right/up
-        // List of grain types that maggots can eat (tunnel through)
+        // Edible grains – maggot destroys and moves into them
         this.edibleGrains = [Meat, Wood, Leaf, Grass];
-        // List of grain types that kill the maggot (turn into charcoal)
-        this.deathGrains = [Lava, Fire, MoltenIron];
+        // Burrowable grains – maggot can swap places (travel through)
+        this.burrowableGrains = [Dirt, WetDirt, Sand, WetSand, Ash, Charcoal];
+        // Death grains – touching any turns maggot into charcoal
+        this.deathGrains = [Lava, Fire, MoltenIron, Acid, AcidVapor, Uran, RadioactiveFly, RadioactiveMeat, Honey, Liquid];
     }
 
     applyPhisics(surrounding) {
         let result = super.applyPhisics(surrounding);
         if (arraysEqual(surrounding, result)) {
-            // ----- Check for death grains (adjacent or self? Self is not possible, but check adjacent) -----
+            // ----- Check for death grains (cardinal neighbors) -----
             for (let x = 0; x < 3; x++) {
                 for (let y = 0; y < 3; y++) {
-                    if ((x + y) % 2 === 1) { // cardinal directions only
+                    if ((x + y) % 2 === 1) {
                         let neighbor = result[x][y];
                         if (neighbor !== 0 && neighbor !== unexistingGrain) {
                             let grainObj = grains[neighbor - 1];
@@ -2705,22 +2707,47 @@ class Maggot extends Grain {
             if (ediblePositions.length > 0) {
                 let target = ediblePositions[getRandomInt(0, ediblePositions.length)];
                 if (getRandom(0, 100) < this.chanceToEat * 100) {
-                    // Move maggot into the target cell (replace edible grain)
+                    // Move maggot into target cell (destroy edible grain)
                     result[target.x][target.y] = result[1][1];
                     result[1][1] = 0;
                     return result;
                 }
             }
 
-            // ----- 2. If no eating, try to move left, right, or up (jump) -----
+            // ----- 2. Try to burrow into adjacent burrowable grain (swap) -----
+            let burrowablePositions = [];
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1) {
+                        let neighbor = result[x][y];
+                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                            let grainObj = grains[neighbor - 1];
+                            for (let burrow of this.burrowableGrains) {
+                                if (grainObj.type instanceof burrow) {
+                                    burrowablePositions.push({x, y});
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (burrowablePositions.length > 0) {
+                let target = burrowablePositions[getRandomInt(0, burrowablePositions.length)];
+                // Swap maggot with the burrowable grain
+                let temp = result[target.x][target.y];
+                result[target.x][target.y] = result[1][1];
+                result[1][1] = temp;
+                return result;
+            }
+
+            // ----- 3. Try to move into empty cells (left/right/up) -----
             if (getRandom(0, 100) < this.chanceToMove * 100) {
                 let moves = [];
-                // Left
-                if (result[0][1] === 0) moves.push([0, 1]);
-                // Right
-                if (result[2][1] === 0) moves.push([2, 1]);
-                // Up
-                if (result[1][0] === 0) moves.push([1, 0]);
+                if (result[0][1] === 0) moves.push([0, 1]); // left
+                if (result[2][1] === 0) moves.push([2, 1]); // right
+                if (result[1][0] === 0) moves.push([1, 0]); // up
 
                 if (moves.length > 0) {
                     let move = moves[getRandomInt(0, moves.length)];
