@@ -264,9 +264,16 @@ class Coal extends FlamableGrain {
 	}
 }
 
+
 class PowderCoal extends Coal {
 	constructor (name="Powder Coal", chanceToDie = 0.1, flames = 20){
 		super(1, name, chanceToDie, flames);
+	}
+}
+
+class Charcoal extends Grian {
+	constructor (name = "Charcoal"){
+		super(0, 0, 5, name);
 	}
 }
 
@@ -2516,6 +2523,22 @@ class Honey extends Grain {
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
 		if (arraysEqual(surrounding, result)) {
+			// check if touches or lava if so turn into charcoal
+
+			for (var x = 0; x < 3; x++) {
+				for (var y = 0; y < 3; y++) {
+					if ((x + y) % 2 === 1 && result[x][y] !== 0 && result[x][y] !== unexistingGrain) {
+						var sideGrain = result[x][y];
+						var grainObj = grains[sideGrain - 1];
+						if (grainObj.type instanceof Lava || grainObj.type instanceof Fire) {
+							result[1][1] = normal_charcoal.getGrainInt(); // Place charcoal
+							return result;
+						}
+					}
+				}
+			}
+
+
 			// Check the grain bellow if check if its honey
 			// Then check left and right if there is a garin with gravity than its stuck
 			// It should be moved down if there is space
@@ -2687,6 +2710,8 @@ const normal_bee = new Bee(normal_honey);
 const normal_coal = new Coal();
 const normal_powder_coal = new PowderCoal();
 
+
+const normal_charcoal = new Charcoal();
 
 
 grains = [
@@ -2861,6 +2886,12 @@ grains = [
 	new GrainType("#ffb100", normal_honey), 
 	new GrainType("#ed8c00", normal_honey),
 	new GrainType("#cc5d00", normal_honey),
+
+	new GrainType("#635442", normal_charcoal),
+	new GrainType("#4d402f", normal_charcoal),
+	new GrainType("#403122", normal_charcoal),
+	new GrainType("#2d1d10", normal_charcoal),
+	new GrainType("#221105", normal_charcoal),
 
 	new GrainType("#dd7d7d", normal_brick), 
 	new GrainType("#cb6b6b", normal_brick),
