@@ -2493,7 +2493,7 @@ class AcidIce extends FrozenGrain {
 }
 
 class Honey extends Grain {
-	constructor(name = "Honey") {
+	constructor(chanceToUnstick = 0.01, chanceToSlide = 0.01, name = "Honey") {
 		super(1, 0, 10, name); // Very sticky grain with low gravity
 	}
 
@@ -2504,20 +2504,28 @@ class Honey extends Grain {
 			// Then check left and right if there is a garin with gravity than its stuck
 			// It should be moved down if there is space
 
-			let is_honey_below = false;
+			let isHoneyBelow = false;
 			if (result[1][2] !== 0 && result[1][2] !== unexistingGrain) {
 				let belowGrain = grains[result[1][2] - 1];
 				if (belowGrain.type instanceof Honey) {
-					is_honey_below = true;
+					isHoneyBelow = true;
+				}
+			}
+			else if (result[1][2] === 0) {
+				let rnd = getRandom(0.0, 100.0);
+				if (rnd < this.chanceToUnstick * 100) {
+					result[1][2] = result[1][1];
+					result[1][1] = 0;
+					return result;
 				}
 			}
 
-			if (is_honey_below) {
+			if (isHoneyBelow) {
 				if (result[0][1] !== 0 && result[0][1] !== unexistingGrain) {
 					let leftGrain = grains[result[0][1] - 1];
 					if (leftGrain.type.gravity == 1) {
 						// then check for space under
-						if (result[0][2] === 0) {
+						if (result[0][2] === 0 && getRandom(0, 100) < this.chanceToSlide * 100) {
 							result[0][2] = result[0][1];
 							result[0][1] = 0;
 						}
@@ -2529,7 +2537,7 @@ class Honey extends Grain {
 					let rightGrain = grains[result[2][1] - 1];
 					if (rightGrain.type.gravity == 1) {
 						// then check for space under
-						if (result[2][2] === 0) {
+						if (result[2][2] === 0 && getRandom(0, 100) < this.chanceToSlide * 100) {
 							result[2][2] = result[2][1];
 							result[2][1] = 0;
 						}
