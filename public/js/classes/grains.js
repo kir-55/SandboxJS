@@ -2626,6 +2626,15 @@ class Honey extends Grain {
 						var grainObj = grains[sideGrain - 1];
 						if (grainObj.type instanceof Lava || grainObj.type instanceof Fire) {
 							result[1][1] = normal_charcoal.getGrainInt(); // Place charcoal
+							// place smoke all around
+							for (var i = 0; i < 3; i++) {
+								for (var j = 0; j < 3; j++) {
+									if (result[i][j] === 0) {
+										result[i][j] = normal_smoke.getGrainInt();
+									}
+								}
+							}
+
 							return result;
 						}
 					}
@@ -2791,6 +2800,13 @@ class Maggot extends Grain {
         }
         return result;
     }
+}
+
+
+class Smoke extends Grain {
+	constructor(name = "Smoke") {
+		super(0, 0, -10, name); // Smoke rises up with low gravity
+	}
 }
 
 //sourrounding formats:
@@ -3137,7 +3153,12 @@ grains = [
 	new GrainType("#f5e6d3", normal_maggot),
 	new GrainType("#ead5bd", normal_maggot),
 	new GrainType("#dcc8a8", normal_maggot),
-	new GrainType("#c9b48b", normal_maggot)
+	new GrainType("#c9b48b", normal_maggot),
+
+	new GrainType("#3a3a3a", normal_smoke),
+	new GrainType("#4d4d4d", normal_smoke),
+	new GrainType("#5c5c5c", normal_smoke),
+	new GrainType("#6e6e6e", normal_smoke)
 ];
 
 class GrainVariety {
