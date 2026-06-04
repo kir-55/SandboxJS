@@ -2653,7 +2653,7 @@ class Honey extends Grain {
 
 class Maggot extends Grain {
     constructor() {
-        super(0, 0, 1, "Maggot");   // gravity 0 → does not fall or float
+        super(1, 0, 1, "Maggot");   // gravity 1 → falls
         this.chanceToEat = 0.15;    // 15% chance per step to eat adjacent edible grain
         this.chanceToDuplicate = 0.2; // when eating, 20% chance to duplicate if under limit
         // List of grain types that maggots can eat (tunnel through)
