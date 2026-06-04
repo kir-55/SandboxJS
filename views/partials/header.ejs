@@ -7,7 +7,8 @@
         </div>
 
         <!-- Mobile hamburger -->
-        <button class="hamburger" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false" style="font-size: 1.5rem">
+        <button class="hamburger" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false"
+            style="font-size: 1.5rem">
             ☰
         </button>
 
@@ -34,7 +35,7 @@
                     <% } else { %>
                         <li class="hide-mobile"><a href="/login">Login</a></li>
                         <li><a href="/register">Register</a></li>
-                    <% } %>
+                        <% } %>
             </ul>
         </nav>
     </div>
@@ -50,21 +51,20 @@
             <% if (locals.user) { %>
                 <li><a href="/discover">Discover</a></li>
                 <li><a href="/logout" style="display:flex;align-items:center;gap:6px;">
-                    <span class="nav-user">
-                        <%= locals.user.username %>
-                    </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                </a></li>
-            <% } else { %>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
-            <% } %>
+                        <span class="nav-user">
+                            <%= locals.user.username %>
+                        </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </a></li>
+                <% } else { %>
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
+                    <% } %>
         </ul>
     </nav>
 </aside>
@@ -72,13 +72,13 @@
 <style>
     /* ...existing code... */
     .site-header {
-        --site-header-height: 60px; /* used by drawer/backdrop so panel sits under header */
+        --site-header-height: 60px;
+        /* used by drawer/backdrop so panel sits under header */
         position: sticky;
         top: 0;
         z-index: 100;
         background: #fff;
         box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
-        font-family: system-ui, -apple-system, sans-serif;
     }
 
     .header-container {
@@ -130,7 +130,7 @@
         font-weight: 600;
     }
 
-    .nav-user{
+    .nav-user {
         color: var(--accent);
     }
 
@@ -141,9 +141,10 @@
         border: 0;
         padding: 8px;
         cursor: pointer;
-        transition: transform 420ms cubic-bezier(.2,.9,.2,1);
+        transition: transform 420ms cubic-bezier(.2, .9, .2, 1);
         transform-origin: center;
     }
+
     /* spin the hamburger when opened */
     .hamburger[aria-expanded="true"] {
         transform: rotate(360deg);
@@ -165,12 +166,13 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0,0,0,0.35);
+        background: rgba(0, 0, 0, 0.35);
         opacity: 0;
         transition: opacity 200ms ease;
         z-index: 140;
         pointer-events: none;
     }
+
     .drawer-backdrop.visible {
         opacity: 1;
         pointer-events: auto;
@@ -179,22 +181,26 @@
     .mobile-drawer {
         display: none;
         position: fixed;
-        
-        top: var(--site-header-height); /* sit under the header */
+
+        top: var(--site-header-height);
+        /* sit under the header */
         left: 0;
         right: 0;
-        height: fit-content; /* panel drops down under header */
+        height: fit-content;
+        /* panel drops down under header */
         width: 100%;
-        background: #f7f7f8; /* slight gray */
+        background: #f7f7f8;
+        /* slight gray */
         /* removed box-shadow as requested */
         transform: translateY(-110%);
-        transition: transform 300ms cubic-bezier(.2,.9,.2,1);
+        transition: transform 300ms cubic-bezier(.2, .9, .2, 1);
         z-index: 150;
         padding: 18px 16px;
 
 
-        border-bottom: 1px solid rgba(0,0,0,0.04);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     }
+
     .mobile-drawer.open {
         display: flex;
 
@@ -202,6 +208,7 @@
         gap: 12px;
         transform: translateY(0);
     }
+
     .drawer-nav ul {
         list-style: none;
         padding: 0;
@@ -211,6 +218,7 @@
         gap: 8px;
         overflow: auto;
     }
+
     .drawer-nav a {
         display: block;
         padding: 10px;
@@ -218,6 +226,7 @@
         text-decoration: none;
         border-radius: 6px;
     }
+
     .drawer-nav a:hover {
         background: #EFEFEF;
     }
@@ -226,9 +235,11 @@
         .hide-mobile {
             display: none;
         }
+
         .main-nav {
             display: none;
         }
+
         .hamburger {
             display: inline-flex;
             align-items: center;
