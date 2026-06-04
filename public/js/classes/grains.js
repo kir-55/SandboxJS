@@ -2185,6 +2185,7 @@ class Fly extends Grain {
 		diesFrom = [],
 		needsOxygen = true,
 		chanceToDoble = 0.1,
+		sticksToHoney = true,
 		name = "Fly",
 	) {
 		super(0, 0, 4, name);
@@ -2194,6 +2195,7 @@ class Fly extends Grain {
 		this.diesFrom = diesFrom; // The grains this fly dies from
 		this.needsOxygen = needsOxygen; // Whether this fly needs oxygen to live
 		this.chanceToDoble = chanceToDoble; // Chance to double the size
+		this.sticksToHoney = sticksToHoney; // Whether this fly sticks to honey
 	}
 
 	applyPhisics(surrounding) {
@@ -2214,6 +2216,8 @@ class Fly extends Grain {
 					) {
 						var sideGrain = result[x][y];
 						var grainObj = grains[sideGrain - 1];
+
+	
 						//check if touches something from array diesFrom
 						if (this.diesFrom && this.diesFrom.length > 0) {
 							for (var i = 0; i < this.diesFrom.length; i++) {
@@ -2221,6 +2225,10 @@ class Fly extends Grain {
 									result[1][1] = this.meat.getGrainInt(); // Turns into meat
 								}
 							}
+						}
+
+						if (grainObj.type instanceof Honey && this.sticksToHoney) {
+							return result; // Sticks to honey
 						}
 
 						// if has leafs around eats them
@@ -2298,6 +2306,7 @@ class FruitFly extends Fly {
 			[Water, WaterVapor, Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
+			true,
 			name,
 		);
 		this.radioactiveFly = radioactiveFly; // The radioactive fly this fruit fly can turn into
@@ -2322,6 +2331,8 @@ class FruitFly extends Fly {
 							result[1][1] = this.radioactiveFly.getGrainInt();
 							return result;
 						}
+
+
 					}
 				}
 			}
@@ -2350,6 +2361,7 @@ class RadioactiveFly extends Fly {
 			[Water, WaterVapor, Lava],
 			false,
 			0.1,
+			true,
 			name,
 		);
 	}
@@ -2385,6 +2397,7 @@ class Bee extends Fly {
 			[Uran, Water, WaterVapor, Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
+			false,
 			name,
 		);
 	}
