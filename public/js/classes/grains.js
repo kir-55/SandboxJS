@@ -2804,9 +2804,21 @@ class Maggot extends Grain {
 
 
 class Smoke extends Gas {
-	constructor(name = "Smoke") {
+	constructor(chanceToFade = 0.001, name = "Smoke") {
 		super(-10, 0, null, name); // Smoke rises up with low gravity
+		this.chanceToFade = chanceToFade; // Chance to fade away each step
 	}
+
+	applyPhisics(surrounding) {
+		if (getRandom(0, 100) < this.chanceToFade * 100) {
+			let result = surrounding.map(row => row.slice());
+			result[1][1] = 0;
+			return result;
+		}
+		return super.applyPhisics(surrounding);
+		
+	}
+
 }
 
 //sourrounding formats:
