@@ -2174,8 +2174,40 @@ class GrassSprout extends Plant {
 
 
 class Grass extends FlamableGrain{
-	constructor (name = "Grass"){
+	
+	constructor (chanceToGrow = 0.0001, name = "Grass"){
 		super(0, 0, 10, 55, name);
+		this.chanceToGrow = chanceToGrow;
+	}
+
+	applyPhisics(surrounding){
+		var result = super.applyPhisics(surrounding);
+		if (arraysEqual(surrounding, result) && getRandom(0.0, 100.0) < this.chanceToGrow * 100) {
+			for (var x = 0; x < 3; x++) {
+				for (var y = 0; y < 3; y++) {
+					if ((x + y) % 2 === 1) {
+						// if touches dirt or wet dirt then grows 3x3 on empty cells
+						var sideGrain = result[x][y];
+						if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+							var grainObj = grains[sideGrain - 1];
+							if (grainObj.type instanceof Dirt || grainObj.type instanceof WetDirt) {
+								
+									for (var i = 0; i < 3; i++) {
+										for (var j = 0; j < 3; j++) {
+											if (result[i][j] === 0) {
+												result[i][j] = this.getGrainInt();
+											}
+										}
+									}
+									return result;
+								
+							}
+						}
+					}
+				}
+			}
+		}
+		return result;
 	}
 }
 
