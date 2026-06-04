@@ -275,6 +275,34 @@ class Charcoal extends Grain {
 	constructor (name = "Charcoal"){
 		super(0, 0, 5, name);
 	}
+
+	applyPhisics(surrounding){
+		var result = super.applyPhisics(surrounding);
+		if (arraysEqual(surrounding, result)) {
+			for (var x = 0; x < 3; x++) {
+				for (var y = 0; y < 3; y++) {
+					var sideGrain = result[x][y];
+					if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+						var grainObj = grains[sideGrain - 1];
+						if (
+							grainObj.type instanceof Lava ||
+							grainObj.type instanceof MoltenIron
+						) {
+							// places fire around
+							for (var x1 = 0; x1 < 3; x1++) {
+								for (var y1 = 0; y1 < 3; y1++) {
+									if (getRandom(0, 100) < 40 && result[x1][y1] == 0){
+										result[x1][y1] = normal_fire.getGrainInt();
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
 }
 
 class Brick extends Grain {
@@ -1569,6 +1597,7 @@ class Acid extends Liquid {
 			result = destroyNear(result, [GrassSeed], 40, true, 100, 1);
 			result = destroyNear(result, [GrassSprout], 40, true, 100, 1);
 			result = destroyNear(result, [Brick], 40, true, 100, 1);
+			result = destroyNear(result, [Charcoal], 40, true, 100, 1);
 			
 			result = destroyNear(
 				result,
