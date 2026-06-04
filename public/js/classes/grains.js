@@ -2655,7 +2655,7 @@ class Maggot extends Grain {
     constructor() {
         super(1, 0, 1, "Maggot");   // gravity 1 → falls down
         this.chanceToEat = 0.15;        // 15% chance per step to eat adjacent edible grain
-        this.chanceToMove = 0.001;        // 0.1% chance per step to try moving left/right/up
+        this.chanceToMove = 0.01;        // 0.1% chance per step to try moving left/right/up
         // Edible grains – maggot destroys and moves into them
         this.edibleGrains = [Meat, Wood, Leaf, Grass];
         // Burrowable grains – maggot can swap places (travel through)
@@ -2714,36 +2714,36 @@ class Maggot extends Grain {
                 }
             }
 
-            // ----- 2. Try to burrow into adjacent burrowable grain (swap) -----
-            let burrowablePositions = [];
-            for (let x = 0; x < 3; x++) {
-                for (let y = 0; y < 3; y++) {
-                    if ((x + y) % 2 === 1) {
-                        let neighbor = result[x][y];
-                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
-                            let grainObj = grains[neighbor - 1];
-                            for (let burrow of this.burrowableGrains) {
-                                if (grainObj.type instanceof burrow) {
-                                    burrowablePositions.push({x, y});
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (burrowablePositions.length > 0) {
-                let target = burrowablePositions[getRandomInt(0, burrowablePositions.length)];
-                // Swap maggot with the burrowable grain
-                let temp = result[target.x][target.y];
-                result[target.x][target.y] = result[1][1];
-                result[1][1] = temp;
-                return result;
-            }
-
             // ----- 3. Try to move into empty cells (left/right/up) -----
             if (getRandom(0, 100) < this.chanceToMove * 100) {
+				let burrowablePositions = [];
+				for (let x = 0; x < 3; x++) {
+					for (let y = 0; y < 3; y++) {
+						if ((x + y) % 2 === 1) {
+							let neighbor = result[x][y];
+							if (neighbor !== 0 && neighbor !== unexistingGrain) {
+								let grainObj = grains[neighbor - 1];
+								for (let burrow of this.burrowableGrains) {
+									if (grainObj.type instanceof burrow) {
+										burrowablePositions.push({x, y});
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (burrowablePositions.length > 0) {
+					let target = burrowablePositions[getRandomInt(0, burrowablePositions.length)];
+					// Swap maggot with the burrowable grain
+					let temp = result[target.x][target.y];
+					result[target.x][target.y] = result[1][1];
+					result[1][1] = temp;
+					return result;
+				}
+
+
                 let moves = [];
                 if (result[0][1] === 0) moves.push([0, 1]); // left
                 if (result[2][1] === 0) moves.push([2, 1]); // right
