@@ -2655,23 +2655,30 @@ class Maggot extends Grain {
     constructor() {
         super(1, 0, 1, "Maggot");   // gravity 1 → falls down
         this.chanceToEat = 0.15;        // 15% chance per step to eat adjacent edible grain
-        this.chanceToDuplicate = 0.2;   // when eating, 20% chance to duplicate if under limit
         this.chanceToMove = 0.3;        // 30% chance per step to try moving left/right/up
         // List of grain types that maggots can eat (tunnel through)
         this.edibleGrains = [Meat, Wood, Leaf, Grass];
+        // List of grain types that kill the maggot (turn into charcoal)
+        this.deathGrains = [Lava, Fire, MoltenIron];
     }
 
     applyPhisics(surrounding) {
         let result = super.applyPhisics(surrounding);
         if (arraysEqual(surrounding, result)) {
-            // Count nearby maggots (including self) in 3×3 area
-            let maggotCount = 0;
+            // ----- Check for death grains (adjacent or self? Self is not possible, but check adjacent) -----
             for (let x = 0; x < 3; x++) {
                 for (let y = 0; y < 3; y++) {
-                    let grainVal = result[x][y];
-                    if (grainVal !== 0 && grainVal !== unexistingGrain) {
-                        let grainObj = grains[grainVal - 1];
-                        if (grainObj.type instanceof Maggot) maggotCount++;
+                    if ((x + y) % 2 === 1) { // cardinal directions only
+                        let neighbor = result[x][y];
+                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                            let grainObj = grains[neighbor - 1];
+                            for (let deadly of this.deathGrains) {
+                                if (grainObj.type instanceof deadly) {
+                                    result[1][1] = normal_charcoal.getGrainInt();
+                                    return result;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -2680,13 +2687,13 @@ class Maggot extends Grain {
             let ediblePositions = [];
             for (let x = 0; x < 3; x++) {
                 for (let y = 0; y < 3; y++) {
-                    if ((x + y) % 2 === 1) { // cardinal directions only
+                    if ((x + y) % 2 === 1) {
                         let neighbor = result[x][y];
                         if (neighbor !== 0 && neighbor !== unexistingGrain) {
                             let grainObj = grains[neighbor - 1];
                             for (let edible of this.edibleGrains) {
                                 if (grainObj.type instanceof edible) {
-                                    ediblePositions.push({x, y, grainVal: neighbor});
+                                    ediblePositions.push({x, y});
                                     break;
                                 }
                             }
@@ -2701,22 +2708,6 @@ class Maggot extends Grain {
                     // Move maggot into the target cell (replace edible grain)
                     result[target.x][target.y] = result[1][1];
                     result[1][1] = 0;
-
-                    // Duplicate if under the limit (max 2 maggots in 3×3)
-                    if (maggotCount < 2 && getRandom(0, 100) < this.chanceToDuplicate * 100) {
-                        let emptyAdjacent = [];
-                        for (let i = 0; i < 3; i++) {
-                            for (let j = 0; j < 3; j++) {
-                                if ((i + j) % 2 === 1 && result[i][j] === 0) {
-                                    emptyAdjacent.push([i, j]);
-                                }
-                            }
-                        }
-                        if (emptyAdjacent.length > 0) {
-                            let pos = emptyAdjacent[getRandomInt(0, emptyAdjacent.length)];
-                            result[pos[0]][pos[1]] = this.getGrainInt();
-                        }
-                    }
                     return result;
                 }
             }
