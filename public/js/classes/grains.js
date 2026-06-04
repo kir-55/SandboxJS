@@ -2494,7 +2494,7 @@ class AcidIce extends FrozenGrain {
 
 class Honey extends Grain {
 	constructor(chanceToUnstick = 0.01, chanceToSlide = 0.01, name = "Honey") {
-		super(1, 0, 10, name); // Very sticky grain with low gravity
+		super(1, 0, -10, name); // Very sticky grain with low gravity
 
 		this.chanceToUnstick = chanceToUnstick; // Chance to unstick if there is space below
 		this.chanceToSlide = chanceToSlide; // Chance to slide off if there is honey below and space to the side
