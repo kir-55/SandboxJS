@@ -62,11 +62,13 @@ class Grain {
 		// check if touches honey if so, stop the grain
 		for (var x = 0; x < 3; x++) {
 			for (var y = 0; y < 3; y++) {
-				var sideGrain = surrounding[x][y];
-				if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
-					var grainObj = grains[sideGrain - 1];
-					if (grainObj.type instanceof Honey) {
-						return surrounding;
+				if ((x + y) % 2 === 1) {
+					var sideGrain = surrounding[x][y];
+					if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+						var grainObj = grains[sideGrain - 1];
+						if (grainObj.type instanceof Honey) {
+							return surrounding;
+						}
 					}
 				}
 			}
