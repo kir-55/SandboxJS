@@ -59,6 +59,18 @@ class Grain {
 	// 2 - gravity only down
 	// 3 - gravity full up (gas gravity)
 	applyPhisics(surrounding) {
+		// check if touches honey if so, stop the grain
+		for (var x = 0; x < 3; x++) {
+			for (var y = 0; y < 3; y++) {
+				var sideGrain = surrounding[x][y];
+				if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+					var grainObj = grains[sideGrain - 1];
+					if (grainObj.type instanceof Honey) {
+						return surrounding;
+					}
+				}
+			}
+		}
 		if (this.gravity == 1 || this.gravity == 2) {
 			var newSurrounding = JSON.parse(JSON.stringify(surrounding));
 			var self = surrounding[1][1];
@@ -2273,19 +2285,7 @@ class Fly extends Grain {
 	}
 }
 
-class Bee extends Fly {
-	constructor(meat, name = "Bee") {
-		super(
-			meat,
-			0.1,
-			[Leaf, TreeSeed, TreeSprout],
-			[Uran, Water, WaterVapor, Acid, AcidVapor, Fire, Lava, MoltenIron],
-			true,
-			0.1,
-			name,
-		);
-	}
-}
+
 
 class FruitFly extends Fly {
 	constructor(meat, radioactiveFly = null, name = "Fruit Fly") {
@@ -2371,6 +2371,20 @@ class RadioactiveFly extends Fly {
 			}
 		}
 		return result;
+	}
+}
+
+class Bee extends Fly {
+	constructor(meat, name = "Bee") {
+		super(
+			meat,
+			0.1,
+			[Leaf, TreeSeed, TreeSprout],
+			[Uran, Water, WaterVapor, Acid, AcidVapor, Fire, Lava, MoltenIron],
+			true,
+			0.1,
+			name,
+		);
 	}
 }
 
@@ -2473,6 +2487,12 @@ class Ice extends FrozenGrain {
 class AcidIce extends FrozenGrain {
 	constructor(acid = null, name = "Acid Ice") {
 		super(0, acid, name);
+	}
+}
+
+class Honey extends Grain {
+	constructor(name = "Honey") {
+		super(1, 0, 10, name); // Very sticky grain with low gravity
 	}
 }
 
@@ -2590,10 +2610,14 @@ const normal_radioactiveFly = new RadioactiveFly(normal_radioactiveMeat);
 normal_radioactiveMeat.radioactiveFly = normal_radioactiveFly;
 const normal_fly = new FruitFly(normal_meat, normal_radioactiveFly);
 
-const normal_bee = new Bee(normal_meat);
+
+const normal_honey = new Honey();
+const normal_bee = new Bee(normal_honey);
 
 const normal_coal = new Coal();
 const normal_powder_coal = new PowderCoal();
+
+
 
 grains = [
 	new GrainType("#f6d7b0", normal_sand),
@@ -2761,11 +2785,26 @@ grains = [
 	new GrainType("#508356", normal_radioactiveMeat),
 	new GrainType("#3a313e", normal_radioactiveMeat),
 
-	new GrainType("#f9c901", normal_bee),
+	
+	new GrainType("#f6e000", normal_honey),
+	new GrainType("#ffbe42", normal_honey),
+	new GrainType("#ffb100", normal_honey), 
+	new GrainType("#ed8c00", normal_honey),
+	new GrainType("#cc5d00", normal_honey),
+
+	new GrainType("#dd7d7d", normal_brick), 
+	new GrainType("#cb6b6b", normal_brick),
+	new GrainType("#b65454", normal_brick),
+	new GrainType("#9e3333", normal_brick),
+	new GrainType("#842020", normal_brick),
+
+
 	new GrainType("#f6e000", normal_bee),
+	new GrainType("#f9c901", normal_bee),
 	new GrainType("#985b10", normal_bee),
-	new GrainType("#6b4701", normal_bee),
 	new GrainType("#896800", normal_bee),
+	new GrainType("#6b4701", normal_bee),
+
 
 
 	new GrainType("#f9d6d4", normal_fly),
@@ -2777,13 +2816,7 @@ grains = [
 	new GrainType("#c3ff00", normal_radioactiveFly),
 	new GrainType("#88ff00", normal_radioactiveFly),
 	new GrainType("#64ff00", normal_radioactiveFly),
-	new GrainType("#1dff00", normal_radioactiveFly),
-
-	new GrainType("#dd7d7d", normal_brick), 
-	new GrainType("#cb6b6b", normal_brick),
-	new GrainType("#b65454", normal_brick),
-	new GrainType("#9e3333", normal_brick),
-	new GrainType("#842020", normal_brick)
+	new GrainType("#1dff00", normal_radioactiveFly)
 ];
 
 class GrainVariety {
