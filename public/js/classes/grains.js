@@ -2654,12 +2654,12 @@ class Honey extends Grain {
 class Maggot extends Grain {
     constructor() {
         super(1, 0, 1, "Maggot");   // gravity 1 → falls down
-        this.chanceToEat = 0.15;        // 15% chance per step to eat adjacent edible grain
+        this.chanceToEat = 0.01;        // 15% chance per step to eat adjacent edible grain
         this.chanceToMove = 0.01;        // 0.1% chance per step to try moving left/right/up
         // Edible grains – maggot destroys and moves into them
         this.edibleGrains = [Meat, Leaf, Grass];
         // Burrowable grains – maggot can swap places (travel through)
-        this.burrowableGrains = [Dirt, WetDirt, Sand, WetSand, Ash, Charcoal];
+        this.burrowableGrains = [Dirt, WetDirt, Sand, WetSand, Ash, Charcoal, Wood, Honey];
         // Death grains – touching any turns maggot into charcoal
         this.deathGrains = [Liquid, Fire, MoltenIron, AcidVapor, Uran, RadioactiveFly, RadioactiveMeat];
     }
