@@ -2935,6 +2935,8 @@ const normal_charcoal = new Charcoal();
 
 const normal_maggot = new Maggot();
 
+const normal_smoke = new Smoke();
+
 
 grains = [
 	new GrainType("#f6d7b0", normal_sand),
