@@ -315,7 +315,7 @@ class Charcoal extends Grain {
 
 class Ash extends Grain {
 	constructor (name = "Ash"){
-		super(1, 0, 1, name);
+		super(1, 0, 4, name);
 	}
 }
 
