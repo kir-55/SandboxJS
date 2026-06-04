@@ -6,10 +6,37 @@ var shiftPressed = false;
 var lockedAxis = null;
 var dragStart = null;
 
+let undoStack = [];
+const MAX_UNDO = 50;          // limit stack size
+let isDrawing = false;        // prevent multiple saves during the same drag
+
 // Helper for both mouse and touch
 function setPointerPos(x, y) {
 	mousePos.x = x;
 	mousePos.y = y;
+}
+
+function saveToUndo() {
+    // Deep copy the entire screen
+    const snapshot = JSON.parse(JSON.stringify(screen));
+    undoStack.push(snapshot);
+    // Keep stack size manageable
+    if (undoStack.length > MAX_UNDO) {
+        undoStack.shift();
+    }
+}
+
+function undo() {
+    if (undoStack.length === 0) return;
+    const previousScreen = undoStack.pop();
+    // Restore screen
+    for (let i = 0; i < width; i++) {
+        for (let j = 0; j < height; j++) {
+            screen[i][j] = previousScreen[i][j];
+        }
+    }
+    // Redraw immediately
+    drawScreen();
 }
 
 document.getElementById("close-btn").onclick = () => {
@@ -43,6 +70,13 @@ canvas.addEventListener("touchstart", function (event) {
 	const pos = getCanvasCoords(event, canvas);
 	mousePos.x = Math.floor(pos.x / cell_size);
 	mousePos.y = Math.floor(pos.y / cell_size);
+	
+	// SAVE UNDO STATE BEFORE FIRST BRUSH STROKE
+	if (!isDrawing) {
+		saveToUndo();
+		isDrawing = true;
+	}
+	
 	if (mouseInterval) clearInterval(mouseInterval);
 	mouseInterval = setInterval(handleMouse, 20);
 });
@@ -59,6 +93,7 @@ canvas.addEventListener("touchend", function (event) {
 	mouseInterval = null;
 	mousePos.x = -1;
 	mousePos.y = -1;
+	isDrawing = false;      // drawing finished
 });
 
 canvas.addEventListener("touchcancel", function (event) {
@@ -66,6 +101,7 @@ canvas.addEventListener("touchcancel", function (event) {
 	mouseInterval = null;
 	mousePos.x = -1;
 	mousePos.y = -1;
+	isDrawing = false;      // drawing finished
 });
 
 // Grain menu event listeners (replaces the old incorrect touchstart)
@@ -77,6 +113,13 @@ if (grainMenu) {
 
 document.addEventListener("mousedown", function (event) {
 	if (mousePos.x < 0 || mousePos.y < 0) return;
+	
+	// SAVE UNDO STATE BEFORE FIRST BRUSH STROKE
+	if (!isDrawing) {
+		saveToUndo();
+		isDrawing = true;
+	}
+	
 	dragStart = { x: mousePos.x, y: mousePos.y };
 	lockedAxis = null;
 	if (mouseInterval) clearInterval(mouseInterval);
@@ -88,10 +131,13 @@ document.addEventListener("mouseup", function (event) {
 	mouseInterval = null;
 	dragStart = null;
 	lockedAxis = null;
+	isDrawing = false;      // drawing finished
 });
 
 document.addEventListener("mouseleave", function (event) {
 	if (mouseInterval) clearInterval(mouseInterval);
+	// Optional: reset drawing state if mouse leaves canvas
+	isDrawing = false;
 });
 
 // Resize handling
