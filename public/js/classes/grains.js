@@ -1628,6 +1628,9 @@ class Acid extends Liquid {
 			result = destroyNear(result, [GrassSprout], 40, true, 100, 1);
 			result = destroyNear(result, [Brick], 40, true, 100, 1);
 			result = destroyNear(result, [Charcoal], 40, true, 100, 1);
+			result = destroyNear(result, [Coal], 40, true, 100, 1);
+			result = destroyNear(result, [Ash], 40, true, 100, 1);
+			result = destroyNear(result, [PowderCoal], 40, true, 100, 1);
 			
 			result = destroyNear(
 				result,
@@ -2648,6 +2651,81 @@ class Honey extends Grain {
 
 }
 
+class Maggot extends Grain {
+    constructor() {
+        super(0, 0, 1, "Maggot");
+        this.chanceToEat = 0.1;        // 10% chance per step to eat adjacent meat
+        this.chanceToDuplicate = 0.2;   // when eating, 20% chance to duplicate (if under limit)
+    }
+
+    applyPhisics(surrounding) {
+        let result = super.applyPhisics(surrounding);
+        if (arraysEqual(surrounding, result)) {
+            // Count nearby maggots (including self)
+            let maggotCount = 0;
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    let grainVal = result[x][y];
+                    if (grainVal !== 0 && grainVal !== unexistingGrain) {
+                        let grainObj = grains[grainVal - 1];
+                        if (grainObj.type instanceof Maggot) maggotCount++;
+                    }
+                }
+            }
+
+            // 1. Movement: try to move to a random empty cardinal cell
+            let emptySides = [];
+            if (result[0][1] === 0) emptySides.push([0, 1]);
+            if (result[2][1] === 0) emptySides.push([2, 1]);
+            if (result[1][0] === 0) emptySides.push([1, 0]);
+            if (result[1][2] === 0) emptySides.push([1, 2]);
+            if (emptySides.length > 0) {
+                let move = emptySides[getRandomInt(0, emptySides.length)];
+                result[move[0]][move[1]] = result[1][1];
+                result[1][1] = 0;
+                return result;
+            }
+
+            // 2. Eating: check adjacent cells for meat
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1) { // cardinal directions only
+                        let neighbor = result[x][y];
+                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                            let grainObj = grains[neighbor - 1];
+                            if (grainObj.type instanceof Meat &&
+                                getRandom(0, 100) < this.chanceToEat * 100) {
+                                // Eat the meat (remove it)
+                                result[x][y] = 0;
+
+                                // Duplicate if under the limit of 2 maggots
+                                if (maggotCount < 2 &&
+                                    getRandom(0, 100) < this.chanceToDuplicate * 100) {
+                                    // Find an empty cardinal cell to place the new maggot
+                                    let emptyAdjacent = [];
+                                    for (let i = 0; i < 3; i++) {
+                                        for (let j = 0; j < 3; j++) {
+                                            if ((i + j) % 2 === 1 && result[i][j] === 0) {
+                                                emptyAdjacent.push([i, j]);
+                                            }
+                                        }
+                                    }
+                                    if (emptyAdjacent.length > 0) {
+                                        let pos = emptyAdjacent[getRandomInt(0, emptyAdjacent.length)];
+                                        result[pos[0]][pos[1]] = this.getGrainInt();
+                                    }
+                                }
+                                return result;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+}
+
 //sourrounding formats:
 // format 0
 //  0|1|2
@@ -2771,6 +2849,8 @@ const normal_powder_coal = new PowderCoal();
 
 const normal_ash = new Ash();
 const normal_charcoal = new Charcoal();
+
+const normal_maggot = new Maggot();
 
 
 grains = [
@@ -2985,7 +3065,12 @@ grains = [
 	new GrainType("#ffbe42", normal_honey),
 	new GrainType("#ffb100", normal_honey), 
 	new GrainType("#ed8c00", normal_honey),
-	new GrainType("#cc5d00", normal_honey)
+	new GrainType("#cc5d00", normal_honey),
+
+	new GrainType("#f5e6d3", normal_maggot),
+	new GrainType("#ead5bd", normal_maggot),
+	new GrainType("#dcc8a8", normal_maggot),
+	new GrainType("#c9b48b", normal_maggot)
 ];
 
 class GrainVariety {
