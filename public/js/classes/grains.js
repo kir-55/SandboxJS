@@ -2803,9 +2803,9 @@ class Maggot extends Grain {
 }
 
 
-class Smoke extends Grain {
+class Smoke extends Gas {
 	constructor(name = "Smoke") {
-		super(0, 0, -10, name); // Smoke rises up with low gravity
+		super(-10, 0, null, name); // Smoke rises up with low gravity
 	}
 }
 
