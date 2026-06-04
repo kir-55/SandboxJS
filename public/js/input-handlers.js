@@ -136,7 +136,6 @@ document.addEventListener("mouseup", function (event) {
 
 document.addEventListener("mouseleave", function (event) {
 	if (mouseInterval) clearInterval(mouseInterval);
-	// Optional: reset drawing state if mouse leaves canvas
 	isDrawing = false;
 });
 
@@ -169,6 +168,12 @@ window.addEventListener("DOMContentLoaded", resizeCanvasForMobile);
 // Keyboard modifiers
 document.addEventListener("keydown", (e) => {
 	if (e.key === "Shift") shiftPressed = true;
+	
+	// Ctrl+Z to undo
+	if (e.ctrlKey && e.key === "z") {
+		e.preventDefault();
+		undo();
+	}
 });
 document.addEventListener("keyup", (e) => {
 	if (e.key === "Shift") shiftPressed = false;
