@@ -271,7 +271,7 @@ class PowderCoal extends Coal {
 	}
 }
 
-class Charcoal extends Grian {
+class Charcoal extends Grain {
 	constructor (name = "Charcoal"){
 		super(0, 0, 5, name);
 	}
