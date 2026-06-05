@@ -2439,7 +2439,7 @@ class FruitFly extends Fly {
 			meat,
 			0.1,
 			[Leaf, TreeSeed, TreeSprout],
-			[Water, WaterVapor, Acid, AcidVapor, Fire, Lava, MoltenIron],
+			[Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
 			true,
