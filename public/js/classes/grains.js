@@ -2530,7 +2530,7 @@ class Bee extends Fly {
 			meat,
 			0.1,
 			[Leaf, TreeSeed, TreeSprout],
-			[Uran, Water, WaterVapor, Acid, AcidVapor, Fire, Lava, MoltenIron],
+			[Uran, Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
 			false,
