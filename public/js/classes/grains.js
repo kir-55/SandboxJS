@@ -2732,7 +2732,8 @@ class Maggot extends Grain {
         super(1, 0, 1, "Maggot");   // gravity 1 → falls down
         this.chanceToEat = 0.01;   
 		this.chanceToDuplicate = 0.15;  // 15% chance per step to eat adjacent edible grain
-        this.chanceToMove = 0.01;        // 0.1% chance per step to try moving left/right/up
+        this.chanceToMove = 0.01;    
+		this.chanceToDie = 0.00001;    // 0.1% chance per step to try moving left/right/up
         // Edible grains – maggot destroys and moves into them
         this.edibleGrains = [Meat, Leaf, Grass, Honey, TreeSeed, TreeSprout, GrassSprout, GrassSeed];
         // Burrowable grains – maggot can swap places (travel through)
@@ -2744,6 +2745,11 @@ class Maggot extends Grain {
     applyPhisics(surrounding) {
         let result = super.applyPhisics(surrounding);
         if (arraysEqual(surrounding, result)) {
+
+			if (getRandom(0, 100) < this.chanceToDie * 100) {
+				result[1][1] = normal_charcoal.getGrainInt();
+				return result;
+			}
             // ----- Check for death grains (cardinal neighbors) -----
             for (let x = 0; x < 3; x++) {
                 for (let y = 0; y < 3; y++) {
