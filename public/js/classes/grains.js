@@ -1243,6 +1243,7 @@ class WetDirt extends LiquidAffectable {
 	constructor(wetGrain = null, dryGrain = null, chanceToGrowGrass = 0.0001, chanceToGrowTree = 0.00001, name = "Wet Dirt") {
 		super(0, 0, 3, wetGrain, dryGrain, 0, 0, false, true, 0.01, name);
 		this.chanceToGrowGrass = chanceToGrowGrass;
+		this.chanceToGrowTree = chanceToGrowTree;
 	}
 
 	// has a chance to grow grass uptop
