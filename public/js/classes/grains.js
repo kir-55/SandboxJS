@@ -2904,7 +2904,7 @@ class Spider extends FlamableGrain {
         let val = grid[x][y];
         if (val === 0) return false;
         if (val === unexistingGrain) return true;
-        return true; // any other grain blocks movement into it
+        return true;
     }
 
     isEmpty(grid, x, y) {
@@ -2962,7 +2962,6 @@ class Spider extends FlamableGrain {
 
         // ----- STEP 3 – no silk at all → plant initial silk -----
         if (silkCount === 0) {
-            // Find an empty cardinal cell to place the first silk
             let cardinals = [[0,1], [1,0], [2,1], [1,2]];
             let emptySpots = cardinals.filter(([x,y]) => this.isEmpty(result, x, y));
             if (emptySpots.length > 0) {
@@ -2972,7 +2971,7 @@ class Spider extends FlamableGrain {
             return result;
         }
 
-        // ----- STEP 4 – right‑hand wall following (all 8 neighbours) -----
+        // ----- STEP 4 – movement: first try strict right‑hand rule -----
         let possibleMoves = [];
         for (let dx = -1; dx <= 1; dx++) {
             for (let dy = -1; dy <= 1; dy++) {
@@ -2981,31 +2980,45 @@ class Spider extends FlamableGrain {
             }
         }
 
-        let validMoves = [];
+        let strictMoves = [];
+        let fallbackMoves = [];
+
         for (let move of possibleMoves) {
             let mx = 1 + move.dx;
             let my = 1 + move.dy;
-            // Target must be empty AND must touch at least one silk (stay on web)
             if (!this.isEmpty(result, mx, my)) continue;
+            // Must stay on web: target must touch at least one silk
             if (this.countSilkNeighbors(result, mx, my) === 0) continue;
 
-            // Right side vector: rotate (dx, dy) 90° clockwise = (dy, -dx)
+            // Compute right side cell (90° clockwise rotation)
             let rx = 1 + move.dy;
             let ry = 1 + (-move.dx);
             let rightIsWall = this.isBlocking(result, rx, ry) || this.isSilk(result, rx, ry);
+            let score = this.countSilkNeighbors(result, mx, my);
             if (rightIsWall) {
-                let score = this.countSilkNeighbors(result, mx, my);
-                validMoves.push({ move: [mx, my], score });
+                strictMoves.push({ move: [mx, my], score });
+            } else {
+                fallbackMoves.push({ move: [mx, my], score });
             }
         }
 
-        if (validMoves.length > 0 && getRandom(0, 100) < this.chanceToMove * 100) {
-            // Prefer move with most silk neighbours (keeps spider hugging the web)
-            validMoves.sort((a, b) => b.score - a.score);
-            let bestScore = validMoves[0].score;
-            let bestMoves = validMoves.filter(m => m.score === bestScore);
-            let chosen = bestMoves[getRandomInt(0, bestMoves.length)];
-            let [nx, ny] = chosen.move;
+        let chosenMove = null;
+        if (strictMoves.length > 0) {
+            // Prefer strict moves with highest silk neighbour count
+            strictMoves.sort((a, b) => b.score - a.score);
+            let best = strictMoves[0].score;
+            let bestMoves = strictMoves.filter(m => m.score === best);
+            chosenMove = bestMoves[getRandomInt(0, bestMoves.length)];
+        } else if (fallbackMoves.length > 0) {
+            // No strict move – fall back to any web‑connected move (lets spider exit corners)
+            fallbackMoves.sort((a, b) => b.score - a.score);
+            let best = fallbackMoves[0].score;
+            let bestMoves = fallbackMoves.filter(m => m.score === best);
+            chosenMove = bestMoves[getRandomInt(0, bestMoves.length)];
+        }
+
+        if (chosenMove && getRandom(0, 100) < this.chanceToMove * 100) {
+            let [nx, ny] = chosenMove.move;
             result[nx][ny] = selfVal;
             result[1][1] = 0;
             return result;
@@ -3037,7 +3050,6 @@ class Spider extends FlamableGrain {
         return result;
     }
 }
-
 
 //sourrounding formats:
 // format 0
