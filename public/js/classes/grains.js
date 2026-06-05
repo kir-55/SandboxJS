@@ -2637,9 +2637,9 @@ class AcidIce extends FrozenGrain {
 }
 
 class Honey extends Grain {
-	constructor(chanceToUnstick = 0.01, chanceToSlide = 0.01, name = "Honey") {
+	constructor(chanceToUnstick = 0.01, chanceToSlide = 0.01, chanceToWash = 0.01, name = "Honey") {
 		super(1, 0, -10, name); // Very sticky grain with low gravity
-
+		this.chanceToWash = chanceToWash; // Chance to wash away if touches water
 		this.chanceToUnstick = chanceToUnstick; // Chance to unstick if there is space below
 		this.chanceToSlide = chanceToSlide; // Chance to slide off if there is honey below and space to the side
 	}
@@ -2666,6 +2666,11 @@ class Honey extends Grain {
 							}
 
 							return result;
+						}else if (grainObj.type instanceof Water || grainObj.type instanceof PutridWater) {
+							if (getRandom(0, 100) < this.chanceToWash * 100) {
+								result[1][1] = 0;
+								return result;
+							}
 						}
 					}
 				}
