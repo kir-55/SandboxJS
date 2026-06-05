@@ -1579,6 +1579,12 @@ const Water = class Water extends Liquid {
 	}
 };
 
+class PutridWater extends Liquid {
+	constructor(gasForm, name = "Putrid Water") {
+		super(2, true, gasForm, true, name);
+	}
+}
+
 class AcidVapor extends Gas {
 	constructor(normalForm, name = "Acid Vapor") {
 		super(0, 0.01, normalForm, name);
@@ -2276,6 +2282,22 @@ class Meat extends FlamableGrain {
 					result[1][1] += 1; // Increase rot level
 				}
 			}
+			else{
+				// check if touches water then turns everything around into putrid water
+				for (var x = 0; x < 3; x++) {
+					for (var y = 0; y < 3; y++) {
+						var sideGrain = result[x][y];
+						if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+							var grainObj = grains[sideGrain - 1];
+							if (grainObj.type instanceof Water || grainObj.type instanceof  WetDirt || grainObj.type instanceof PutridWater) {
+								result[x][y] = normal_putridWater.getGrainInt();
+								result[1][1] = normal_putridWater.getGrainInt();
+								return result;
+							}
+						}
+					}
+				}
+			}
 		}
 
 		return result;
@@ -2707,7 +2729,7 @@ class Maggot extends Grain {
 		this.chanceToDuplicate = 0.15;  // 15% chance per step to eat adjacent edible grain
         this.chanceToMove = 0.01;        // 0.1% chance per step to try moving left/right/up
         // Edible grains – maggot destroys and moves into them
-        this.edibleGrains = [Meat, Leaf, Grass];
+        this.edibleGrains = [Meat, Leaf, Grass, Honey, TreeSeed, TreeSprout, GrassSprout, GrassSeed];
         // Burrowable grains – maggot can swap places (travel through)
         this.burrowableGrains = [Dirt, WetDirt, Sand, WetSand, Ash, Charcoal, Wood, Honey];
         // Death grains – touching any turns maggot into charcoal
@@ -2872,6 +2894,8 @@ const normal_waterVapor = new WaterVapor(normal_water);
 normal_water.gasForm = normal_waterVapor;
 const normal_ice = new Ice(normal_water);
 
+const normal_putridWater = new PutridWater(normal_waterVapor);
+
 const normal_weakRustIron = new WeakRustIron();
 
 const normal_rustIron = new RustIron(null, null);
@@ -2963,6 +2987,8 @@ const normal_charcoal = new Charcoal();
 const normal_maggot = new Maggot();
 
 const normal_smoke = new Smoke();
+
+
 
 
 grains = [
@@ -3183,6 +3209,12 @@ grains = [
 	new GrainType("#ead5bd", normal_maggot),
 	new GrainType("#dcc8a8", normal_maggot),
 	new GrainType("#c9b48b", normal_maggot),
+
+	new GrainType("#8f9779", normal_putridWater),
+	new GrainType("#78866b", normal_putridWater),
+	new GrainType("#738276", normal_putridWater),
+	new GrainType("#738678", normal_putridWater),
+	new GrainType("#4d5d53", normal_putridWater),
 
 	new GrainType("#0a0a0a", normal_smoke),
 	new GrainType("#111010", normal_smoke),
