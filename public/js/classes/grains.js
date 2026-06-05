@@ -2877,7 +2877,139 @@ class Smoke extends Gas {
 }
 
 class Silk extends StickyGrain {
+	constructor(name = "Silk") {
+		super(1, 0, -5, name); // Sticky grain with normal gravity
+	}
+}
 
+class Spider extends FlamableGrain {
+    constructor(flammability = 10, chanceToDuplicate = 0.1, chanceToMove = 0.3, chanceToPlaceSilk = 0.05, name = "Spider") {
+        super(1, 0, 5, flammability, name);   // gravity 1, density 5
+        this.chanceToDuplicate = chanceToDuplicate;
+        this.chanceToMove = chanceToMove;
+        this.chanceToPlaceSilk = chanceToPlaceSilk;
+        // Edible grains: Meat and various flies
+        this.edibleGrains = [Meat, Fly, FruitFly];
+    }
+
+    applyPhisics(surrounding) {
+        let result = super.applyPhisics(surrounding);
+        if (arraysEqual(surrounding, result)) {
+            // ----- 1. Check for fire (already handled by FlamableGrain, but we keep pattern) -----
+            // (FlamableGrain already turns to fire if flammability condition met)
+
+            // ----- 2. Look for edible grains (Meat, Fly, FruitFly) -----
+            let ediblePositions = [];
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    if ((x + y) % 2 === 1) { // cardinal directions only
+                        let neighbor = result[x][y];
+                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                            let grainObj = grains[neighbor - 1];
+                            for (let edible of this.edibleGrains) {
+                                if (grainObj.type instanceof edible) {
+                                    ediblePositions.push({ x, y });
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (ediblePositions.length > 0) {
+                let target = ediblePositions[getRandomInt(0, ediblePositions.length)];
+                // Eat the food (remove it)
+                result[target.x][target.y] = 0;
+
+                // Chance to duplicate spider into a random adjacent empty cell
+                if (getRandom(0, 100) < this.chanceToDuplicate * 100) {
+                    let emptyAdjacent = [];
+                    for (let i = 0; i < 3; i++) {
+                        for (let j = 0; j < 3; j++) {
+                            if ((i + j) % 2 === 1 && result[i][j] === 0) {
+                                emptyAdjacent.push([i, j]);
+                            }
+                        }
+                    }
+                    if (emptyAdjacent.length > 0) {
+                        let pos = emptyAdjacent[getRandomInt(0, emptyAdjacent.length)];
+                        result[pos[0]][pos[1]] = this.getGrainInt();
+                    }
+                }
+                return result; // spider stays in place after eating
+            }
+
+            // ----- 3. Silk web building logic -----
+            let hasSilkNearby = false;
+            let silkAdjacentCells = [];
+            // Check for existing silk in the 3x3 area
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    let neighbor = result[x][y];
+                    if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                        let grainObj = grains[neighbor - 1];
+                        if (grainObj.type instanceof Silk) {
+                            hasSilkNearby = true;
+                            // Record empty cells adjacent to this silk (but not the spider's own cell)
+                            for (let dx = -1; dx <= 1; dx++) {
+                                for (let dy = -1; dy <= 1; dy++) {
+                                    if ((dx === 0 && dy === 0) || (Math.abs(dx) + Math.abs(dy) !== 1)) continue;
+                                    let nx = x + dx;
+                                    let ny = y + dy;
+                                    if (nx >= 0 && nx < 3 && ny >= 0 && ny < 3 && result[nx][ny] === 0) {
+                                        silkAdjacentCells.push([nx, ny]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (getRandom(0, 100) < this.chanceToPlaceSilk * 100) {
+                let placePosition = null;
+                if (silkAdjacentCells.length > 0) {
+                    // Prefer to place silk next to existing silk (to extend the web)
+                    placePosition = silkAdjacentCells[getRandomInt(0, silkAdjacentCells.length)];
+                } else if (!hasSilkNearby) {
+                    // No silk nearby – start a new web by placing silk in a random empty adjacent cell
+                    let emptyCells = [];
+                    for (let i = 0; i < 3; i++) {
+                        for (let j = 0; j < 3; j++) {
+                            if ((i + j) % 2 === 1 && result[i][j] === 0) {
+                                emptyCells.push([i, j]);
+                            }
+                        }
+                    }
+                    if (emptyCells.length > 0) {
+                        placePosition = emptyCells[getRandomInt(0, emptyCells.length)];
+                    }
+                }
+                if (placePosition) {
+                    result[placePosition[0]][placePosition[1]] = normal_silk.getGrainInt();
+                    return result;
+                }
+            }
+
+            // ----- 4. Movement (crawl to an adjacent empty cell) -----
+            if (getRandom(0, 100) < this.chanceToMove * 100) {
+                let emptyMoves = [];
+                if (result[0][1] === 0) emptyMoves.push([0, 1]); // left
+                if (result[2][1] === 0) emptyMoves.push([2, 1]); // right
+                if (result[1][0] === 0) emptyMoves.push([1, 0]); // up
+                if (result[1][2] === 0) emptyMoves.push([1, 2]); // down (though gravity will pull anyway)
+
+                if (emptyMoves.length > 0) {
+                    let move = emptyMoves[getRandomInt(0, emptyMoves.length)];
+                    result[move[0]][move[1]] = result[1][1];
+                    result[1][1] = 0;
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
 }
 
 
@@ -3013,6 +3145,7 @@ const normal_smoke = new Smoke();
 
 const normal_silk = new Silk();
 
+const normal_spider = new Spider();
 
 
 
@@ -3247,10 +3380,14 @@ grains = [
 	new GrainType("#272727", normal_smoke),
 
 	new GrainType("#e3eeee", normal_silk),
-	new GrainType("#c6d0d0", normal_silk),
-	new GrainType("#b2baba", normal_silk),
-	new GrainType("#a3aaaa", normal_silk),
+	new GrainType("#d8dfdf", normal_silk),
+	new GrainType("#c0caca", normal_silk),
+	new GrainType("#bec5c5", normal_silk),
 
+	new GrainType("#1a0c20", normal_spider),
+	new GrainType("#380d04", normal_spider),
+	new GrainType("#461e1c", normal_spider),
+	new GrainType("#5d3c29", normal_spider)
 ];
 
 class GrainVariety {
