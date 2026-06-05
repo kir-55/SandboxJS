@@ -2742,7 +2742,7 @@ class Maggot extends Grain {
         this.chanceToMove = 0.01;    
 		this.chanceToDie = 0.00001;    // 0.1% chance per step to try moving left/right/up
         // Edible grains – maggot destroys and moves into them
-        this.edibleGrains = [Meat, Leaf, Grass, Honey, TreeSeed, TreeSprout, GrassSprout, GrassSeed];
+        this.edibleGrains = [Meat, Leaf, Grass, Honey, TreeSeed, TreeSprout, GrassSprout, GrassSeed, Maggot];
         // Burrowable grains – maggot can swap places (travel through)
         this.burrowableGrains = [Dirt, WetDirt, Sand, WetSand, Ash, Charcoal, Wood, Honey];
         // Death grains – touching any turns maggot into charcoal
