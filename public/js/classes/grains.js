@@ -2883,13 +2883,12 @@ class Silk extends StickyGrain {
 }
 
 class Spider extends FlamableGrain {
-    constructor(flammability = 10, chanceToDuplicate = 0.05, chanceToMove = 0.4, chanceToPlaceSilk = 0.0015, name = "Spider") {
+    constructor(flammability = 10, chanceToDuplicate = 0.05, chanceToMove = 0.04, chanceToPlaceSilk = 0.0015, name = "Spider") {
         super(0, 0, 5, flammability, name);
         this.chanceToDuplicate = chanceToDuplicate;
         this.chanceToMove = chanceToMove;
         this.chanceToPlaceSilk = chanceToPlaceSilk;
-        this.edibleGrains = [Fly, FruitFly];
-        if (typeof Maggot !== 'undefined') this.edibleGrains.push(Maggot);
+        this.edibleGrains = [Fly, Meat, Maggot];
     }
 
     isSilk(grid, x, y) {
