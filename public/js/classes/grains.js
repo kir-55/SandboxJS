@@ -2881,188 +2881,161 @@ class Silk extends StickyGrain {
 		super(0, 0, -5, name); // Sticky grain with normal gravity
 	}
 }
+
 class Spider extends FlamableGrain {
-    constructor(flammability = 10, chanceToDuplicate = 0.1, chanceToMove = 0.4, chanceToPlaceSilk = 0.2, name = "Spider") {
-        super(0, 0, 5, flammability, name);   // gravity = 0, density 5
+    constructor(flammability = 10, chanceToDuplicate = 0.05, chanceToMove = 0.4, chanceToPlaceSilk = 0.15, name = "Spider") {
+        super(0, 0, 5, flammability, name);
         this.chanceToDuplicate = chanceToDuplicate;
         this.chanceToMove = chanceToMove;
         this.chanceToPlaceSilk = chanceToPlaceSilk;
-        // Edible grains: Meat, Fly, FruitFly, Maggot (if defined)
-        this.edibleGrains = [Meat, Fly, FruitFly];
-        // If Maggot class exists, add it
+        this.edibleGrains = [Fly, FruitFly];
         if (typeof Maggot !== 'undefined') this.edibleGrains.push(Maggot);
     }
 
-    // Helper: check if a cell (x,y) in 3x3 grid contains silk
     isSilk(grid, x, y) {
         if (x < 0 || x >= 3 || y < 0 || y >= 3) return false;
         let val = grid[x][y];
         if (val === 0 || val === unexistingGrain) return false;
-        let grainObj = grains[val - 1];
-        return (grainObj.type instanceof Silk);
+        return (grains[val - 1].type instanceof Silk);
     }
 
-    // Helper: count silk neighbors (all 8 directions) of a cell
+    isBlocking(grid, x, y) {
+        // Blocking = silk, solid, or out of bounds. Empty = not blocking.
+        if (x < 0 || x >= 3 || y < 0 || y >= 3) return true;
+        let val = grid[x][y];
+        if (val === 0) return false;
+        if (val === unexistingGrain) return true;
+        return true; // any grain blocks
+    }
+
+    isEmpty(grid, x, y) {
+        if (x < 0 || x >= 3 || y < 0 || y >= 3) return false;
+        return grid[x][y] === 0;
+    }
+
     countSilkNeighbors(grid, x, y) {
         let count = 0;
-        for (let dx = -1; dx <= 1; dx++) {
+        for (let dx = -1; dx <= 1; dx++)
             for (let dy = -1; dy <= 1; dy++) {
                 if (dx === 0 && dy === 0) continue;
                 if (this.isSilk(grid, x + dx, y + dy)) count++;
             }
-        }
         return count;
     }
 
-    // Helper: check if a cell is empty (0) and inside grid
-    isEmpty(grid, x, y) {
-        if (x < 0 || x >= 3 || y < 0 || y >= 3) return false;
-        return (grid[x][y] === 0);
-    }
-
     applyPhisics(surrounding) {
-        let result = JSON.parse(JSON.stringify(surrounding)); // deep copy to modify
-        let selfVal = result[1][1]; // the spider's own grain ID
+        let result = JSON.parse(JSON.stringify(surrounding));
+        let selfVal = result[1][1];
 
-        // ---------- STEP 1: EAT any adjacent edible grain (8 neighbors) ----------
-        let ediblePositions = [];
+        // STEP 1 — EAT
         for (let x = 0; x < 3; x++) {
             for (let y = 0; y < 3; y++) {
-                if (x === 1 && y === 1) continue; // skip self
-                let neighbor = result[x][y];
-                if (neighbor !== 0 && neighbor !== unexistingGrain) {
-                    let grainObj = grains[neighbor - 1];
-                    for (let edible of this.edibleGrains) {
-                        if (grainObj.type instanceof edible) {
-                            ediblePositions.push({ x, y });
-                            break;
+                if (x === 1 && y === 1) continue;
+                let val = result[x][y];
+                if (val === 0 || val === unexistingGrain) continue;
+                let grainObj = grains[val - 1];
+                let edible = this.edibleGrains.some(e => grainObj.type instanceof e);
+                if (edible) {
+                    result[x][y] = 0;
+                    // chance to spawn new spider in a random empty neighbor
+                    if (getRandom(0, 100) < this.chanceToDuplicate * 100) {
+                        let empties = [];
+                        for (let ex = 0; ex < 3; ex++)
+                            for (let ey = 0; ey < 3; ey++)
+                                if (!(ex === 1 && ey === 1) && this.isEmpty(result, ex, ey))
+                                    empties.push([ex, ey]);
+                        if (empties.length > 0) {
+                            let pos = empties[getRandomInt(0, empties.length)];
+                            result[pos[0]][pos[1]] = selfVal;
                         }
                     }
+                    return result;
                 }
             }
         }
 
-        if (ediblePositions.length > 0) {
-            let target = ediblePositions[getRandomInt(0, ediblePositions.length)];
-            result[target.x][target.y] = 0;   // eat the food
+        // STEP 2 — count silk neighbors (all 8)
+        let silkCount = 0;
+        for (let x = 0; x < 3; x++)
+            for (let y = 0; y < 3; y++) {
+                if (x === 1 && y === 1) continue;
+                if (this.isSilk(result, x, y)) silkCount++;
+            }
 
-            // Duplicate chance: spawn new spider in random empty adjacent cell (cardinal)
-            if (getRandom(0, 100) < this.chanceToDuplicate * 100) {
-                let emptyAdjacent = [];
-                let cardinals = [[0,1], [1,0], [2,1], [1,2]]; // left, up, right, down
-                for (let [dx, dy] of cardinals) {
-                    if (this.isEmpty(result, dx, dy)) {
-                        emptyAdjacent.push([dx, dy]);
-                    }
-                }
-                if (emptyAdjacent.length > 0) {
-                    let pos = emptyAdjacent[getRandomInt(0, emptyAdjacent.length)];
-                    result[pos[0]][pos[1]] = selfVal;
-                }
+        // STEP 3 — no silk at all, plant one and wait
+        if (silkCount === 0) {
+            let empties = [];
+            for (let x = 0; x < 3; x++)
+                for (let y = 0; y < 3; y++)
+                    if (!(x === 1 && y === 1) && this.isEmpty(result, x, y))
+                        empties.push([x, y]);
+            if (empties.length > 0) {
+                let pos = empties[getRandomInt(0, empties.length)];
+                result[pos[0]][pos[1]] = normal_silk.getGrainInt();
             }
             return result;
         }
 
-        // ---------- STEP 2: Am I touching any silk (cardinal only for movement decision)? ----------
-        let hasSilkNearby = false;
-        let cardinals = [[0,1], [1,0], [2,1], [1,2]];
-        for (let [dx, dy] of cardinals) {
-            if (this.isSilk(result, dx, dy)) {
-                hasSilkNearby = true;
-                break;
-            }
-        }
+        // STEP 4 — right-hand wall following
+        // Each entry: move direction (where spider goes), right-side cell (must be silk/blocking)
+        // Spider at [1][1]. Grid is [x][y], x=0 is left, x=2 is right, y=0 is top, y=2 is bottom.
+        //
+        // Moving LEFT  (x=0,y=1): right side of leftward travel = DOWN = [0][2] -> actually
+        // Let's think carefully:
+        //   Facing LEFT  means moving to [0][1]. Right of LEFT is UP.    Right cell = [0][0]
+        //   Facing RIGHT means moving to [2][1]. Right of RIGHT is DOWN.  Right cell = [2][2]
+        //   Facing UP    means moving to [1][0]. Right of UP is RIGHT.   Right cell = [2][0]
+        //   Facing DOWN  means moving to [1][2]. Right of DOWN is LEFT.   Right cell = [0][2]
 
-        // ---------- STEP 3: No silk nearby -> plant one silk in a random empty cardinal neighbor ----------
-        if (!hasSilkNearby) {
-            if (getRandom(0, 100) < this.chanceToPlaceSilk * 100) {
-                let emptyCardinals = [];
-                for (let [dx, dy] of cardinals) {
-                    if (this.isEmpty(result, dx, dy)) {
-                        emptyCardinals.push([dx, dy]);
-                    }
-                }
-                if (emptyCardinals.length > 0) {
-                    let pos = emptyCardinals[getRandomInt(0, emptyCardinals.length)];
-                    result[pos[0]][pos[1]] = normal_silk.getGrainInt();
-                }
-            }
-            return result; // do not move this tick
-        }
-
-        // ---------- STEP 4: Move using "right‑hand rule" (silk stays on right) ----------
-        // Direction vectors for cardinal moves and their corresponding "right" cells
         const directions = [
-            { move: [0,1], right: [1,0] },   // left  → right is up
-            { move: [2,1], right: [1,2] },   // right → right is down
-            { move: [1,0], right: [2,1] },   // up    → right is right
-            { move: [1,2], right: [0,1] }    // down  → right is left
+            { move: [0, 1], right: [0, 0] },  // move LEFT,  right side is UP-LEFT
+            { move: [2, 1], right: [2, 2] },  // move RIGHT, right side is DOWN-RIGHT
+            { move: [1, 0], right: [2, 0] },  // move UP,    right side is UP-RIGHT
+            { move: [1, 2], right: [0, 2] },  // move DOWN,  right side is DOWN-LEFT
         ];
 
         let validMoves = [];
-
         for (let dir of directions) {
             let [mx, my] = dir.move;
             let [rx, ry] = dir.right;
-
-            // Target cell must be empty
-            if (this.isEmpty(result, mx, my)) {
-                // Check if right cell is silk OR out of bounds (treat as silk)
-                let rightIsSilk = false;
-                if (rx < 0 || rx >= 3 || ry < 0 || ry >= 3) {
-                    rightIsSilk = true; // out of bounds counts as silk (wall)
-                } else {
-                    rightIsSilk = this.isSilk(result, rx, ry);
-                }
-
-                if (rightIsSilk) {
-                    // Score this move by number of silk neighbors around destination (for tie‑breaker)
-                    let score = this.countSilkNeighbors(result, mx, my);
-                    validMoves.push({ move: [mx, my], score: score });
-                }
+            if (!this.isEmpty(result, mx, my)) continue;
+            // Right side must be silk or blocking (wall/out-of-bounds)
+            let rightIsWall = this.isBlocking(result, rx, ry) || this.isSilk(result, rx, ry);
+            if (rightIsWall) {
+                let score = this.countSilkNeighbors(result, mx, my);
+                validMoves.push({ move: [mx, my], score });
             }
         }
 
-        // Decide whether to move (chanceToMove)
-        if (getRandom(0, 100) < this.chanceToMove * 100 && validMoves.length > 0) {
-            // Choose move with highest score (most silk neighbors), random if tie
+        // Move only if chance allows and valid moves exist
+        if (validMoves.length > 0 && getRandom(0, 100) < this.chanceToMove * 100) {
+            // Prefer move with most silk neighbors (keeps spider hugging the web)
             validMoves.sort((a, b) => b.score - a.score);
-            let bestScore = validMoves[0].score;
-            let bestMoves = validMoves.filter(m => m.score === bestScore);
-            let chosen = bestMoves[getRandomInt(0, bestMoves.length)];
-            let [newX, newY] = chosen.move;
-
-            // Move spider
-            result[newX][newY] = selfVal;
+            let best = validMoves[0].score;
+            let candidates = validMoves.filter(m => m.score === best);
+            let chosen = candidates[getRandomInt(0, candidates.length)];
+            let [nx, ny] = chosen.move;
+            result[nx][ny] = selfVal;
             result[1][1] = 0;
-            return result;
+            return result; // return immediately — no silk placement after moving
         }
 
-        // ---------- STEP 5: Grow the web (place new silk touching existing silk) ----------
+        // STEP 5 — grow web (only if spider did NOT move this tick)
         if (getRandom(0, 100) < this.chanceToPlaceSilk * 100) {
-            // Find all empty cells that have at least one silk neighbor (including diagonals)
             let candidates = [];
-            for (let x = 0; x < 3; x++) {
+            for (let x = 0; x < 3; x++)
                 for (let y = 0; y < 3; y++) {
-                    if (this.isEmpty(result, x, y)) {
-                        // Check if any neighbor (8‑way) is silk
-                        let touchesSilk = false;
-                        for (let dx = -1; dx <= 1; dx++) {
-                            for (let dy = -1; dy <= 1; dy++) {
-                                if (dx === 0 && dy === 0) continue;
-                                if (this.isSilk(result, x + dx, y + dy)) {
-                                    touchesSilk = true;
-                                    break;
-                                }
-                            }
-                            if (touchesSilk) break;
+                    if (x === 1 && y === 1) continue;
+                    if (!this.isEmpty(result, x, y)) continue;
+                    // Must touch existing silk
+                    let touchesSilk = false;
+                    for (let dx = -1; dx <= 1 && !touchesSilk; dx++)
+                        for (let dy = -1; dy <= 1 && !touchesSilk; dy++) {
+                            if (dx === 0 && dy === 0) continue;
+                            if (this.isSilk(result, x + dx, y + dy)) touchesSilk = true;
                         }
-                        if (touchesSilk) {
-                            candidates.push([x, y]);
-                        }
-                    }
+                    if (touchesSilk) candidates.push([x, y]);
                 }
-            }
             if (candidates.length > 0) {
                 let pos = candidates[getRandomInt(0, candidates.length)];
                 result[pos[0]][pos[1]] = normal_silk.getGrainInt();
