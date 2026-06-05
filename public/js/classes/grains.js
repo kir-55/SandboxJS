@@ -1434,7 +1434,7 @@ class Plant extends FlamableGrain {
 
 class Wood extends FlamableGrain {
 	constructor(name = "Wood") {
-		super(0, 0, 10, 55, name);
+		super(0, 0, 10, 10, name);
 	}
 
 	
@@ -2878,7 +2878,7 @@ class Smoke extends Gas {
 
 class Silk extends StickyGrain {
 	constructor(name = "Silk") {
-		super(0, 0, -5, 2, name); // Sticky grain with normal gravity
+		super(0, 0, -5, 20, name); // Sticky grain with normal gravity
 	}
 }
 
