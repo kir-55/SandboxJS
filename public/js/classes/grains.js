@@ -2904,7 +2904,7 @@ class Spider extends FlamableGrain {
         let val = grid[x][y];
         if (val === 0) return false;
         if (val === unexistingGrain) return true;
-        return true;
+        return true; // any other grain blocks movement into it
     }
 
     isEmpty(grid, x, y) {
@@ -2960,10 +2960,16 @@ class Spider extends FlamableGrain {
                 if (this.isSilk(result, x, y)) silkCount++;
             }
 
-        // ----- STEP 3 – If no silk exists at all, the spider cannot move or place silk -----
-        // The user must manually place the first silk. Spider will just sit idle.
+        // ----- STEP 3 – no silk at all → plant initial silk -----
         if (silkCount === 0) {
-            return result;   // no silk → do nothing
+            // Find an empty cardinal cell to place the first silk
+            let cardinals = [[0,1], [1,0], [2,1], [1,2]];
+            let emptySpots = cardinals.filter(([x,y]) => this.isEmpty(result, x, y));
+            if (emptySpots.length > 0) {
+                let pos = emptySpots[getRandomInt(0, emptySpots.length)];
+                result[pos[0]][pos[1]] = normal_silk.getGrainInt();
+            }
+            return result;
         }
 
         // ----- STEP 4 – right‑hand wall following (all 8 neighbours) -----
@@ -2979,8 +2985,11 @@ class Spider extends FlamableGrain {
         for (let move of possibleMoves) {
             let mx = 1 + move.dx;
             let my = 1 + move.dy;
+            // Target must be empty AND must touch at least one silk (stay on web)
             if (!this.isEmpty(result, mx, my)) continue;
+            if (this.countSilkNeighbors(result, mx, my) === 0) continue;
 
+            // Right side vector: rotate (dx, dy) 90° clockwise = (dy, -dx)
             let rx = 1 + move.dy;
             let ry = 1 + (-move.dx);
             let rightIsWall = this.isBlocking(result, rx, ry) || this.isSilk(result, rx, ry);
@@ -2991,6 +3000,7 @@ class Spider extends FlamableGrain {
         }
 
         if (validMoves.length > 0 && getRandom(0, 100) < this.chanceToMove * 100) {
+            // Prefer move with most silk neighbours (keeps spider hugging the web)
             validMoves.sort((a, b) => b.score - a.score);
             let bestScore = validMoves[0].score;
             let bestMoves = validMoves.filter(m => m.score === bestScore);
