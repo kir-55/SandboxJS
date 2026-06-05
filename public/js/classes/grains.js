@@ -2883,7 +2883,7 @@ class Silk extends StickyGrain {
 }
 
 class Spider extends FlamableGrain {
-    constructor(flammability = 10, chanceToDuplicate = 0.05, chanceToMove = 0.4, chanceToPlaceSilk = 0.15, name = "Spider") {
+    constructor(flammability = 10, chanceToDuplicate = 0.05, chanceToMove = 0.4, chanceToPlaceSilk = 0.00015, name = "Spider") {
         super(0, 0, 5, flammability, name);
         this.chanceToDuplicate = chanceToDuplicate;
         this.chanceToMove = chanceToMove;
