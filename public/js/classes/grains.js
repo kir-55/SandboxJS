@@ -1223,13 +1223,13 @@ class HeatSensor extends Sensor {
 
 class Sand extends LiquidAffectable {
 	constructor(wetGrain = null, dryGrain = null, name = "Sand") {
-		super(1, 0, 3, wetGrain, dryGrain, 3, 0.01, true, false, 0, name);
+		super(1, 0, 5, wetGrain, dryGrain, 3, 0.01, true, false, 0, name);
 	}
 }
 
 class WetSand extends LiquidAffectable {
 	constructor(wetGrain = null, dryGrain = null, name = "Wet Sand") {
-		super(0, 0, 3, wetGrain, dryGrain, 0, 0, false, true, 0.01, name);
+		super(0, 0, 6, wetGrain, dryGrain, 0, 0, false, true, 0.01, name);
 	}
 }
 
