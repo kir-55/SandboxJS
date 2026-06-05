@@ -2703,7 +2703,8 @@ class Honey extends Grain {
 class Maggot extends Grain {
     constructor() {
         super(1, 0, 1, "Maggot");   // gravity 1 → falls down
-        this.chanceToEat = 0.01;        // 15% chance per step to eat adjacent edible grain
+        this.chanceToEat = 0.01;   
+		this.chanceToDuplicate = 0.15;  // 15% chance per step to eat adjacent edible grain
         this.chanceToMove = 0.01;        // 0.1% chance per step to try moving left/right/up
         // Edible grains – maggot destroys and moves into them
         this.edibleGrains = [Meat, Leaf, Grass];
@@ -2758,7 +2759,13 @@ class Maggot extends Grain {
                 if (getRandom(0, 100) < this.chanceToEat * 100) {
                     // Move maggot into target cell (destroy edible grain)
                     result[target.x][target.y] = result[1][1];
-                    result[1][1] = 0;
+
+					if (getRandom(0, 100) < this.chanceToDuplicate * 100) {
+						// Chance to duplicate (leave a new maggot in the original cell)
+						result[1][1] = this.getGrainInt();
+					}else{
+                    	result[1][1] = 0;
+					}
                     return result;
                 }
             }
