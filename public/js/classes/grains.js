@@ -2636,16 +2636,16 @@ class AcidIce extends FrozenGrain {
 	}
 }
 
-class StickyGrain extends Grain {
-	constructor(gravity, surroundingFormat, density, name = "Sticky Grain") {
-		super(gravity, surroundingFormat, density, name);
+class StickyGrain extends FlamableGrain {
+	constructor(gravity, surroundingFormat, density, flammability, name = "Sticky Grain") {
+		super(gravity, surroundingFormat, density, flammability, name);
 	}
 }
 
 
 class Honey extends StickyGrain {
 	constructor(chanceToUnstick = 0.01, chanceToSlide = 0.01, chanceToWash = 0.01, name = "Honey") {
-		super(1, 0, -10, name); // Very sticky grain with low gravity
+		super(1, 0, -10, 0, name); // Very sticky grain with low gravity
 		this.chanceToWash = chanceToWash; // Chance to wash away if touches water
 		this.chanceToUnstick = chanceToUnstick; // Chance to unstick if there is space below
 		this.chanceToSlide = chanceToSlide; // Chance to slide off if there is honey below and space to the side
@@ -2878,7 +2878,7 @@ class Smoke extends Gas {
 
 class Silk extends StickyGrain {
 	constructor(name = "Silk") {
-		super(0, 0, -5, name); // Sticky grain with normal gravity
+		super(0, 0, -5, 0.1, name); // Sticky grain with normal gravity
 	}
 }
 
