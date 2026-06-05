@@ -2881,159 +2881,194 @@ class Silk extends StickyGrain {
 		super(0, 0, -5, name); // Sticky grain with normal gravity
 	}
 }
-
 class Spider extends FlamableGrain {
-    constructor(flammability = 10, chanceToDuplicate = 0.1, chanceToMove = 0.3, chanceToPlaceSilk = 0.05, name = "Spider") {
+    constructor(flammability = 10, chanceToDuplicate = 0.1, chanceToMove = 0.4, chanceToPlaceSilk = 0.2, name = "Spider") {
         super(0, 0, 5, flammability, name);   // gravity = 0, density 5
         this.chanceToDuplicate = chanceToDuplicate;
         this.chanceToMove = chanceToMove;
         this.chanceToPlaceSilk = chanceToPlaceSilk;
+        // Edible grains: Meat, Fly, FruitFly, Maggot (if defined)
         this.edibleGrains = [Meat, Fly, FruitFly];
-        this.direction = 0;    // 0=up, 1=right, 2=down, 3=left
+        // If Maggot class exists, add it
+        if (typeof Maggot !== 'undefined') this.edibleGrains.push(Maggot);
     }
 
-    // Helper: check if a cell (x,y) in 3x3 grid touches any silk (cardinal neighbours)
-    cellTouchesSilk(grid, x, y) {
-        const dirs = [[0,1],[1,0],[2,1],[1,2]]; // left, up, right, down in surrounding coords
-        for (let [nx, ny] of dirs) {
-            if (nx === x && ny === y) continue;
-            if (nx >= 0 && nx < 3 && ny >= 0 && ny < 3) {
-                let neighbor = grid[nx][ny];
-                if (neighbor !== 0 && neighbor !== unexistingGrain) {
-                    let grainObj = grains[neighbor - 1];
-                    if (grainObj.type instanceof Silk) return true;
-                }
+    // Helper: check if a cell (x,y) in 3x3 grid contains silk
+    isSilk(grid, x, y) {
+        if (x < 0 || x >= 3 || y < 0 || y >= 3) return false;
+        let val = grid[x][y];
+        if (val === 0 || val === unexistingGrain) return false;
+        let grainObj = grains[val - 1];
+        return (grainObj.type instanceof Silk);
+    }
+
+    // Helper: count silk neighbors (all 8 directions) of a cell
+    countSilkNeighbors(grid, x, y) {
+        let count = 0;
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                if (dx === 0 && dy === 0) continue;
+                if (this.isSilk(grid, x + dx, y + dy)) count++;
             }
         }
-        return false;
+        return count;
+    }
+
+    // Helper: check if a cell is empty (0) and inside grid
+    isEmpty(grid, x, y) {
+        if (x < 0 || x >= 3 || y < 0 || y >= 3) return false;
+        return (grid[x][y] === 0);
     }
 
     applyPhisics(surrounding) {
-        let result = super.applyPhisics(surrounding);
-        if (arraysEqual(surrounding, result)) {
-            // ----- 1. Eat adjacent edible grains -----
-            let ediblePositions = [];
-            for (let x = 0; x < 3; x++) {
-                for (let y = 0; y < 3; y++) {
-                    if ((x + y) % 2 === 1) {
-                        let neighbor = result[x][y];
-                        if (neighbor !== 0 && neighbor !== unexistingGrain) {
-                            let grainObj = grains[neighbor - 1];
-                            for (let edible of this.edibleGrains) {
-                                if (grainObj.type instanceof edible) {
-                                    ediblePositions.push({ x, y });
-                                    break;
-                                }
-                            }
+        let result = JSON.parse(JSON.stringify(surrounding)); // deep copy to modify
+        let selfVal = result[1][1]; // the spider's own grain ID
+
+        // ---------- STEP 1: EAT any adjacent edible grain (8 neighbors) ----------
+        let ediblePositions = [];
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                if (x === 1 && y === 1) continue; // skip self
+                let neighbor = result[x][y];
+                if (neighbor !== 0 && neighbor !== unexistingGrain) {
+                    let grainObj = grains[neighbor - 1];
+                    for (let edible of this.edibleGrains) {
+                        if (grainObj.type instanceof edible) {
+                            ediblePositions.push({ x, y });
+                            break;
                         }
-                    }
-                }
-            }
-
-            if (ediblePositions.length > 0) {
-                let target = ediblePositions[getRandomInt(0, ediblePositions.length)];
-                result[target.x][target.y] = 0;   // eat
-
-                // Duplicate chance
-                if (getRandom(0, 100) < this.chanceToDuplicate * 100) {
-                    let emptyAdjacent = [];
-                    for (let i = 0; i < 3; i++) {
-                        for (let j = 0; j < 3; j++) {
-                            if ((i + j) % 2 === 1 && result[i][j] === 0) {
-                                emptyAdjacent.push([i, j]);
-                            }
-                        }
-                    }
-                    if (emptyAdjacent.length > 0) {
-                        let pos = emptyAdjacent[getRandomInt(0, emptyAdjacent.length)];
-                        result[pos[0]][pos[1]] = this.getGrainInt();
-                    }
-                }
-                return result;
-            }
-
-            // ----- 2. Rare silk placement (extend web) -----
-            let hasSilkNearby = false;
-            let silkAdjacentEmptyCells = [];
-            for (let x = 0; x < 3; x++) {
-                for (let y = 0; y < 3; y++) {
-                    let neighbor = result[x][y];
-                    if (neighbor !== 0 && neighbor !== unexistingGrain) {
-                        let grainObj = grains[neighbor - 1];
-                        if (grainObj.type instanceof Silk) {
-                            hasSilkNearby = true;
-                            for (let dx = -1; dx <= 1; dx++) {
-                                for (let dy = -1; dy <= 1; dy++) {
-                                    if ((dx === 0 && dy === 0) || (Math.abs(dx) + Math.abs(dy) !== 1)) continue;
-                                    let nx = x + dx;
-                                    let ny = y + dy;
-                                    if (nx >= 0 && nx < 3 && ny >= 0 && ny < 3 && result[nx][ny] === 0) {
-                                        if (!silkAdjacentEmptyCells.some(pos => pos[0] === nx && pos[1] === ny)) {
-                                            silkAdjacentEmptyCells.push([nx, ny]);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (getRandom(0, 100) < this.chanceToPlaceSilk * 100) {
-                let placePosition = null;
-                if (silkAdjacentEmptyCells.length > 0) {
-                    placePosition = silkAdjacentEmptyCells[getRandomInt(0, silkAdjacentEmptyCells.length)];
-                } else if (!hasSilkNearby) {
-                    let emptyCells = [];
-                    for (let i = 0; i < 3; i++) {
-                        for (let j = 0; j < 3; j++) {
-                            if ((i + j) % 2 === 1 && result[i][j] === 0) {
-                                emptyCells.push([i, j]);
-                            }
-                        }
-                    }
-                    if (emptyCells.length > 0) {
-                        placePosition = emptyCells[getRandomInt(0, emptyCells.length)];
-                    }
-                }
-                if (placePosition) {
-                    result[placePosition[0]][placePosition[1]] = normal_silk.getGrainInt();
-                    return result;
-                }
-            }
-
-            // ----- 3. Movement: left‑hand rule, only onto cells touching silk -----
-            if (getRandom(0, 100) < this.chanceToMove * 100) {
-                // Direction vectors for 3x3 surrounding grid (center is [1,1])
-                const dirVectors = [
-                    [1, 0],   // up
-                    [2, 1],   // right
-                    [1, 2],   // down
-                    [0, 1]    // left
-                ];
-
-                // Order: left of current direction, forward, right, backward
-                let leftDir = (this.direction + 3) % 4;
-                let forwardDir = this.direction;
-                let rightDir = (this.direction + 1) % 4;
-                let backDir = (this.direction + 2) % 4;
-
-                const order = [leftDir, forwardDir, rightDir, backDir];
-
-                for (let tryDir of order) {
-                    let [dx, dy] = dirVectors[tryDir];
-                    let targetX = dx, targetY = dy;
-                    // Target cell must be empty AND must touch silk
-                    if (result[targetX][targetY] === 0 && this.cellTouchesSilk(result, targetX, targetY)) {
-                        // Move spider
-                        result[targetX][targetY] = result[1][1];
-                        result[1][1] = 0;
-                        this.direction = tryDir;   // remember new direction
-                        return result;
                     }
                 }
             }
         }
+
+        if (ediblePositions.length > 0) {
+            let target = ediblePositions[getRandomInt(0, ediblePositions.length)];
+            result[target.x][target.y] = 0;   // eat the food
+
+            // Duplicate chance: spawn new spider in random empty adjacent cell (cardinal)
+            if (getRandom(0, 100) < this.chanceToDuplicate * 100) {
+                let emptyAdjacent = [];
+                let cardinals = [[0,1], [1,0], [2,1], [1,2]]; // left, up, right, down
+                for (let [dx, dy] of cardinals) {
+                    if (this.isEmpty(result, dx, dy)) {
+                        emptyAdjacent.push([dx, dy]);
+                    }
+                }
+                if (emptyAdjacent.length > 0) {
+                    let pos = emptyAdjacent[getRandomInt(0, emptyAdjacent.length)];
+                    result[pos[0]][pos[1]] = selfVal;
+                }
+            }
+            return result;
+        }
+
+        // ---------- STEP 2: Am I touching any silk (cardinal only for movement decision)? ----------
+        let hasSilkNearby = false;
+        let cardinals = [[0,1], [1,0], [2,1], [1,2]];
+        for (let [dx, dy] of cardinals) {
+            if (this.isSilk(result, dx, dy)) {
+                hasSilkNearby = true;
+                break;
+            }
+        }
+
+        // ---------- STEP 3: No silk nearby -> plant one silk in a random empty cardinal neighbor ----------
+        if (!hasSilkNearby) {
+            if (getRandom(0, 100) < this.chanceToPlaceSilk * 100) {
+                let emptyCardinals = [];
+                for (let [dx, dy] of cardinals) {
+                    if (this.isEmpty(result, dx, dy)) {
+                        emptyCardinals.push([dx, dy]);
+                    }
+                }
+                if (emptyCardinals.length > 0) {
+                    let pos = emptyCardinals[getRandomInt(0, emptyCardinals.length)];
+                    result[pos[0]][pos[1]] = normal_silk.getGrainInt();
+                }
+            }
+            return result; // do not move this tick
+        }
+
+        // ---------- STEP 4: Move using "right‑hand rule" (silk stays on right) ----------
+        // Direction vectors for cardinal moves and their corresponding "right" cells
+        const directions = [
+            { move: [0,1], right: [1,0] },   // left  → right is up
+            { move: [2,1], right: [1,2] },   // right → right is down
+            { move: [1,0], right: [2,1] },   // up    → right is right
+            { move: [1,2], right: [0,1] }    // down  → right is left
+        ];
+
+        let validMoves = [];
+
+        for (let dir of directions) {
+            let [mx, my] = dir.move;
+            let [rx, ry] = dir.right;
+
+            // Target cell must be empty
+            if (this.isEmpty(result, mx, my)) {
+                // Check if right cell is silk OR out of bounds (treat as silk)
+                let rightIsSilk = false;
+                if (rx < 0 || rx >= 3 || ry < 0 || ry >= 3) {
+                    rightIsSilk = true; // out of bounds counts as silk (wall)
+                } else {
+                    rightIsSilk = this.isSilk(result, rx, ry);
+                }
+
+                if (rightIsSilk) {
+                    // Score this move by number of silk neighbors around destination (for tie‑breaker)
+                    let score = this.countSilkNeighbors(result, mx, my);
+                    validMoves.push({ move: [mx, my], score: score });
+                }
+            }
+        }
+
+        // Decide whether to move (chanceToMove)
+        if (getRandom(0, 100) < this.chanceToMove * 100 && validMoves.length > 0) {
+            // Choose move with highest score (most silk neighbors), random if tie
+            validMoves.sort((a, b) => b.score - a.score);
+            let bestScore = validMoves[0].score;
+            let bestMoves = validMoves.filter(m => m.score === bestScore);
+            let chosen = bestMoves[getRandomInt(0, bestMoves.length)];
+            let [newX, newY] = chosen.move;
+
+            // Move spider
+            result[newX][newY] = selfVal;
+            result[1][1] = 0;
+            return result;
+        }
+
+        // ---------- STEP 5: Grow the web (place new silk touching existing silk) ----------
+        if (getRandom(0, 100) < this.chanceToPlaceSilk * 100) {
+            // Find all empty cells that have at least one silk neighbor (including diagonals)
+            let candidates = [];
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    if (this.isEmpty(result, x, y)) {
+                        // Check if any neighbor (8‑way) is silk
+                        let touchesSilk = false;
+                        for (let dx = -1; dx <= 1; dx++) {
+                            for (let dy = -1; dy <= 1; dy++) {
+                                if (dx === 0 && dy === 0) continue;
+                                if (this.isSilk(result, x + dx, y + dy)) {
+                                    touchesSilk = true;
+                                    break;
+                                }
+                            }
+                            if (touchesSilk) break;
+                        }
+                        if (touchesSilk) {
+                            candidates.push([x, y]);
+                        }
+                    }
+                }
+            }
+            if (candidates.length > 0) {
+                let pos = candidates[getRandomInt(0, candidates.length)];
+                result[pos[0]][pos[1]] = normal_silk.getGrainInt();
+            }
+        }
+
         return result;
     }
 }
