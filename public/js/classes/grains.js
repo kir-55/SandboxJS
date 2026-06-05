@@ -66,7 +66,7 @@ class Grain {
 					var sideGrain = surrounding[x][y];
 					if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 						var grainObj = grains[sideGrain - 1];
-						if (grainObj.type instanceof Honey) {
+						if (grainObj.type instanceof StickyGrain) {
 							return surrounding;
 						}
 					}
@@ -2358,7 +2358,7 @@ class Fly extends Grain {
 							}
 						}
 
-						if (grainObj.type instanceof Honey && this.sticksToHoney) {
+						if ((grainObj.type instanceof Honey && this.sticksToHoney) || (grainObj.type instanceof Silk)) {
 							return result; // Sticks to honey
 						}
 
@@ -2636,7 +2636,14 @@ class AcidIce extends FrozenGrain {
 	}
 }
 
-class Honey extends Grain {
+class StickyGrain extends Grain {
+	constructor(gravity, surroundingFormat, density, name = "Sticky Grain") {
+		super(gravity, surroundingFormat, density, name);
+	}
+}
+
+
+class Honey extends StickyGrain {
 	constructor(chanceToUnstick = 0.01, chanceToSlide = 0.01, chanceToWash = 0.01, name = "Honey") {
 		super(1, 0, -10, name); // Very sticky grain with low gravity
 		this.chanceToWash = chanceToWash; // Chance to wash away if touches water
@@ -2869,6 +2876,11 @@ class Smoke extends Gas {
 
 }
 
+class Silk extends StickyGrain {
+
+}
+
+
 //sourrounding formats:
 // format 0
 //  0|1|2
@@ -2998,6 +3010,8 @@ const normal_charcoal = new Charcoal();
 const normal_maggot = new Maggot();
 
 const normal_smoke = new Smoke();
+
+const normal_silk = new Silk();
 
 
 
@@ -3230,7 +3244,13 @@ grains = [
 	new GrainType("#0a0a0a", normal_smoke),
 	new GrainType("#111010", normal_smoke),
 	new GrainType("#2b2b2b", normal_smoke),
-	new GrainType("#272727", normal_smoke)
+	new GrainType("#272727", normal_smoke),
+
+	new GrainType("#e3eeee", normal_silk),
+	new GrainType("#c6d0d0", normal_silk),
+	new GrainType("#b2baba", normal_silk),
+	new GrainType("#a3aaaa", normal_silk),
+
 ];
 
 class GrainVariety {
