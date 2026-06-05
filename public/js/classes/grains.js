@@ -2895,8 +2895,7 @@ class Spider extends FlamableGrain {
     applyPhisics(surrounding) {
         let result = super.applyPhisics(surrounding);
         if (arraysEqual(surrounding, result)) {
-            // ----- 1. Check for fire (already handled by FlamableGrain, but we keep pattern) -----
-            // (FlamableGrain already turns to fire if flammability condition met)
+            // ----- 1. Check for fire (handled by FlamableGrain) -----
 
             // ----- 2. Look for edible grains (Meat, Fly, FruitFly) -----
             let ediblePositions = [];
@@ -2919,8 +2918,7 @@ class Spider extends FlamableGrain {
 
             if (ediblePositions.length > 0) {
                 let target = ediblePositions[getRandomInt(0, ediblePositions.length)];
-                // Eat the food (remove it)
-                result[target.x][target.y] = 0;
+                result[target.x][target.y] = 0;   // eat the food
 
                 // Chance to duplicate spider into a random adjacent empty cell
                 if (getRandom(0, 100) < this.chanceToDuplicate * 100) {
@@ -2942,8 +2940,7 @@ class Spider extends FlamableGrain {
 
             // ----- 3. Silk web building logic -----
             let hasSilkNearby = false;
-            let silkAdjacentCells = [];
-            // Check for existing silk in the 3x3 area
+            let silkAdjacentEmptyCells = [];
             for (let x = 0; x < 3; x++) {
                 for (let y = 0; y < 3; y++) {
                     let neighbor = result[x][y];
@@ -2951,14 +2948,17 @@ class Spider extends FlamableGrain {
                         let grainObj = grains[neighbor - 1];
                         if (grainObj.type instanceof Silk) {
                             hasSilkNearby = true;
-                            // Record empty cells adjacent to this silk (but not the spider's own cell)
+                            // For every silk, look for empty cells adjacent to it
                             for (let dx = -1; dx <= 1; dx++) {
                                 for (let dy = -1; dy <= 1; dy++) {
                                     if ((dx === 0 && dy === 0) || (Math.abs(dx) + Math.abs(dy) !== 1)) continue;
                                     let nx = x + dx;
                                     let ny = y + dy;
                                     if (nx >= 0 && nx < 3 && ny >= 0 && ny < 3 && result[nx][ny] === 0) {
-                                        silkAdjacentCells.push([nx, ny]);
+                                        // Avoid duplicates
+                                        if (!silkAdjacentEmptyCells.some(pos => pos[0] === nx && pos[1] === ny)) {
+                                            silkAdjacentEmptyCells.push([nx, ny]);
+                                        }
                                     }
                                 }
                             }
@@ -2969,9 +2969,9 @@ class Spider extends FlamableGrain {
 
             if (getRandom(0, 100) < this.chanceToPlaceSilk * 100) {
                 let placePosition = null;
-                if (silkAdjacentCells.length > 0) {
-                    // Prefer to place silk next to existing silk (to extend the web)
-                    placePosition = silkAdjacentCells[getRandomInt(0, silkAdjacentCells.length)];
+                if (silkAdjacentEmptyCells.length > 0) {
+                    // Place silk next to existing silk (extend the web)
+                    placePosition = silkAdjacentEmptyCells[getRandomInt(0, silkAdjacentEmptyCells.length)];
                 } else if (!hasSilkNearby) {
                     // No silk nearby – start a new web by placing silk in a random empty adjacent cell
                     let emptyCells = [];
@@ -2992,16 +2992,57 @@ class Spider extends FlamableGrain {
                 }
             }
 
-            // ----- 4. Movement (crawl to an adjacent empty cell) -----
+            // ----- 4. Movement: prefer cells adjacent to silk -----
             if (getRandom(0, 100) < this.chanceToMove * 100) {
-                let emptyMoves = [];
-                if (result[0][1] === 0) emptyMoves.push([0, 1]); // left
-                if (result[2][1] === 0) emptyMoves.push([2, 1]); // right
-                if (result[1][0] === 0) emptyMoves.push([1, 0]); // up
-                if (result[1][2] === 0) emptyMoves.push([1, 2]); // down (though gravity will pull anyway)
+                // First, find empty adjacent cells that are adjacent to silk
+                let webAdjacentMoves = [];
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if ((i + j) % 2 === 1 && result[i][j] === 0) {
+                            // Check if this empty cell touches any silk
+                            let touchesSilk = false;
+                            for (let dx = -1; dx <= 1; dx++) {
+                                for (let dy = -1; dy <= 1; dy++) {
+                                    if ((dx === 0 && dy === 0) || (Math.abs(dx) + Math.abs(dy) !== 1)) continue;
+                                    let nx = i + dx;
+                                    let ny = j + dy;
+                                    if (nx >= 0 && nx < 3 && ny >= 0 && ny < 3) {
+                                        let neighborVal = result[nx][ny];
+                                        if (neighborVal !== 0 && neighborVal !== unexistingGrain) {
+                                            let neighborGrain = grains[neighborVal - 1];
+                                            if (neighborGrain.type instanceof Silk) {
+                                                touchesSilk = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if (touchesSilk) break;
+                            }
+                            if (touchesSilk) {
+                                webAdjacentMoves.push([i, j]);
+                            }
+                        }
+                    }
+                }
 
-                if (emptyMoves.length > 0) {
-                    let move = emptyMoves[getRandomInt(0, emptyMoves.length)];
+                let move = null;
+                if (webAdjacentMoves.length > 0) {
+                    // Move to a random cell that touches silk
+                    move = webAdjacentMoves[getRandomInt(0, webAdjacentMoves.length)];
+                } else {
+                    // Fallback: move to any empty adjacent cell (left, right, up, down)
+                    let emptyMoves = [];
+                    if (result[0][1] === 0) emptyMoves.push([0, 1]); // left
+                    if (result[2][1] === 0) emptyMoves.push([2, 1]); // right
+                    if (result[1][0] === 0) emptyMoves.push([1, 0]); // up
+                    if (result[1][2] === 0) emptyMoves.push([1, 2]); // down
+                    if (emptyMoves.length > 0) {
+                        move = emptyMoves[getRandomInt(0, emptyMoves.length)];
+                    }
+                }
+
+                if (move) {
                     result[move[0]][move[1]] = result[1][1];
                     result[1][1] = 0;
                     return result;
