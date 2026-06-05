@@ -1240,7 +1240,7 @@ class Dirt extends LiquidAffectable {
 }
 
 class WetDirt extends LiquidAffectable {
-	constructor(wetGrain = null, dryGrain = null, chanceToGrowGrass = 0.0001, name = "Wet Dirt") {
+	constructor(wetGrain = null, dryGrain = null, chanceToGrowGrass = 0.0001, chanceToGrowTree = 0.00001, name = "Wet Dirt") {
 		super(0, 0, 3, wetGrain, dryGrain, 0, 0, false, true, 0.01, name);
 		this.chanceToGrowGrass = chanceToGrowGrass;
 	}
@@ -1252,10 +1252,14 @@ class WetDirt extends LiquidAffectable {
 			var above = surrounding[1][0];
 			if (above === 0) {
 				var rnd = getRandom(0.0, 100.0);
-				if (rnd < this.chanceToGrowGrass * 100) {
+				
+				if (rnd < this.chanceToGrowTree * 100){
+					result[1][0] = normal_treeSeed.getGrainInt();
+					return result;
+				}else if (rnd < this.chanceToGrowGrass * 100) {
 					result[1][0] = normal_grass.getGrainInt();
 					return result;
-				}
+				} 
 			}
 		}
 		return result;
