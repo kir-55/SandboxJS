@@ -2878,7 +2878,7 @@ class Smoke extends Gas {
 
 class Silk extends StickyGrain {
 	constructor(name = "Silk") {
-		super(0, 0, -5, 0.1, name); // Sticky grain with normal gravity
+		super(0, 0, -5, 2, name); // Sticky grain with normal gravity
 	}
 }
 
