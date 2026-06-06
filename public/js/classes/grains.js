@@ -353,7 +353,7 @@ class Ash extends Grain {
 					var sideGrain = result[x][y];
 					if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 						var grainObj = grains[sideGrain - 1];
-						if (grainObj.type instanceof Water || grainObj.type instanceof PutridWater)
+						if (grainObj.type instanceof Water || grainObj.type instanceof PutridWater || grainObj.type instanceof WetDirt)
 						{
 							if (getRandom(0, 100) < this.chanceToTurnIntoDirt * 100) {
 								result[1][1] = normal_dirt.getGrainInt();
