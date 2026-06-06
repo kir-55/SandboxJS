@@ -2198,6 +2198,7 @@ class Grass extends FlamableGrain{
 		super(0, 0, 10, 55, name);
 		this.chanceToGrow = chanceToGrow;
 		this.chanceToConsumeWater = chanceToConsumeWater;
+		this.chanceToDieFromWater = chanceToDieFromWater;
 	}
 
 	applyPhisics(surrounding){
