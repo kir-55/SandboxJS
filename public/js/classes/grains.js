@@ -2096,7 +2096,8 @@ class TreeSprout extends Plant {
 		chanceToGrowLeafs = 0.0001,
 		name = "Tree Sprout",
 		turnInto = normal_wood,
-		chanceToDie = 0.0001
+		chanceToDie = 0.0001,
+		chanceToSpawnHive = 0.0001
 	) {
 		super(grownForm, leaf, growthChance, 0, chanceToGrowLeafs, name);
 		this.chanceToDoble = chanceToDoble; // Chance to double the size
@@ -2104,6 +2105,7 @@ class TreeSprout extends Plant {
 		this.seed = seed; // The seed this sprout can trow
 		this.turnInto = turnInto;
 		this.chanceToDie = chanceToDie;
+		this.chanceToSpawnHive = chanceToSpawnHive;
 	}
 
 	applyPhisics(surrounding) {
@@ -2134,8 +2136,25 @@ class TreeSprout extends Plant {
 				rnd = getRandom(0.0, 100.0);
 				if (rnd < this.chanceToThrowSeed * 100) {
 					result[1][2] = this.seed.getGrainInt(); // Trow a seed
-				}
+					return result;
+				}	
 			}
+
+		
+			if (getRandom(0.0, 100.0) < this.chanceToSpawnHive * 100) {
+				result[1][1] = normal_bee.getGrainInt();
+				for (var x = 0; x < 3; x++) {
+					for (var y = 0; y < 2; y++) {
+						if (result[x][y] === 0) {
+							if (getRandom(0, 100) < 50){
+								result[x][y] = normal_honey.getGrainInt();
+							}
+						}
+					}
+				}
+				return result;
+			}
+			
 
 
 
@@ -2159,7 +2178,7 @@ class TreeSprout extends Plant {
 
 			rnd = getRandom(0.0, 100.0);
 			if (rnd < this.chanceToDie * 100) {
-				result[1][2] = 0; // Trow a seed
+				result[1][1] = normal_treeSeed.getGrainInt(); 
 			}
 
 
