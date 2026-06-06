@@ -2425,7 +2425,7 @@ class Meat extends FlamableGrain {
 
 class Fly extends Grain {
 	constructor(
-		meat,
+		meat = [],
 		chanceToEat = 0.1,
 		eats = [],
 		diesFrom = [],
@@ -2468,7 +2468,7 @@ class Fly extends Grain {
 						if (this.diesFrom && this.diesFrom.length > 0) {
 							for (var i = 0; i < this.diesFrom.length; i++) {
 								if (grainObj.type instanceof this.diesFrom[i]) {
-									result[1][1] = this.meat.getGrainInt(); // Turns into meat
+									result[1][1] = this.meat[Math.floor(Math.random() * array.length)].getGrainInt(); // Turns into meat
 								}
 							}
 						}
@@ -3308,13 +3308,13 @@ const normal_heatSensor = new HeatSensor();
 // Meat and Fly
 const normal_meat = new Meat();
 const normal_radioactiveMeat = new RadioactiveMeat(0.01, null);
-const normal_radioactiveFly = new RadioactiveFly(normal_radioactiveMeat);
+const normal_radioactiveFly = new RadioactiveFly([normal_radioactiveMeat]);
 normal_radioactiveMeat.radioactiveFly = normal_radioactiveFly;
-const normal_fly = new FruitFly(normal_meat, normal_radioactiveFly);
+const normal_fly = new FruitFly([normal_meat], normal_radioactiveFly);
 
 
 const normal_honey = new Honey();
-const normal_bee = new Bee(normal_honey);
+const normal_bee = new Bee([normal_honey, normal_meat]);
 
 const normal_coal = new Coal();
 const normal_powder_coal = new PowderCoal();
