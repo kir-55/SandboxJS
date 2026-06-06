@@ -2146,7 +2146,7 @@ class TreeSprout extends Plant {
 				for (var x = 0; x < 3; x++) {
 					for (var y = 0; y < 2; y++) {
 						if (result[x][y] === 0) {
-							if (getRandom(0, 100) < 50){
+							if (getRandom(0, 100) < 20){
 								result[x][y] = normal_honey.getGrainInt();
 							}
 						}
