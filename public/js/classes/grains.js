@@ -1252,12 +1252,17 @@ class WetDirt extends LiquidAffectable {
 		if (arraysEqual(surrounding, result)) {
 			var above = surrounding[1][0];
 			if (above === 0) {
-				var rnd = getRandom(0.0, 100.0);
-				
-				if (rnd < this.chanceToGrowTree * 100){
-					result[1][0] = normal_treeSeed.getGrainInt();
+				if (getRandom(0.0, 100.0) < this.chanceToGrowTree * 100){
+					if (getRandom(0.0, 100.0) < 30){
+						result[1][0] = normal_fireTreeSprout.getGrainInt();
+					}
+					else{
+						result[1][0] = normal_treeSprout.getGrainInt();
+					}
+
 					return result;
-				}else if (rnd < this.chanceToGrowGrass * 100) {
+				}
+				if (getRandom(0.0, 100.0) < this.chanceToGrowGrass * 100) {
 					result[1][0] = normal_grass.getGrainInt();
 					return result;
 				} 
