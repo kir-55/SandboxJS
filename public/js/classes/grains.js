@@ -357,12 +357,14 @@ class Ash extends Grain {
 						{
 							if (getRandom(0, 100) < this.chanceToTurnIntoDirt * 100) {
 								result[1][1] = normal_dirt.getGrainInt();
+								return result;
 							}
 						}
 					}
 				}
 			}
 		}
+		return result;
 	}
 }
 
