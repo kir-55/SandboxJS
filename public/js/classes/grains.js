@@ -1592,6 +1592,31 @@ const Water = class Water extends Liquid {
 class PutridWater extends Liquid {
 	constructor(gasForm, name = "Putrid Water") {
 		super(2, true, gasForm, true, name);
+		this.chanceToPutrifyWater = 0.001;
+	}
+
+	applyPhisics(surrounding) {
+		var result = super.applyPhisics(surrounding);
+		if (arraysEqual(surrounding, result)) {
+			for (var x = 0; x < 3; x++) {
+				for (var y = 0; y < 3; y++) {
+					var surroundingGrain = surrounding[x][y];
+					if (
+						surroundingGrain != 0 &&
+						surroundingGrain != unexistingGrain
+					) {
+						var grainObj = grains[surroundingGrain - 1];
+						if (grainObj.type instanceof Water){
+							if (getRandom(0.0, 100.0) < this.chanceToPutrifyWater * 100){
+								result[x][y] = normal_putridWater.getGrainInt();
+							}
+						}
+
+					}
+				}
+			}
+		}
+		return result;
 	}
 }
 
@@ -2321,7 +2346,6 @@ class Meat extends FlamableGrain {
 						if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 							var grainObj = grains[sideGrain - 1];
 							if (grainObj.type instanceof Water || grainObj.type instanceof  WetDirt || grainObj.type instanceof PutridWater) {
-								result[x][y] = normal_putridWater.getGrainInt();
 								result[1][1] = normal_putridWater.getGrainInt();
 								return result;
 							}
