@@ -279,14 +279,14 @@ class PowderCoal extends Coal {
 	}
 }
 
-class Charcoal extends Grain {
-	constructor (name = "Charcoal"){
-		super(0, 0, 5, name);
-		this.chanceToBurnOut = 0.1;
-		this.chanceToTurnIntoDirt = 0.001;
+class Charcoal extends FlamableGrain {
+	constructor (chanceToBurnOut = 0.05, chanceToTurnIntoDirt = 0.001, name = "Charcoal"){
+		super(0, 0, 5, 0, name);
+		this.chanceToBurnOut = chanceToBurnOut;
+		this.chanceToTurnIntoDirt = chanceToTurnIntoDirt;
 	}
 
-	applyPhisics(surrounding){
+	applyPhisics(surrounding){ 
 		var result = super.applyPhisics(surrounding);
 		if (arraysEqual(surrounding, result)) {
 			for (var x = 0; x < 3; x++) {
