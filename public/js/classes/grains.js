@@ -2194,9 +2194,10 @@ class GrassSprout extends Plant {
 
 class Grass extends FlamableGrain{
 	
-	constructor (chanceToGrow = 0.0001, name = "Grass"){
+	constructor (chanceToGrow = 0.0001, chanceToConsumeWater = 0.001, chanceToDieFromWater = 0.0001, name = "Grass"){
 		super(0, 0, 10, 55, name);
 		this.chanceToGrow = chanceToGrow;
+		this.chanceToConsumeWater = chanceToConsumeWater;
 	}
 
 	applyPhisics(surrounding){
@@ -2209,6 +2210,17 @@ class Grass extends FlamableGrain{
 						var sideGrain = result[x][y];
 						if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 							var grainObj = grains[sideGrain - 1];
+							if (grainObj.type instanceof Water || grainObj.type instanceof PutridWater)
+							{
+								if (getRandom(0.0, 100.0) < this.chanceToDieFromWater * 100) {
+									result[1][1] = 0;
+									return result;
+								}
+								if (getRandom(0.0, 100.0) < this.chanceToConsumeWater * 100){
+									result[x][y] = 0;
+									return result;
+								}
+							}
 							if (grainObj.type instanceof Dirt || grainObj.type instanceof WetDirt) {
 								
 									for (var i = 0; i < 3; i++) {
@@ -2272,22 +2284,27 @@ class FireTreeSprout extends TreeSprout {
 class Meat extends FlamableGrain {
 	maxRotLevel = 5;
 	chanceToRot = 0.001; // Percentage chance to rot
-	constructor(maxRotLevel = 5, chanceToRot = 0.001, name = "Meat") {
+	constructor(maxRotLevel = 5, chanceToRot = 0.001, chanceToMakeMaggot = 0.0001, name = "Meat") {
 		super(1, 0, 4, 1, name);
 		this.maxRotLevel = maxRotLevel; // Maximum rot level
 		this.chanceToRot = chanceToRot; // Chance to rot
+		this.chanceToMakeMaggot = chanceToMakeMaggot;
 	}
 	applyPhisics(surrounding) {
 		var result = super.applyPhisics(surrounding);
 		if (arraysEqual(surrounding, result)) {
 			if (result[1][1] + 1 < this.normalInt + this.maxRotLevel) {
 				// Check if it can rot
-				var rnd = getRandom(0.0, 100.0);
+				let rnd = getRandom(0.0, 100.0);
 				if (rnd < this.chanceToRot * 100) {
 					result[1][1] += 1; // Increase rot level
 				}
 			}
 			else{
+				let rnd = getRandom(0.0, 100.0);
+				if (rnd < this.chanceToMakeMaggot * 100) {
+					result[1][1] = normal_maggot.getGrainInt();
+				}
 				// check if touches water then turns everything around into putrid water
 				for (var x = 0; x < 3; x++) {
 					for (var y = 0; y < 3; y++) {
@@ -2545,7 +2562,7 @@ class RadioactiveMeat extends Meat {
 		radioactiveFly = null,
 		name = "Radioactive Meat",
 	) {
-		super(5, 0.001, name); // Higher rot level and chance to rot
+		super(5, 0.001, 0, name); // Higher rot level and chance to rot
 		this.chanceToRevive = chanceToRevive; // Chance to revive into a radioactive fly
 		this.radioactiveFly = radioactiveFly; // The radioactive fly this meat can turn into
 	}
@@ -2932,23 +2949,25 @@ class Spider extends FlamableGrain {
             let selfVal = result[1][1];
 
             // ----- STEP 0 – If completely surrounded by silk, break all silk around -----
-            let allNeighborsAreSilk = true;
+            let allNeighborsBlocked = true;
             for (let dx = -1; dx <= 1; dx++) {
                 for (let dy = -1; dy <= 1; dy++) {
                     if (dx === 0 && dy === 0) continue;
-                    if (!this.isSilk(result, 1 + dx, 1 + dy)) {
-                        allNeighborsAreSilk = false;
+                    if (result[1+dx][1+dy] === 0) {
+                        allNeighborsBlocked = false;
                         break;
                     }
                 }
-                if (!allNeighborsAreSilk) break;
+                if (!allNeighborsBlocked) break;
             }
-            if (allNeighborsAreSilk) {
+            if (allNeighborsBlocked) {
                 // Remove all surrounding silk (set to empty)
                 for (let dx = -1; dx <= 1; dx++) {
                     for (let dy = -1; dy <= 1; dy++) {
                         if (dx === 0 && dy === 0) continue;
-                        result[1 + dx][1 + dy] = 0;
+						if (this.isSilk(result, 1 + dx, 1 + dy)){
+							result[1 + dx][1 + dy] = 0;
+						}
                     }
                 }
                 // Spider stays in place, but now has room to move
