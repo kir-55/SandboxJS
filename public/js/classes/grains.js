@@ -2202,7 +2202,7 @@ class Grass extends FlamableGrain{
 
 	applyPhisics(surrounding){
 		var result = super.applyPhisics(surrounding);
-		if (arraysEqual(surrounding, result) && getRandom(0.0, 100.0) < this.chanceToGrow * 100) {
+		if (arraysEqual(surrounding, result)) {
 			for (var x = 0; x < 3; x++) {
 				for (var y = 0; y < 3; y++) {
 					if ((x + y) % 2 === 1) {
@@ -2222,7 +2222,7 @@ class Grass extends FlamableGrain{
 								}
 							}
 							if (grainObj.type instanceof Dirt || grainObj.type instanceof WetDirt) {
-								
+								if (getRandom(0.0, 100.0) < this.chanceToGrow * 100){
 									for (var i = 0; i < 3; i++) {
 										for (var j = 0; j < 3; j++) {
 											if (result[i][j] === 0) {
@@ -2230,7 +2230,9 @@ class Grass extends FlamableGrain{
 											}
 										}
 									}
-									return result;
+								}
+								
+								return result;
 								
 							}
 						}
