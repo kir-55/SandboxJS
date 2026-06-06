@@ -2468,7 +2468,7 @@ class Fly extends Grain {
 						if (this.diesFrom && this.diesFrom.length > 0) {
 							for (var i = 0; i < this.diesFrom.length; i++) {
 								if (grainObj.type instanceof this.diesFrom[i]) {
-									result[1][1] = this.meat[Math.floor(Math.random() * array.length)].getGrainInt(); // Turns into meat
+									result[1][1] = this.meat[Math.floor(Math.random() * meat.length)].getGrainInt(); // Turns into meat
 								}
 							}
 						}
@@ -2534,7 +2534,7 @@ class Fly extends Grain {
 				}
 			} else if (this.needsOxygen) {
 				// No space to move, dies
-				result[1][1] = this.meat[Math.floor(Math.random() * array.length)].getGrainInt(); // Turns into meat
+				result[1][1] = this.meat[Math.floor(Math.random() * meat.length)].getGrainInt(); // Turns into meat
 			}
 		}
 		return result;
