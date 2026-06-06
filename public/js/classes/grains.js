@@ -340,8 +340,29 @@ class Charcoal extends FlamableGrain {
 
 
 class Ash extends Grain {
-	constructor (name = "Ash"){
+	constructor (chanceToTurnIntoDirt = 0.001, name = "Ash"){
 		super(1, 0, 4, name);
+		this.chanceToTurnIntoDirt = chanceToTurnIntoDirt;
+	}
+
+	applyPhisics(surrounding){ 
+		var result = super.applyPhisics(surrounding);
+		if (arraysEqual(surrounding, result)) {
+			for (var x = 0; x < 3; x++) {
+				for (var y = 0; y < 3; y++) {
+					var sideGrain = result[x][y];
+					if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
+						var grainObj = grains[sideGrain - 1];
+						if (grainObj.type instanceof Water || grainObj.type instanceof PutridWater)
+						{
+							if (getRandom(0, 100) < this.chanceToTurnIntoDirt * 100) {
+								result[1][1] = normal_dirt.getGrainInt();
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
