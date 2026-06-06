@@ -282,6 +282,8 @@ class PowderCoal extends Coal {
 class Charcoal extends Grain {
 	constructor (name = "Charcoal"){
 		super(0, 0, 5, name);
+		this.chanceToBurnOut = 0.1;
+		this.chanceToTurnIntoDirt = 0.001;
 	}
 
 	applyPhisics(surrounding){
@@ -306,10 +308,26 @@ class Charcoal extends Grain {
 								}
 							}
 							result[1][1] = normal_ash.getGrainInt();
+							return result;
 						}
 						else if (grainObj.type instanceof Fire) {
-							if (getRandom(0, 100) < 1){
+							if (getRandom(0, 100) < this.chanceToBurnOut * 100){
 								result[1][1] = normal_ash.getGrainInt();
+								for (var x1 = 0; x1 < 3; x1++) {
+									for (var y1 = 0; y1 < 3; y1++) {
+										if (result[x1][y1] == 0){
+											result[x1][y1] = normal_fire.getGrainInt();
+										}
+									}
+								}
+								return result;
+							}
+							
+						}
+						else if (grainObj.type instanceof Water || grainObj.type instanceof PutridWater){
+							if (getRandom(0, 100) < this.chanceToTurnIntoDirt * 100){
+								result[1][1] = normal_dirt.getGrainInt();
+								return result;
 							}
 						}
 					}
