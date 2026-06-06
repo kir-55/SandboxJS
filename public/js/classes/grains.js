@@ -2142,16 +2142,30 @@ class TreeSprout extends Plant {
 
 		
 			if (getRandom(0.0, 100.0) < this.chanceToSpawnHive * 100) {
-				result[1][1] = normal_bee.getGrainInt();
-				for (var x = 0; x < 3; x++) {
-					for (var y = 0; y < 2; y++) {
-						if (result[x][y] === 0) {
-							if (getRandom(0, 100) < 20){
-								result[x][y] = normal_honey.getGrainInt();
+				if (getRandom(0, 100) < 70){
+					result[1][1] = normal_bee.getGrainInt();
+					for (var x = 0; x < 3; x++) {
+						for (var y = 0; y < 2; y++) {
+							if (result[x][y] === 0) {
+								if (getRandom(0, 100) < 20){
+									result[x][y] = normal_honey.getGrainInt();
+								}
+							}
+						}
+					}
+				}else{
+					result[1][1] = normal_spider.getGrainInt();
+					for (var x = 0; x < 3; x++) {
+						for (var y = 0; y < 2; y++) {
+							if (result[x][y] === 0) {
+								if (getRandom(0, 100) < 20){
+									result[x][y] = normal_silk.getGrainInt();
+								}
 							}
 						}
 					}
 				}
+				
 				return result;
 			}
 			
