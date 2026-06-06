@@ -2534,7 +2534,7 @@ class Fly extends Grain {
 				}
 			} else if (this.needsOxygen) {
 				// No space to move, dies
-				result[1][1] = this.meat.getGrainInt(); // Turns into meat
+				result[1][1] = this.meat[Math.floor(Math.random() * array.length)].getGrainInt(); // Turns into meat
 			}
 		}
 		return result;
