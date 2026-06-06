@@ -2562,7 +2562,7 @@ class FruitFly extends Fly {
 		super(
 			meat,
 			0.1,
-			[Leaf, TreeSeed, TreeSprout],
+			[Leaf, TreeSeed, TreeSprout, Grass, Honey],
 			[Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
