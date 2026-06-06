@@ -2304,6 +2304,7 @@ class Meat extends FlamableGrain {
 				let rnd = getRandom(0.0, 100.0);
 				if (rnd < this.chanceToMakeMaggot * 100) {
 					result[1][1] = normal_maggot.getGrainInt();
+					return result;
 				}
 				// check if touches water then turns everything around into putrid water
 				for (var x = 0; x < 3; x++) {
@@ -2763,6 +2764,7 @@ class Maggot extends Grain {
 		this.chanceToDuplicate = 0.15;  // 15% chance per step to eat adjacent edible grain
         this.chanceToMove = 0.01;    
 		this.chanceToDie = 0.00001;    // 0.1% chance per step to try moving left/right/up
+		this.chanceToBecomeFly = 0.001;
         // Edible grains – maggot destroys and moves into them
         this.edibleGrains = [Meat, Leaf, Grass, Honey, TreeSeed, TreeSprout, GrassSprout, GrassSeed, Maggot];
         // Burrowable grains – maggot can swap places (travel through)
@@ -2868,6 +2870,11 @@ class Maggot extends Grain {
                 if (result[1][0] === 0) moves.push([1, 0]); // up
 
                 if (moves.length > 0) {
+					if (getRandom(0, 100) < this.chanceToBecomeFly * 100) {
+						result[1][1] = normal_fly.getGrainInt();
+						return result;
+					}
+
                     let move = moves[getRandomInt(0, moves.length)];
                     result[move[0]][move[1]] = result[1][1];
                     result[1][1] = 0;
