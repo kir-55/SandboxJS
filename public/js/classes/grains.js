@@ -1519,6 +1519,7 @@ class Wood extends FlamableGrain {
 class Leaf extends FlamableGrain {
 	constructor(name = "Leaf") {
 		super(0, 0, 1, 25, name);
+		this.chanceToGrow = 0.1;
 	}
 
 	applyPhisics(surrounding) {
@@ -1538,6 +1539,7 @@ class Leaf extends FlamableGrain {
 								return result;
 							}
 							if (grainObj.type instanceof Wood) {
+								if (getRandom(0.0, 100.0) < this.chanceToGrow * 100)
 								for (var i = 0; i < 3; i++) {
 									for (var j = 0; j < 3; j++) {
 										//(i + j) % 2 === 1 &&
