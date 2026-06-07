@@ -2562,7 +2562,7 @@ class FruitFly extends Fly {
 		super(
 			meat,
 			0.1,
-			[Leaf, TreeSeed, TreeSprout, Grass, Honey],
+			[Leaf, TreeSeed, Grass, Honey],
 			[Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
@@ -2653,7 +2653,7 @@ class Bee extends Fly {
 		super(
 			meat,
 			0.1,
-			[Leaf, TreeSeed, TreeSprout, Grass],
+			[Leaf, TreeSeed, Grass],
 			[Uran, Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
