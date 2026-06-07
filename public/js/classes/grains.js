@@ -2960,6 +2960,18 @@ class Maggot extends Grain {
 					}
 				}
 
+				let moves = [];
+                if (result[0][1] === 0) moves.push([0, 1]); // left
+                if (result[2][1] === 0) moves.push([2, 1]); // right
+                if (result[1][0] === 0) moves.push([1, 0]); // up
+
+				if (moves.length > 0){
+					if (getRandom(0, 100) < this.chanceToBecomeFly * 100) {
+						result[1][1] = normal_fly.getGrainInt();
+						return result;
+					}
+				}
+
 				if (burrowablePositions.length > 0) {
 					let target = burrowablePositions[getRandomInt(0, burrowablePositions.length)];
 					// Swap maggot with the burrowable grain
@@ -2970,10 +2982,7 @@ class Maggot extends Grain {
 				}
 
 
-                let moves = [];
-                if (result[0][1] === 0) moves.push([0, 1]); // left
-                if (result[2][1] === 0) moves.push([2, 1]); // right
-                if (result[1][0] === 0) moves.push([1, 0]); // up
+
 
                 if (moves.length > 0) {
 					if (getRandom(0, 100) < this.chanceToBecomeFly * 100) {
