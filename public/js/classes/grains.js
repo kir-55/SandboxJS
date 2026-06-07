@@ -1640,6 +1640,7 @@ class PutridWater extends Liquid {
 	constructor(gasForm, name = "Putrid Water") {
 		super(2, true, gasForm, true, name);
 		this.chanceToPutrifyWater = 0.001;
+		this.chanceToSpawnAlgae = 0.0001;
 	}
 
 	applyPhisics(surrounding) {
@@ -1659,6 +1660,12 @@ class PutridWater extends Liquid {
 							}
 						}
 
+					}else{
+						if (surroundingGrain == 0){
+							if (getRandom(0.0, 100.0) < this.chanceToSpawnAlgae * 100){
+								result[x][y] = normal_algae.getGrainInt();
+							}
+						}
 					}
 				}
 			}
@@ -1842,6 +1849,12 @@ class FlamableLiquid extends Liquid {
 
 class Oil extends FlamableLiquid {
 	constructor(chanceToBurn = 1, name = "Oil") {
+		super(chanceToBurn, name);
+	}
+}
+
+class Algae extends FlamableLiquid {
+	constructor(chanceToBurn = 1, name = "Algae") {
 		super(chanceToBurn, name);
 	}
 }
@@ -3360,6 +3373,8 @@ const normal_silk = new Silk();
 const normal_spider = new Spider();
 
 
+const normal_algae = new Algae();
+
 
 grains = [
 	new GrainType("#f6d7b0", normal_sand),
@@ -3599,7 +3614,13 @@ grains = [
 	new GrainType("#1a0c20", normal_spider),
 	new GrainType("#380d04", normal_spider),
 	new GrainType("#461e1c", normal_spider),
-	new GrainType("#5d3c29", normal_spider)
+	new GrainType("#5d3c29", normal_spider),
+
+	new GrainType("#89c17c", normal_algae),
+	new GrainType("#75a76d", normal_algae),
+	new GrainType("#5d9466", normal_algae),
+	new GrainType("#4a7864", normal_algae),
+	new GrainType("#386c6d", normal_algae)
 ];
 
 class GrainVariety {
