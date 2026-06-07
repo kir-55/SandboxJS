@@ -1533,6 +1533,10 @@ class Leaf extends FlamableGrain {
 						var sideGrain = result[x][y];
 						if (sideGrain !== 0 && sideGrain !== unexistingGrain) {
 							var grainObj = grains[sideGrain - 1];
+							if (grainObj.type instanceof Liquid){
+								result[1][1] = 0;
+								return result;
+							}
 							if (grainObj.type instanceof Wood) {
 								for (var i = 0; i < 3; i++) {
 									for (var j = 0; j < 3; j++) {
