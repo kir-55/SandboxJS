@@ -2653,7 +2653,7 @@ class Bee extends Fly {
 		super(
 			meat,
 			0.1,
-			[Leaf, TreeSeed, TreeSprout],
+			[Leaf, TreeSeed, TreeSprout, Grass],
 			[Uran, Acid, AcidVapor, Fire, Lava, MoltenIron],
 			true,
 			0.1,
