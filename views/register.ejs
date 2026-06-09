@@ -21,6 +21,10 @@
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" required>
                     </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
                     <button type="submit" class="btn">Register</button>
                 </form>
                 <p id="message" class="error-message"></p>
@@ -33,10 +37,17 @@
                     e.preventDefault();
                     const username = document.getElementById('username').value;
                     const password = document.getElementById('password').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    
+                    if (password !== confirmPassword) {
+                        document.getElementById('message').textContent = 'Passwords do not match';
+                        return;
+                    }
+                    
                     const response = await fetch('/api/auth/register', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
+                        body: JSON.stringify({ username, password, confirmPassword })
                     });
                     const data = await response.json();
                     if (response.ok) {

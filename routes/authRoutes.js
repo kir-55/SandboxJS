@@ -6,8 +6,12 @@ import { createUser, findUserByUsername, verifyPassword } from '../models/userMo
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
+    const { username, password, confirmPassword } = req.body;
+    if (!username || !password || !confirmPassword) return res.status(400).json({ error: 'Missing fields' });
+    
+    if (password !== confirmPassword) {
+        return res.status(400).json({ error: 'Passwords do not match' });
+    }
 
     try {
         await createUser(username, password);
